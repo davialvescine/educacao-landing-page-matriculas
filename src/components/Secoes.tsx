@@ -78,16 +78,28 @@ export function Diferenciais() {
     <section id="diferenciais" className="scroll-mt-10 bg-paper">
       <div className="mx-auto max-w-7xl px-4 py-28">
         <Reveal>
-          <Eyebrow>Nossos diferenciais</Eyebrow>
-          <h2 className="mt-4 text-center text-4xl font-extrabold tracking-tighter text-brand-900 sm:text-5xl">
-            Por que escolher a<br className="hidden sm:block" /> Educação
-            Adventista?
-          </h2>
+          <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div>
+              <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-brand-500">
+                <span aria-hidden className="text-gold-500">✦</span>
+                Nossos diferenciais
+              </p>
+              <h2 className="mt-4 text-5xl font-extrabold tracking-tighter text-brand-900 sm:text-6xl">
+                Por que <span className="tarja text-brand-950">escolher</span> a
+                <br />
+                Educação Adventista?
+              </h2>
+            </div>
+            <p className="max-w-sm leading-relaxed text-muted-foreground lg:pb-3">
+              Cinco compromissos que acompanham cada aluno da matrícula à
+              formatura, em todas as 39 unidades.
+            </p>
+          </div>
         </Reveal>
         <div className="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-6 lg:auto-rows-[13.5rem]">
           {/* Tile foto: 2 colunas × 2 linhas */}
           <Reveal className="lg:col-span-2 lg:row-span-2">
-            <div className="relative h-full min-h-[22rem] overflow-hidden rounded-2xl bg-gold-400">
+            <div className="relative h-full min-h-[24rem] overflow-hidden rounded-3xl bg-gold-400">
               <Image
                 src="/imagens/campanha/hero-bg.jpg"
                 alt=""
@@ -95,43 +107,58 @@ export function Diferenciais() {
                 sizes="(max-width: 1024px) 100vw, 33vw"
                 className="object-cover"
               />
+              <div
+                aria-hidden
+                className="absolute inset-0 bg-gradient-to-b from-gold-200/70 via-transparent to-gold-600/40"
+              />
               <Image
                 src="/imagens/fotos/alunos2.png"
                 alt="Alunos da Educação Adventista"
                 width={584}
                 height={700}
-                className="absolute bottom-0 left-1/2 z-10 w-[85%] -translate-x-1/2 drop-shadow-foto"
+                className="absolute bottom-0 left-1/2 z-10 w-[82%] -translate-x-1/2 drop-shadow-foto"
               />
-              <p className="absolute left-5 top-5 z-20 max-w-[80%] text-2xl font-extrabold leading-tight tracking-tight text-brand-950">
-                Muito além
-                <br />
-                do ensino.
-              </p>
+              <div className="absolute inset-x-6 top-6 z-20">
+                <p className="text-3xl font-extrabold leading-[1.05] tracking-tighter text-brand-950">
+                  Muito além
+                  <br />
+                  do ensino.
+                </p>
+                <Image
+                  src="/imagens/campanha/muito-alem-do-ensino.png"
+                  alt="#MuitoAlémdoEnsino"
+                  width={1617}
+                  height={122}
+                  className="mt-3 h-3.5 w-auto"
+                />
+              </div>
             </div>
           </Reveal>
 
           {rede.diferenciais.map((d, i) => (
             <Reveal key={d} delay={(i % 2) * 0.08} className="lg:col-span-2">
-              <div className="group relative h-full overflow-hidden rounded-2xl border border-line bg-surface p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-card-hover">
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -right-1 -top-7 text-[6.5rem] font-extrabold tracking-tighter text-brand-50 transition-colors duration-300 group-hover:text-gold-200"
-                >
-                  0{i + 1}
-                </span>
-                <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gold-300 shadow-[0_6px_14px_rgba(248,160,16,0.35)]">
-                  <Image
-                    src={ICONES_DIFERENCIAIS[i % ICONES_DIFERENCIAIS.length]}
-                    alt=""
-                    width={56}
-                    height={56}
-                    className="h-7 w-7 object-contain"
-                  />
+              <div className="group flex h-full flex-col rounded-3xl border border-line bg-surface p-7 shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:border-gold-400/60 hover:shadow-card-hover">
+                <div className="flex items-start justify-between">
+                  <span
+                    aria-hidden
+                    className="text-6xl font-extrabold leading-none tracking-tighter text-transparent [-webkit-text-stroke:2px_#b6c4fa] transition-all duration-300 group-hover:text-gold-400 group-hover:[-webkit-text-stroke:0px]"
+                  >
+                    0{i + 1}
+                  </span>
+                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gold-300/80 transition-colors duration-300 group-hover:bg-gold-400">
+                    <Image
+                      src={ICONES_DIFERENCIAIS[i % ICONES_DIFERENCIAIS.length]}
+                      alt=""
+                      width={56}
+                      height={56}
+                      className="h-6 w-6 object-contain"
+                    />
+                  </span>
                 </div>
-                <h3 className="relative mt-4 text-lg font-extrabold leading-snug tracking-tight text-brand-900">
+                <h3 className="mt-5 text-xl font-extrabold leading-snug tracking-tight text-brand-900">
                   {d}
                 </h3>
-                <p className="relative mt-2 text-sm leading-relaxed text-muted-foreground">
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                   {DESCRICOES[d] ?? ""}
                 </p>
               </div>
