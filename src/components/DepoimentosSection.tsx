@@ -56,11 +56,65 @@ const DEPOIMENTOS = [
   },
 ];
 
-/** Prova social real antes do CTA final. */
+const LINHA_1 = DEPOIMENTOS.slice(0, 3);
+const LINHA_2 = DEPOIMENTOS.slice(3);
+
+function CartaoDepoimento({ d }: { d: (typeof DEPOIMENTOS)[number] }) {
+  return (
+    <figure className="flex h-full w-[340px] shrink-0 flex-col rounded-2xl border border-line bg-surface p-6 shadow-card sm:w-[400px]">
+      <div className="flex gap-1" aria-label="5 estrelas">
+        {Array.from({ length: 5 }).map((_, j) => (
+          <Star key={j} aria-hidden className="size-4 fill-gold-400 text-gold-400" />
+        ))}
+      </div>
+      <blockquote className="mt-3 flex-grow text-[0.98rem] leading-relaxed text-ink">
+        “{d.texto}”
+      </blockquote>
+      <figcaption className="mt-5 border-t border-line pt-3">
+        <p className="font-extrabold tracking-tight text-brand-900">{d.nome}</p>
+        <p className="text-xs text-muted-foreground">
+          {d.papel} · {d.escola}
+        </p>
+        <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-gold-600">
+          {d.fonte}
+        </p>
+      </figcaption>
+    </figure>
+  );
+}
+
+function Esteira({
+  itens,
+  reverso = false,
+}: {
+  itens: typeof DEPOIMENTOS;
+  reverso?: boolean;
+}) {
+  /* Track com 2 metades idênticas (loop -50%); cada metade repete os
+     cartões 3× para cobrir telas largas sem emenda visível. */
+  const metade = [...itens, ...itens, ...itens];
+  return (
+    <div className={`flex w-max ${reverso ? "anim-esteira-rev" : "anim-esteira"}`}>
+      {[false, true].map((duplicada) => (
+        <div
+          key={String(duplicada)}
+          aria-hidden={duplicada || undefined}
+          className="flex items-stretch gap-5 pr-5"
+        >
+          {metade.map((d, i) => (
+            <CartaoDepoimento key={`${d.nome}-${i}`} d={d} />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Prova social real em esteiras infinitas (pausam no hover). */
 export default function DepoimentosSection() {
   return (
-    <section id="depoimentos" className="scroll-mt-10 bg-paper">
-      <div className="mx-auto max-w-7xl px-4 py-28">
+    <section id="depoimentos" className="scroll-mt-10 overflow-hidden bg-paper">
+      <div className="mx-auto max-w-7xl px-4 pt-28">
         <Reveal>
           <Eyebrow>Quem vive, recomenda</Eyebrow>
           <h2 className="mt-4 text-center text-4xl font-extrabold tracking-tighter text-brand-900 sm:text-5xl">
@@ -70,37 +124,18 @@ export default function DepoimentosSection() {
             Avaliações públicas reais de famílias da rede, com fonte em cada uma.
           </p>
         </Reveal>
-        <div className="mt-14 grid gap-5 lg:grid-cols-3">
-          {DEPOIMENTOS.map((d, i) => (
-            <Reveal key={d.nome} delay={i * 0.1} className="h-full">
-              <figure className="flex h-full flex-col rounded-2xl border border-line bg-surface p-7 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
-                <div className="flex gap-1" aria-label="5 estrelas">
-                  {Array.from({ length: 5 }).map((_, j) => (
-                    <Star
-                      key={j}
-                      aria-hidden
-                      className="size-4 fill-gold-400 text-gold-400"
-                    />
-                  ))}
-                </div>
-                <blockquote className="mt-4 flex-grow text-[1.05rem] leading-relaxed text-ink">
-                  “{d.texto}”
-                </blockquote>
-                <figcaption className="mt-6 border-t border-line pt-4">
-                  <p className="font-extrabold tracking-tight text-brand-900">
-                    {d.nome}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {d.papel} · {d.escola}
-                  </p>
-                  <p className="mt-1 text-xs font-semibold uppercase tracking-widest text-gold-600">
-                    {d.fonte}
-                  </p>
-                </figcaption>
-              </figure>
-            </Reveal>
-          ))}
-        </div>
+      </div>
+      <div className="esteira-pausavel relative mt-14 flex flex-col gap-5 pb-28">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-paper to-transparent"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-paper to-transparent"
+        />
+        <Esteira itens={LINHA_1} />
+        <Esteira itens={LINHA_2} reverso />
       </div>
     </section>
   );

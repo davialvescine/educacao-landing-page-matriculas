@@ -137,6 +137,11 @@ body {
   to   { transform: translateX(-50%); }
 }
 
+@keyframes marquee-reverso {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
 @keyframes float-chip {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-12px); }
@@ -152,6 +157,10 @@ body {
 .anim-glow     { animation: glow-pulse 7s ease-in-out infinite; }
 .anim-bounce   { animation: bounce-soft 2.2s ease-in-out infinite; }
 .anim-marquee  { animation: marquee 26s linear infinite; }
+.anim-esteira        { animation: marquee 60s linear infinite; }
+.anim-esteira-rev    { animation: marquee-reverso 75s linear infinite; }
+.esteira-pausavel:hover .anim-esteira,
+.esteira-pausavel:hover .anim-esteira-rev { animation-play-state: paused; }
 
 /* Aurora de degradês (manchas desfocadas derivando) */
 @keyframes aurora {
@@ -231,7 +240,7 @@ a:focus-visible .estado-topo { transform: translateY(-16px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .anim-kenburns, .anim-float, .anim-glow, .anim-bounce, .anim-marquee, .anim-chip, .pin-pulso, .anim-aurora { animation: none; }
+  .anim-kenburns, .anim-float, .anim-glow, .anim-bounce, .anim-marquee, .anim-chip, .pin-pulso, .anim-aurora, .anim-esteira, .anim-esteira-rev { animation: none; }
   .tarja::before { transform: scaleX(1); transition: none; }
   .hero-enter, .hero-pop { animation: none; opacity: 1; }
   .reveal { opacity: 1; transform: none; transition: none; }
