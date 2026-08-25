@@ -2,9 +2,9 @@ import { Star } from "lucide-react";
 import Reveal from "@/components/Reveal";
 import { Eyebrow } from "@/components/Secoes";
 
-/* Avaliações públicas reais coletadas em 25/08/2026 —
-   Quero Bolsa (Colégio Adventista Setor Pedro Ludovico, nota 4,97/5)
-   e Google (Colégio Adventista de Águas Claras). */
+/* Avaliações públicas reais coletadas em 25/08/2026 nas plataformas
+   Quero Bolsa, Melhor Escola e Google (páginas públicas das escolas).
+   Validar/atualizar com a equipe antes de campanhas pagas. */
 const DEPOIMENTOS = [
   {
     texto:
@@ -30,6 +30,30 @@ const DEPOIMENTOS = [
     escola: "Colégio Adventista de Águas Claras — DF",
     fonte: "via Google",
   },
+  {
+    texto:
+      "Essa escola vai ficar sempre marcada em minha vida. Foi aí que fiz os melhores amigos que irei levar para toda a vida.",
+    nome: "Carolina Medeiros",
+    papel: "Ex-aluna",
+    escola: "Escola Adventista de Palmas — TO",
+    fonte: "via Melhor Escola",
+  },
+  {
+    texto:
+      "Escola maravilhosa!! Com princípios cristãos e ensino de qualidade.",
+    nome: "Elani Bezerra",
+    papel: "Mãe de aluno",
+    escola: "Colégio Adventista de Araguaína — TO",
+    fonte: "via Melhor Escola",
+  },
+  {
+    texto:
+      "Conheci a estrutura da escola e as referências são as melhores.",
+    nome: "Maria do Carmo da Rocha",
+    papel: "Mãe",
+    escola: "Colégio Adventista de Taguatinga — DF",
+    fonte: "via Melhor Escola",
+  },
 ];
 
 /** Prova social real antes do CTA final. */
@@ -42,6 +66,9 @@ export default function DepoimentosSection() {
           <h2 className="mt-4 text-center text-4xl font-extrabold tracking-tighter text-brand-900 sm:text-5xl">
             O que as famílias dizem
           </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
+            Avaliações públicas reais de famílias da rede, com fonte em cada uma.
+          </p>
         </Reveal>
         <div className="mt-14 grid gap-5 lg:grid-cols-3">
           {DEPOIMENTOS.map((d, i) => (
