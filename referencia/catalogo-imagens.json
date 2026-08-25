@@ -1,0 +1,275 @@
+[
+  {
+    "estado": "distrito-federal",
+    "escola": "Colégio Adventista Águas Claras",
+    "foto": "imagens/unidades/distrito-federal/colegio-adventista-aguas-claras.png",
+    "foto_original": "aguas.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "distrito-federal",
+    "escola": "Colégio Adventista Asa Sul",
+    "foto": "imagens/unidades/distrito-federal/colegio-adventista-asa-sul.png",
+    "foto_original": "asa.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "distrito-federal",
+    "escola": "Escola Adventista Formosa",
+    "foto": "imagens/unidades/distrito-federal/escola-adventista-formosa.png",
+    "foto_original": "formosa.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "distrito-federal",
+    "escola": "Colégio Adventista Gama",
+    "foto": "imagens/unidades/distrito-federal/colegio-adventista-gama.png",
+    "foto_original": "gama.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "distrito-federal",
+    "escola": "Escola Adventista Guará",
+    "foto": "imagens/unidades/distrito-federal/escola-adventista-guara.png",
+    "foto_original": "guara.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "distrito-federal",
+    "escola": "Colégio Adventista Planaltina",
+    "foto": "imagens/unidades/distrito-federal/colegio-adventista-planaltina.png",
+    "foto_original": "planaltina.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "distrito-federal",
+    "escola": "Colégio Adventista Sobradinho",
+    "foto": "imagens/unidades/distrito-federal/colegio-adventista-sobradinho.png",
+    "foto_original": "sobradinho.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "distrito-federal",
+    "escola": "Colégio Adventista Taguatinga",
+    "foto": "imagens/unidades/distrito-federal/colegio-adventista-taguatinga.png",
+    "foto_original": "taguatinga.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "distrito-federal",
+    "escola": "Escola Adventista Valparaíso",
+    "foto": "imagens/unidades/goias/escola-adventista-setor-pedro-ludovico.png",
+    "foto_original": "ludovico.png",
+    "foto_reaproveitada_de": "Escola Adventista Setor Pedro Ludovico"
+  },
+  {
+    "estado": "goias",
+    "escola": "Escola Adventista Uruaçu",
+    "foto": "imagens/unidades/goias/escola-adventista-uruacu.png",
+    "foto_original": "uruacu.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "goias",
+    "escola": "Escola Adventista Vila Nova",
+    "foto": "imagens/unidades/goias/escola-adventista-vila-nova.png",
+    "foto_original": "vila-nova.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "goias",
+    "escola": "Escola Adventista Anápolis",
+    "foto": "imagens/unidades/goias/escola-adventista-anapolis.png",
+    "foto_original": "anapolis.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "goias",
+    "escola": "Escola Adventista Jardim Europa",
+    "foto": "imagens/unidades/goias/escola-adventista-jardim-europa.png",
+    "foto_original": "europa.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "goias",
+    "escola": "Escola Adventista Novo Mundo",
+    "foto": "imagens/unidades/goias/escola-adventista-novo-mundo.png",
+    "foto_original": "novo-mundo.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "goias",
+    "escola": "Escola Adventista Porangatu",
+    "foto": "imagens/unidades/goias/escola-adventista-jardim-europa.png",
+    "foto_original": "europa.png",
+    "foto_reaproveitada_de": "Escola Adventista Jardim Europa"
+  },
+  {
+    "estado": "goias",
+    "escola": "Escola Adventista Rio Verde",
+    "foto": "imagens/unidades/goias/escola-adventista-rio-verde.png",
+    "foto_original": "rio-verde.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "goias",
+    "escola": "Colégio Goianiense Adventista",
+    "foto": "imagens/unidades/goias/escola-adventista-jardim-europa.png",
+    "foto_original": "europa.png",
+    "foto_reaproveitada_de": "Escola Adventista Jardim Europa"
+  },
+  {
+    "estado": "goias",
+    "escola": "Escola Adventista Setor Pedro Ludovico",
+    "foto": "imagens/unidades/goias/escola-adventista-setor-pedro-ludovico.png",
+    "foto_original": "ludovico.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "mato-grosso-do-sul",
+    "escola": "Colégio Adventista Corumbá",
+    "foto": "imagens/unidades/mato-grosso-do-sul/colegio-adventista-corumba.png",
+    "foto_original": "corumba.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "mato-grosso-do-sul",
+    "escola": "Colégio Adventista Dourados I",
+    "foto": "imagens/unidades/mato-grosso-do-sul/colegio-adventista-dourados-i.png",
+    "foto_original": "dourados.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "mato-grosso-do-sul",
+    "escola": "Colégio Adventista Jardim dos Estados",
+    "foto": "imagens/unidades/mato-grosso-do-sul/colegio-adventista-jardim-dos-estados.png",
+    "foto_original": "estados.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "mato-grosso-do-sul",
+    "escola": "Escola Adventista Jardim Leblon",
+    "foto": "imagens/unidades/mato-grosso-do-sul/escola-adventista-jardim-leblon.png",
+    "foto_original": "leblon.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "mato-grosso-do-sul",
+    "escola": "Colégio Adventista Miranda",
+    "foto": "imagens/unidades/mato-grosso-do-sul/colegio-adventista-miranda.png",
+    "foto_original": "miranda.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "mato-grosso-do-sul",
+    "escola": "Escola Adventista Mundo Novo",
+    "foto": "imagens/unidades/mato-grosso-do-sul/escola-adventista-mundo-novo.png",
+    "foto_original": "mundo-novo.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "mato-grosso-do-sul",
+    "escola": "Colégio Adventista Vilas Boas",
+    "foto": "imagens/unidades/mato-grosso-do-sul/colegio-adventista-vilas-boas.png",
+    "foto_original": "vilas-boas.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "mato-grosso-do-sul",
+    "escola": "Escola Adventista Nova Andradina",
+    "foto": "imagens/unidades/mato-grosso-do-sul/escola-adventista-nova-andradina.png",
+    "foto_original": "andradina.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "oeste-mt",
+    "escola": "Colégio Adventista Cáceres",
+    "foto": "imagens/unidades/oeste-mt/colegio-adventista-caceres.png",
+    "foto_original": "caceres.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "oeste-mt",
+    "escola": "Colégio Adventista Jardim Glória",
+    "foto": "imagens/unidades/oeste-mt/colegio-adventista-jardim-gloria.png",
+    "foto_original": "jardim-gloria.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "oeste-mt",
+    "escola": "Colégio Adventista Sinop",
+    "foto": "imagens/unidades/goias/escola-adventista-anapolis.png",
+    "foto_original": "anapolis.png",
+    "foto_reaproveitada_de": "Escola Adventista Anápolis"
+  },
+  {
+    "estado": "oeste-mt",
+    "escola": "Escola Adventista Tangará da Serra",
+    "foto": "imagens/unidades/oeste-mt/escola-adventista-tangara-da-serra.png",
+    "foto_original": "tangara.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "oeste-mt",
+    "escola": "Colégio Adventista Várzea Grande",
+    "foto": "imagens/unidades/goias/escola-adventista-novo-mundo.png",
+    "foto_original": "novo-mundo.png",
+    "foto_reaproveitada_de": "Escola Adventista Novo Mundo"
+  },
+  {
+    "estado": "tocantins",
+    "escola": "Colégio Adventista Araguaína",
+    "foto": "imagens/unidades/tocantins/colegio-adventista-araguaina.png",
+    "foto_original": "araguaina.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "tocantins",
+    "escola": "Colégio Adventista Gurupi",
+    "foto": "imagens/unidades/tocantins/colegio-adventista-gurupi.png",
+    "foto_original": "gurupi.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "tocantins",
+    "escola": "Escola Adventista Palmas",
+    "foto": "imagens/unidades/tocantins/escola-adventista-palmas.png",
+    "foto_original": "palmas.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "tocantins",
+    "escola": "Colégio Adventista Palmas Sul",
+    "foto": "imagens/unidades/tocantins/colegio-adventista-palmas-sul.png",
+    "foto_original": "palmas-sul.png",
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "leste-mt",
+    "escola": "Colégio Adventista Centro América",
+    "foto": "imagens/unidades/leste-mt/colegio-adventista-centro-america.png",
+    "foto_original": null,
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "leste-mt",
+    "escola": "Colégio Adventista do CPA",
+    "foto": "imagens/unidades/leste-mt/colegio-adventista-do-cpa.jpg",
+    "foto_original": null,
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "leste-mt",
+    "escola": "Colégio Adventista do Porto",
+    "foto": "imagens/unidades/leste-mt/colegio-adventista-do-porto.png",
+    "foto_original": null,
+    "foto_reaproveitada_de": null
+  },
+  {
+    "estado": "leste-mt",
+    "escola": "Colégio Adventista de Rondonópolis",
+    "foto": null,
+    "foto_original": null,
+    "foto_reaproveitada_de": null
+  }
+]

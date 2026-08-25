@@ -1,0 +1,22 @@
+-- Tabela de leads da landing de matrículas.
+-- Rode uma vez no Postgres criado pelo Coolify:
+--   psql "$DATABASE_URL" -f db/schema.sql
+
+CREATE TABLE IF NOT EXISTS leads (
+  id                 uuid PRIMARY KEY,
+  nome               text NOT NULL,
+  whatsapp           text NOT NULL,
+  email              text NOT NULL DEFAULT '',
+  estado             text NOT NULL,            -- slug da região (ex.: goias, leste-mt)
+  escola             text NOT NULL DEFAULT '', -- escola de interesse (opcional)
+  nivel              text NOT NULL DEFAULT '',
+  criado_em          timestamptz NOT NULL DEFAULT now(),
+  webhook_status     text NOT NULL DEFAULT 'pendente', -- pendente | enviado | falhou:*
+  webhook_tentativas int  NOT NULL DEFAULT 0,
+  enviado_em         timestamptz
+);
+
+CREATE INDEX IF NOT EXISTS leads_estado_idx ON leads (estado);
+CREATE INDEX IF NOT EXISTS leads_criado_em_idx ON leads (criado_em DESC);
+CREATE INDEX IF NOT EXISTS leads_webhook_pendente_idx
+  ON leads (webhook_status) WHERE webhook_status <> 'enviado';

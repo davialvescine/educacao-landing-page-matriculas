@@ -1,0 +1,481 @@
+{
+  "projeto": "Landing page Matrículas — Educação Adventista Centro-Oeste (UCOB)",
+  "gerado_em": "2026-08-25",
+  "fonte": "https://ucob.efcx.pro/",
+  "slogan": "#Muito Além do Ensino",
+  "titulo_campanha": "Matrículas Abertas!",
+  "estatisticas": [
+    {
+      "valor": "525",
+      "rotulo": "Unidades no Brasil"
+    },
+    {
+      "valor": "9.800",
+      "rotulo": "Instituições"
+    },
+    {
+      "valor": "117.000",
+      "rotulo": "Professores"
+    },
+    {
+      "valor": "280.000",
+      "rotulo": "Alunos no Brasil"
+    },
+    {
+      "valor": "+2.000.000",
+      "rotulo": "Alunos no mundo"
+    }
+  ],
+  "diferenciais": [
+    "Educação Integral",
+    "Presente em Todo o Centro-Oeste",
+    "Valores Cristãos que Transformam",
+    "Ambiente Saudável e Inspirador",
+    "Cidadania e Propósito"
+  ],
+  "estados": [
+    {
+      "slug": "distrito-federal",
+      "nome": "Distrito Federal",
+      "uf": "DF",
+      "whatsapp": {
+        "numero": "+55 61 98329-0006",
+        "link": "https://wa.me/5561983290006",
+        "confirmar_numero": false
+      },
+      "total_escolas": 9,
+      "escolas": [
+        {
+          "nome": "Colégio Adventista Águas Claras",
+          "endereco": "Avenida Sibipiruna lotes 24 e 26 n 28, Águas Claras – DF, CEP 71.928-720",
+          "foto": "imagens/unidades/distrito-federal/colegio-adventista-aguas-claras.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista de Águas Claras"
+        },
+        {
+          "nome": "Colégio Adventista Asa Sul",
+          "endereco": "SGAS 611 – Mod75, L2 Sul s/n, Asa Sul – Brasília DF, CEP 70200-710",
+          "foto": "imagens/unidades/distrito-federal/colegio-adventista-asa-sul.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista da Asa Sul"
+        },
+        {
+          "nome": "Escola Adventista Formosa",
+          "endereco": "Rua Leonino César nº 171 – Centro, Formosa – GO, CEP 73801-670",
+          "foto": "imagens/unidades/distrito-federal/escola-adventista-formosa.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Escola Adventista de Formosa"
+        },
+        {
+          "nome": "Colégio Adventista Gama",
+          "endereco": "Área Especial 22/23 – Setor Central Lado Oeste – Gama, Brasília-DF, CEP 72.425-000",
+          "foto": "imagens/unidades/distrito-federal/colegio-adventista-gama.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista do Gama"
+        },
+        {
+          "nome": "Escola Adventista Guará",
+          "endereco": "Área Especial EQ 15/17 – Lote A – Guará II, Brasília – DF, CEP 71050-010",
+          "foto": "imagens/unidades/distrito-federal/escola-adventista-guara.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Escola Adventista do Guará"
+        },
+        {
+          "nome": "Colégio Adventista Planaltina",
+          "endereco": "Via Setor Educacional, Lote P – Centro, Planaltina DF, CEP 73310-18",
+          "foto": "imagens/unidades/distrito-federal/colegio-adventista-planaltina.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista de Planaltina"
+        },
+        {
+          "nome": "Colégio Adventista Sobradinho",
+          "endereco": "Quadra 12 Área Reservada nº6 -Sobradinho, Brasília – DF, CEP 73011-050",
+          "foto": "imagens/unidades/distrito-federal/colegio-adventista-sobradinho.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Escola Adventista de Sobradinho"
+        },
+        {
+          "nome": "Colégio Adventista Taguatinga",
+          "endereco": "Avenida Sandu – QSB 4/5 – Área especial nº 7 – Taguatinga, Brasília – DF, CEP 72015-540",
+          "foto": "imagens/unidades/distrito-federal/colegio-adventista-taguatinga.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista de Taguatinga"
+        },
+        {
+          "nome": "Escola Adventista Valparaíso",
+          "endereco": "Rua 29 Quadra 35 Lote 10 – Parque EsplanadaI, Valparaíso de Goiás, CEP 72876-335",
+          "foto": "imagens/unidades/goias/escola-adventista-setor-pedro-ludovico.png",
+          "foto_propria": false,
+          "foto_reaproveitada_de": "Escola Adventista Setor Pedro Ludovico",
+          "nome_oficial": "Escola Adventista de Valparaíso"
+        }
+      ],
+      "associacao": "APLAC"
+    },
+    {
+      "slug": "goias",
+      "nome": "Goiás",
+      "uf": "GO",
+      "whatsapp": {
+        "numero": "+55 62 99409-4449",
+        "link": "https://wa.me/5562994094449",
+        "confirmar_numero": false
+      },
+      "total_escolas": 9,
+      "escolas": [
+        {
+          "nome": "Escola Adventista Uruaçu",
+          "endereco": "Av. Transbrasiliana, 1135, Centro, CEP 76400-000, Uruaçu–GO",
+          "foto": "imagens/unidades/goias/escola-adventista-uruacu.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Escola Adventista de Uruaçu"
+        },
+        {
+          "nome": "Escola Adventista Vila Nova",
+          "endereco": "Rua 208, Quadra B,, Lote 01, S/N, Cep.74635-055,, Goiânia–GO",
+          "foto": "imagens/unidades/goias/escola-adventista-vila-nova.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Escola Adventista Vila Nova"
+        },
+        {
+          "nome": "Escola Adventista Anápolis",
+          "endereco": "Rua General Curado, S/N, CEP 75110-280, Anápolis–GO",
+          "foto": "imagens/unidades/goias/escola-adventista-anapolis.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista Anápolis"
+        },
+        {
+          "nome": "Escola Adventista Jardim Europa",
+          "endereco": "Santa Efigênia Q. 44 L., 27 a 30 – Jardim Planalto, CEP 74333-230, Goiânia–GO",
+          "foto": "imagens/unidades/goias/escola-adventista-jardim-europa.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista Jardim Europa"
+        },
+        {
+          "nome": "Escola Adventista Novo Mundo",
+          "endereco": "Qd 212- Lotes 5-9,, R. Indianápolis, S/N, Jardim Novo Mundo, CEP 74705-300, Goiânia–GO",
+          "foto": "imagens/unidades/goias/escola-adventista-novo-mundo.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista Novo Mundo"
+        },
+        {
+          "nome": "Escola Adventista Porangatu",
+          "endereco": "Rua 15, nº 75 – Centro, CEP 76550-00, Porangatu–GO",
+          "foto": "imagens/unidades/goias/escola-adventista-jardim-europa.png",
+          "foto_propria": false,
+          "foto_reaproveitada_de": "Escola Adventista Jardim Europa",
+          "nome_oficial": "Escola Adventista de Porangatu"
+        },
+        {
+          "nome": "Escola Adventista Rio Verde",
+          "endereco": "Rua Luiz de Bastos, nº 45, St. Central, CEP 75901-110, Rio Verde – GO",
+          "foto": "imagens/unidades/goias/escola-adventista-rio-verde.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Escola Adventista Rio Verde"
+        },
+        {
+          "nome": "Colégio Goianiense Adventista",
+          "endereco": "Rua Capistabos,, nº 1. 345, Quadra 24 Setor – Santa Genoveva, CEP 74672-200, Goiânia–GO",
+          "foto": "imagens/unidades/goias/escola-adventista-jardim-europa.png",
+          "foto_propria": false,
+          "foto_reaproveitada_de": "Escola Adventista Jardim Europa",
+          "nome_oficial": "Colégio Goianiense Adventista"
+        },
+        {
+          "nome": "Escola Adventista Setor Pedro Ludovico",
+          "endereco": "Alameda Leopoldo de Bulhões, 228 – St. Pedro Ludovico, CEP 74820-060, Goiânia–GO",
+          "foto": "imagens/unidades/goias/escola-adventista-setor-pedro-ludovico.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista Setor Pedro Ludovico"
+        }
+      ],
+      "associacao": "ABC"
+    },
+    {
+      "slug": "mato-grosso-do-sul",
+      "nome": "Mato Grosso do Sul",
+      "uf": "MS",
+      "whatsapp": {
+        "numero": "+55 67 9985-0619",
+        "link": "https://wa.me/556799850619",
+        "confirmar_numero": true
+      },
+      "total_escolas": 8,
+      "escolas": [
+        {
+          "nome": "Colégio Adventista Corumbá",
+          "endereco": "Rua Porto Carreiro,, 1956, Aeroporto, Corumbá – MS, Cep. 79332-090",
+          "foto": "imagens/unidades/mato-grosso-do-sul/colegio-adventista-corumba.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista de Corumbá"
+        },
+        {
+          "nome": "Colégio Adventista Dourados I",
+          "endereco": "Rua Onofre Pereira de Matos, 970, Centro, Dourados – MS, Cep. 79802-010",
+          "foto": "imagens/unidades/mato-grosso-do-sul/colegio-adventista-dourados-i.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Escola Adventista de Dourados"
+        },
+        {
+          "nome": "Colégio Adventista Jardim dos Estados",
+          "endereco": "Rua Rio Grande, do Sul, 760, Campo Grande – MS, Cep. 79022-300",
+          "foto": "imagens/unidades/mato-grosso-do-sul/colegio-adventista-jardim-dos-estados.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista Jardim dos Estados"
+        },
+        {
+          "nome": "Escola Adventista Jardim Leblon",
+          "endereco": "Avenida Cuiabá, 1311, Jardim Leblon, Campo Grande – MS, Cep. 79092-035",
+          "foto": "imagens/unidades/mato-grosso-do-sul/escola-adventista-jardim-leblon.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista Jardim Leblon"
+        },
+        {
+          "nome": "Colégio Adventista Miranda",
+          "endereco": "Rua Chokite Massuda, Nº36, Centro, Miranda – MS, Cep. 79380-000",
+          "foto": "imagens/unidades/mato-grosso-do-sul/colegio-adventista-miranda.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Escola Adventista de Miranda"
+        },
+        {
+          "nome": "Escola Adventista Mundo Novo",
+          "endereco": "Rua José Bonifácio, 1157, Tapajós, Mundo Novo – MS, Cep. 79980-000",
+          "foto": "imagens/unidades/mato-grosso-do-sul/escola-adventista-mundo-novo.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Escola Adventista de Mundo Novo"
+        },
+        {
+          "nome": "Colégio Adventista Vilas Boas",
+          "endereco": "Rua Giocondo Orsi,, 848, Vilas Boas, Campo Grande – MS, Cep. 79050-270",
+          "foto": "imagens/unidades/mato-grosso-do-sul/colegio-adventista-vilas-boas.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista Vilas Boas"
+        },
+        {
+          "nome": "Escola Adventista Nova Andradina",
+          "endereco": "Rua Vearni Castro, 1023, Nova Andradina – MS, Cep. 79750-000",
+          "foto": "imagens/unidades/mato-grosso-do-sul/escola-adventista-nova-andradina.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Escola Adventista de Nova Andradina"
+        }
+      ],
+      "associacao": "ASM"
+    },
+    {
+      "slug": "oeste-mt",
+      "nome": "Oeste Matogrossense",
+      "uf": "MT",
+      "whatsapp": {
+        "numero": "+55 65 9942-1370",
+        "link": "https://wa.me/556599421370",
+        "confirmar_numero": true
+      },
+      "total_escolas": 5,
+      "escolas": [
+        {
+          "nome": "Colégio Adventista Cáceres",
+          "endereco": "R. das Scaf, 235, Cavalhada I, Cáceres – MT, CEP 78200-000",
+          "foto": "imagens/unidades/oeste-mt/colegio-adventista-caceres.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista de Cáceres"
+        },
+        {
+          "nome": "Colégio Adventista Jardim Glória",
+          "endereco": "R. da Bondade, 182, Jardim Glória L, Várzea Grande – MT, CEP 78141-018",
+          "foto": "imagens/unidades/oeste-mt/colegio-adventista-jardim-gloria.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista Jardim Glória"
+        },
+        {
+          "nome": "Colégio Adventista Sinop",
+          "endereco": "Av. das Acácias, 465, Centro, Sinop – MT, CEP 78556-060",
+          "foto": "imagens/unidades/goias/escola-adventista-anapolis.png",
+          "foto_propria": false,
+          "foto_reaproveitada_de": "Escola Adventista Anápolis",
+          "nome_oficial": "Colégio Adventista de Sinop"
+        },
+        {
+          "nome": "Escola Adventista Tangará da Serra",
+          "endereco": "Rua Neftes de Carvalho, 563s LT 03, Bairro Duas Pontes, Tangará da Serra – MT, CEP 78300-000",
+          "foto": "imagens/unidades/oeste-mt/escola-adventista-tangara-da-serra.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Escola Adventista Tangará da Serra",
+          "obs": "Confirmada como AOM pelo cliente em 25/08/2026 (não constava na lista oficial recebida)."
+        },
+        {
+          "nome": "Colégio Adventista Várzea Grande",
+          "endereco": "R. Manoel Olímpio Curvo, 56, Centro Norte, Várzea Grande – MT, CEP 78110-540",
+          "foto": "imagens/unidades/goias/escola-adventista-novo-mundo.png",
+          "foto_propria": false,
+          "foto_reaproveitada_de": "Escola Adventista Novo Mundo",
+          "nome_oficial": "Colégio Adventista de Várzea Grande"
+        }
+      ],
+      "associacao": "AOM"
+    },
+    {
+      "slug": "tocantins",
+      "nome": "Tocantins",
+      "uf": "TO",
+      "whatsapp": {
+        "numero": "+55 63 99202-1837",
+        "link": "https://wa.me/5563992021837",
+        "confirmar_numero": false
+      },
+      "total_escolas": 4,
+      "escolas": [
+        {
+          "nome": "Colégio Adventista Araguaína",
+          "endereco": "R. Ipameri, 170 – Senador, Araguaína – TO, CEP 77813-450",
+          "foto": "imagens/unidades/tocantins/colegio-adventista-araguaina.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista de Araguaína"
+        },
+        {
+          "nome": "Colégio Adventista Gurupi",
+          "endereco": "Presidente Castelo Branco Quadra 219 Lote 07, 2061 –, Centro, Gurupi -TO, CEP 77405-090",
+          "foto": "imagens/unidades/tocantins/colegio-adventista-gurupi.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista de Gurupi"
+        },
+        {
+          "nome": "Escola Adventista Palmas",
+          "endereco": "210 Sul (Arse 24) Alameda 2, Área Institucional 09 –, Plano Diretor Sul, Palmas -TO, CEP 77020-586",
+          "foto": "imagens/unidades/tocantins/escola-adventista-palmas.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista Palmas Centro"
+        },
+        {
+          "nome": "Colégio Adventista Palmas Sul",
+          "endereco": "Conj. 02 – Quadra 701 Sul, Av. NS 01, Lote 07, Plano Diretor Sul, Palmas – TO, Cep. 77017-004",
+          "foto": "imagens/unidades/tocantins/colegio-adventista-palmas-sul.png",
+          "foto_propria": true,
+          "foto_reaproveitada_de": null,
+          "nome_oficial": "Colégio Adventista Palmas Sul"
+        }
+      ],
+      "associacao": "MTO"
+    },
+    {
+      "slug": "leste-mt",
+      "nome": "Leste Matogrossense",
+      "uf": "MT",
+      "associacao": "ALM",
+      "whatsapp": {
+        "numero": null,
+        "link": null,
+        "confirmar_numero": true
+      },
+      "sem_pagina_no_site": true,
+      "total_escolas": 4,
+      "escolas": [
+        {
+          "nome": "Colégio Adventista Centro América",
+          "nome_oficial": "Colégio Adventista Centro América",
+          "endereco": "R. Osório Duque Estrada, S/N – Araés, Cuiabá – MT, CEP 78005-720",
+          "foto": "imagens/unidades/leste-mt/colegio-adventista-centro-america.png",
+          "foto_propria": true,
+          "pendencias": [],
+          "telefone": "(65) 3021-7800",
+          "whatsapp_escola": "(65) 99360-3279",
+          "site": "https://centroamerica.educacaoadventista.org.br/",
+          "obs": "No portal oficial aparece como \"Escola Adventista Centro América\".",
+          "fonte_endereco": "site oficial da escola (educacaoadventista.org.br), 25/08/2026",
+          "fonte_foto": "fachada no site oficial da escola (educacaoadventista.org.br), 25/08/2026"
+        },
+        {
+          "nome": "Colégio Adventista do CPA",
+          "nome_oficial": "Colégio Adventista do CPA",
+          "endereco": "R. Ceará, 292 – CPA II, Cuiabá – MT, CEP 78055-558",
+          "foto": "imagens/unidades/leste-mt/colegio-adventista-do-cpa.jpg",
+          "foto_propria": true,
+          "pendencias": [],
+          "telefone": "(65) 3027-5477",
+          "whatsapp_escola": "(65) 99671-3291",
+          "site": "https://cpa.educacaoadventista.org.br/",
+          "fonte_endereco": "site oficial da escola (educacaoadventista.org.br), 25/08/2026",
+          "fonte_foto": "fachada no site oficial da escola (educacaoadventista.org.br), 25/08/2026"
+        },
+        {
+          "nome": "Colégio Adventista do Porto",
+          "nome_oficial": "Colégio Adventista do Porto",
+          "endereco": "R. Comandante Costa, 2521 – Porto, Cuiabá – MT, CEP 78020-400",
+          "foto": "imagens/unidades/leste-mt/colegio-adventista-do-porto.png",
+          "foto_propria": true,
+          "pendencias": [],
+          "telefone": "(65) 3051-2411",
+          "whatsapp_escola": "(65) 99671-3291",
+          "site": "https://porto.educacaoadventista.org.br/",
+          "fonte_endereco": "site oficial da escola (educacaoadventista.org.br), 25/08/2026",
+          "fonte_foto": "fachada no site oficial da escola (educacaoadventista.org.br), 25/08/2026"
+        },
+        {
+          "nome": "Colégio Adventista de Rondonópolis",
+          "nome_oficial": "Colégio Adventista de Rondonópolis",
+          "endereco": "R. Afonso Pena, 806 – Centro, Rondonópolis – MT, CEP 78700-070",
+          "foto": null,
+          "foto_propria": false,
+          "pendencias": [
+            "foto"
+          ],
+          "telefone": "(66) 3024-5106",
+          "whatsapp_escola": "(66) 99936-4657",
+          "site": "https://rondonopolis.educacaoadventista.org.br/",
+          "fonte_endereco": "site oficial da escola (educacaoadventista.org.br), 25/08/2026"
+        }
+      ]
+    }
+  ],
+  "iabc": {
+    "nome": "IABC — Instituto Adventista Brasil Central",
+    "tipo": "internato",
+    "site": "https://colegioiabc.com.br/",
+    "observacao": "Card na home do site atual, aponta para site próprio.",
+    "endereco": "Rodovia BR 414, km 411 – Planalmira, Abadiânia – GO, CEP 72940-000",
+    "telefone": "(62) 3395-8000",
+    "whatsapp": "(62) 3395-8000",
+    "site_oficial": "https://www.iabc.org.br/",
+    "fonte_endereco": "iabc.org.br/contato, 25/08/2026"
+  },
+  "lista_oficial": {
+    "fonte": "Luciene Soares via WhatsApp",
+    "data": "2026-08-25",
+    "associacoes": {
+      "APLAC": "Distrito Federal",
+      "ABC": "Goiás",
+      "ASM": "Mato Grosso do Sul",
+      "AOM": "Oeste Matogrossense",
+      "MTO": "Tocantins",
+      "ALM": "Mato Grosso (Cuiabá/Rondonópolis)"
+    }
+  }
+}
