@@ -1,24 +1,14 @@
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Hero, { HeroCtas } from "@/components/Hero";
 import LeadForm from "@/components/LeadForm";
+import MapaRegioes from "@/components/MapaRegioes";
 import Marquee from "@/components/Marquee";
+import MundoSection from "@/components/MundoSection";
 import Reveal from "@/components/Reveal";
-import { Diferenciais, Eyebrow, IabcDestaque, StatsStrip } from "@/components/Secoes";
+import { Diferenciais, IabcDestaque, StatsStrip } from "@/components/Secoes";
 import { getEstados, getFormEstados } from "@/lib/rede";
-
-/* Distribuição do bento grid das regiões (6 colunas no desktop). */
-const BENTO: Record<string, string> = {
-  "distrito-federal": "lg:col-span-4 lg:row-span-2",
-  goias: "lg:col-span-2",
-  "mato-grosso-do-sul": "lg:col-span-2",
-  "oeste-mt": "lg:col-span-2",
-  tocantins: "lg:col-span-2",
-  "leste-mt": "lg:col-span-2",
-};
 
 export default function Home() {
   const estados = getEstados();
@@ -60,69 +50,10 @@ export default function Home() {
         <Marquee />
         <StatsStrip />
 
-        {/* Regiões — bento grid */}
-        <section id="regioes" className="mx-auto max-w-7xl scroll-mt-10 px-4 py-28">
-          <Reveal>
-            <Eyebrow>6 regiões, {totalEscolas} escolas</Eyebrow>
-            <h2 className="mt-4 text-center text-4xl font-extrabold tracking-tighter text-brand-900 sm:text-5xl">
-              Encontre uma escola
-              <br className="hidden sm:block" /> perto de você
-            </h2>
-          </Reveal>
-          <div className="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-6 lg:auto-rows-[14rem]">
-            {estados.map((e, i) => {
-              const capa = e.escolas.find((s) => s.foto)?.foto;
-              const grande = e.slug === "distrito-federal";
-              return (
-                <Reveal
-                  key={e.slug}
-                  delay={(i % 3) * 0.08}
-                  className={BENTO[e.slug] ?? "lg:col-span-2"}
-                >
-                  <Link
-                    href={`/${e.slug}`}
-                    className="group relative block h-full min-h-[14rem] overflow-hidden rounded-2xl bg-brand-900 shadow-card transition-shadow duration-300 hover:shadow-card-hover"
-                  >
-                    {capa && (
-                      <Image
-                        src={`/${capa}`}
-                        alt=""
-                        fill
-                        sizes={
-                          grande
-                            ? "(max-width: 1024px) 100vw, 66vw"
-                            : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        }
-                        className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
-                      />
-                    )}
-                    <div
-                      aria-hidden
-                      className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/25 to-transparent"
-                    />
-                    <span className="absolute left-4 top-4 rounded-full border border-white/25 bg-brand-950/60 px-3 py-1 text-xs font-bold text-white">
-                      {e.escolas.length}{" "}
-                      {e.escolas.length === 1 ? "unidade" : "unidades"}
-                    </span>
-                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-5">
-                      <div>
-                        <p className="text-xs font-bold uppercase tracking-widest text-gold-300">
-                          {e.associacao}
-                        </p>
-                        <h3 className={tituloRegiao(grande)}>{e.nome}</h3>
-                      </div>
-                      <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white/20 text-white transition-all duration-300 group-hover:bg-gold-400 group-hover:text-brand-950">
-                        <ArrowRight aria-hidden className="size-5" />
-                      </span>
-                    </div>
-                  </Link>
-                </Reveal>
-              );
-            })}
-          </div>
-        </section>
+        <MapaRegioes />
 
         <Diferenciais />
+        <MundoSection />
         <IabcDestaque />
 
         {/* Formulário — finale */}
@@ -182,8 +113,3 @@ export default function Home() {
   );
 }
 
-function tituloRegiao(grande: boolean) {
-  return grande
-    ? "text-3xl font-extrabold tracking-tight text-white sm:text-4xl"
-    : "text-xl font-extrabold tracking-tight text-white";
-}
