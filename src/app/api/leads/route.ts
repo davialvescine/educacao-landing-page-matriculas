@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     );
   }
 
-  // Dispara para o sistema externo depois de salvar — lead nunca se perde.
+  // Dispara para o sistema externo depois de salvar: lead nunca se perde.
   const webhookUrl = process.env.LEAD_WEBHOOK_URL;
   if (webhookUrl) {
     try {

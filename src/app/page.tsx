@@ -31,7 +31,7 @@ export default function Home() {
           ]}
         >
           <h1 className="sr-only">
-            Educando gerações com valores pra vida — Educação Adventista
+            Educando gerações com valores pra vida. Educação Adventista
             Centro-Oeste
           </h1>
           <div
@@ -69,7 +69,7 @@ export default function Home() {
         <DepoimentosSection />
         <IabcDestaque />
 
-        {/* Formulário — finale */}
+        {/* Formulário (finale) */}
         <section
           id="matricula"
           className="relative scroll-mt-10 overflow-hidden bg-brand-950"
@@ -93,7 +93,7 @@ export default function Home() {
                 </h2>
                 <p className="mt-6 max-w-md text-lg leading-relaxed text-primary-foreground/70">
                   Deixe seu contato e a equipe da unidade escolhida fala com você
-                  pelo WhatsApp para garantir a vaga — rápido, sem compromisso e
+                  pelo WhatsApp para garantir a vaga: rápido, sem compromisso e
                   sem fila.
                 </p>
               </Reveal>

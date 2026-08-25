@@ -11,7 +11,7 @@ const DEPOIMENTOS = [
       "Ótima escola com profissionais qualificados, estrutura ótima, ensino de alta qualidade. Eu e meu filho agradecemos pelo cuidado e atenção conosco.",
     nome: "Nathalia Francielly",
     papel: "Mãe de aluno",
-    escola: "Colégio Adventista Setor Pedro Ludovico — Goiânia",
+    escola: "Colégio Adventista Setor Pedro Ludovico · Goiânia",
     fonte: "via Quero Bolsa",
   },
   {
@@ -19,7 +19,7 @@ const DEPOIMENTOS = [
       "Uma escola que preza por valores e princípios cristãos. Muito além do ensino.",
     nome: "Ritha Brito",
     papel: "Aluna",
-    escola: "Colégio Adventista Setor Pedro Ludovico — Goiânia",
+    escola: "Colégio Adventista Setor Pedro Ludovico · Goiânia",
     fonte: "via Quero Bolsa",
   },
   {
@@ -27,7 +27,7 @@ const DEPOIMENTOS = [
       "Educação baseada em valores éticos e morais, com uma equipe pedagógica comprometida com o sucesso dos alunos.",
     nome: "Célia Ribeiro",
     papel: "Responsável",
-    escola: "Colégio Adventista de Águas Claras — DF",
+    escola: "Colégio Adventista de Águas Claras · DF",
     fonte: "via Google",
   },
   {
@@ -35,7 +35,7 @@ const DEPOIMENTOS = [
       "Essa escola vai ficar sempre marcada em minha vida. Foi aí que fiz os melhores amigos que irei levar para toda a vida.",
     nome: "Carolina Medeiros",
     papel: "Ex-aluna",
-    escola: "Escola Adventista de Palmas — TO",
+    escola: "Escola Adventista de Palmas · TO",
     fonte: "via Melhor Escola",
   },
   {
@@ -43,7 +43,7 @@ const DEPOIMENTOS = [
       "Escola maravilhosa!! Com princípios cristãos e ensino de qualidade.",
     nome: "Elani Bezerra",
     papel: "Mãe de aluno",
-    escola: "Colégio Adventista de Araguaína — TO",
+    escola: "Colégio Adventista de Araguaína · TO",
     fonte: "via Melhor Escola",
   },
   {
@@ -51,7 +51,7 @@ const DEPOIMENTOS = [
       "Conheci a estrutura da escola e as referências são as melhores.",
     nome: "Maria do Carmo da Rocha",
     papel: "Mãe",
-    escola: "Colégio Adventista de Taguatinga — DF",
+    escola: "Colégio Adventista de Taguatinga · DF",
     fonte: "via Melhor Escola",
   },
 ];

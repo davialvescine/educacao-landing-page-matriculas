@@ -30,7 +30,7 @@ export default function Hero({
 }: Props) {
   return (
     <section className="relative isolate overflow-hidden bg-gold-400">
-      {/* Fundo — mosaico oficial estático */}
+      {/* Fundo: mosaico oficial estático */}
       <div className="absolute inset-0 -z-20">
         <Image
           src="/imagens/campanha/hero-bg.jpg"
@@ -56,7 +56,7 @@ export default function Hero({
       <div className="mx-auto max-w-7xl px-4 pt-20">
         <div className="grid items-end gap-x-8 lg:min-h-[600px] lg:grid-cols-12 xl:min-h-[660px]">
 
-          {/* Direita — pilha vertical central */}
+          {/* Direita: pilha vertical central */}
           <div className="flex flex-col items-start gap-7 py-12 sm:py-14 lg:col-span-7 lg:items-center lg:self-center lg:py-24 lg:text-center">
             {/* Logo + selo 130 anos */}
             <div
@@ -73,7 +73,7 @@ export default function Hero({
               />
               <Image
                 src="/imagens/campanha/selo-130-anos.png"
-                alt="130 anos — 1896 a 2026"
+                alt="130 anos, de 1896 a 2026"
                 width={1142}
                 height={369}
                 className="h-9 w-auto xl:h-10"
@@ -97,7 +97,7 @@ export default function Hero({
             </div>
           </div>
 
-          {/* Esquerda — aluno ancorado na base, como na arte */}
+          {/* Esquerda: aluno ancorado na base, como na arte */}
           <div className="relative flex items-end justify-center lg:order-first lg:col-span-5">
             {fotos && fotos.length > 1 ? (
               <div

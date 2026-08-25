@@ -49,7 +49,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="transition-colors hover:text-primary-foreground"
               >
-                IABC — Internato
+                IABC · Internato
               </a>
             </li>
           </ul>
@@ -74,8 +74,8 @@ export default function Footer() {
       <div className="border-t border-primary-foreground/10">
         <div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-2 px-4 py-5 text-xs">
           <span>
-            © {new Date().getFullYear()} Educação Adventista — Centro-Oeste
-            (UCOB) · 130 anos (1896–2026)
+            © {new Date().getFullYear()} Educação Adventista Centro-Oeste
+            (UCOB) · 130 anos, de 1896 a 2026
           </span>
           <span>Educando para esta vida e para a eternidade.</span>
         </div>

@@ -39,7 +39,7 @@ const NIVEIS = [
   },
 ];
 
-/** Da Educação Infantil ao Ensino Médio — com os alunos da campanha. */
+/** Da Educação Infantil ao Ensino Médio, com os alunos da campanha. */
 export default function NiveisSection() {
   return (
     <section id="niveis" className="scroll-mt-10 bg-paper">
@@ -68,7 +68,7 @@ export default function NiveisSection() {
                   />
                   <Image
                     src={n.foto}
-                    alt={`Estudante — ${n.nome}`}
+                    alt={`Estudante, ${n.nome}`}
                     width={n.w}
                     height={n.h}
                     className="relative z-10 h-[88%] w-auto transition-transform duration-500 group-hover:scale-[1.04]"

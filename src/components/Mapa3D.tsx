@@ -181,7 +181,7 @@ function Cena({ pins }: { pins: PinMapa[] }) {
               <a
                 href={`/${pin.slug}`}
                 className="group flex -translate-y-1 flex-col items-center gap-1 whitespace-nowrap"
-                aria-label={`${pin.rotulo} — ${pin.contagem} unidades`}
+                aria-label={`${pin.rotulo}, ${pin.contagem} unidades`}
               >
                 <span className="block h-3.5 w-3.5 rounded-full border-[3px] border-brand-950 bg-gold-400 shadow-[0_0_14px_rgba(248,192,56,0.9)] transition-transform group-hover:scale-125" />
                 <span className="rounded-full border border-gold-400/50 bg-brand-950/95 px-3 py-1 text-[11px] font-extrabold text-white shadow-lg transition-colors group-hover:border-gold-400">

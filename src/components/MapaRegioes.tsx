@@ -53,7 +53,7 @@ function Pin({ pin }: { pin: (typeof PINS)[number] }) {
   const rotulo = `${pin.rotulo} · ${contagem}`;
   const largura = rotulo.length * 21 + 56;
   return (
-    <Link href={`/${pin.slug}`} aria-label={`${pin.rotulo} — ${contagem} unidades`}>
+    <Link href={`/${pin.slug}`} aria-label={`${pin.rotulo}, ${contagem} unidades`}>
       <g className="mapa-pin" style={{ cursor: "pointer" }}>
         <circle className="pin-pulso" cx={pin.x} cy={pin.y} r="34" fill="#f8c038" style={{ "--delay": pin.delay } as React.CSSProperties} />
         <g transform={`translate(${pin.x}, ${pin.y})`}>
@@ -102,7 +102,7 @@ export default function MapaRegioes() {
           <StatsTiles />
         </Reveal>
         <div className="mt-20 grid items-center gap-x-16 gap-y-14 lg:grid-cols-12">
-          {/* Esquerda — título e lista */}
+          {/* Esquerda: título e lista */}
           <div className="lg:col-span-5">
             <Reveal>
               <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-gold-400">
@@ -145,7 +145,7 @@ export default function MapaRegioes() {
               </div>
             </Reveal>
           </div>
-          {/* Direita — mapa em relevo */}
+          {/* Direita: mapa em relevo */}
           <Reveal delay={0.1} className="lg:col-span-7">
             <MapaInterativo
               pins={PINS.map((p) => ({

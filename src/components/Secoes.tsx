@@ -62,7 +62,7 @@ const DESCRICOES: Record<string, string> = {
   "Educação Integral":
     "Conhecimento acadêmico aliado ao desenvolvimento físico, emocional e espiritual.",
   "Presente em Todo o Centro-Oeste":
-    "São 39 unidades em 6 regiões — sempre existe uma escola perto de você.",
+    "São 39 unidades em 6 regiões: sempre existe uma escola perto de você.",
   "Valores Cristãos que Transformam":
     "Princípios e valores permanentes que acompanham o aluno por toda a vida.",
   "Ambiente Saudável e Inspirador":
@@ -85,7 +85,7 @@ export function Diferenciais() {
           </h2>
         </Reveal>
         <div className="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-6 lg:auto-rows-[13.5rem]">
-          {/* Tile foto — 2 colunas × 2 linhas */}
+          {/* Tile foto: 2 colunas × 2 linhas */}
           <Reveal className="lg:col-span-2 lg:row-span-2">
             <div className="relative h-full min-h-[22rem] overflow-hidden rounded-2xl bg-gold-400">
               <Image
@@ -138,7 +138,7 @@ export function Diferenciais() {
             </Reveal>
           ))}
 
-          {/* Tile CTA — ocupa o restante da linha */}
+          {/* Tile CTA: ocupa o restante da linha */}
           <Reveal delay={0.12} className="lg:col-span-4">
             <Link
               href="/#matricula"
@@ -177,7 +177,7 @@ export function IabcDestaque() {
         <Reveal>
           <Image
             src="/imagens/logos/Logo-IABC.png"
-            alt="IABC — Instituto Adventista Brasil Central"
+            alt="IABC, Instituto Adventista Brasil Central"
             width={220}
             height={120}
             className="h-24 w-auto object-contain"
@@ -185,7 +185,7 @@ export function IabcDestaque() {
         </Reveal>
         <Reveal delay={0.1} className="flex-1 text-center md:text-left">
           <h2 className="text-3xl font-extrabold tracking-tighter text-primary-foreground sm:text-4xl">
-            Conheça o IABC — nosso internato
+            Conheça o IABC, nosso internato
           </h2>
           <p className="mt-3 leading-relaxed text-primary-foreground/75">
             O Instituto Adventista Brasil Central reúne educação de excelência e

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-/** Página de conversão pós-lead — ponto de disparo dos pixels de campanha. */
+/** Página de conversão pós-lead: ponto de disparo dos pixels de campanha. */
 export default async function Obrigado({
   searchParams,
 }: {
@@ -89,7 +89,7 @@ export default async function Obrigado({
           >
             <Image
               src="/imagens/campanha/selo-130-anos.png"
-              alt="130 anos — 1896 a 2026"
+              alt="130 anos, de 1896 a 2026"
               width={1142}
               height={369}
               className="h-10 w-auto"

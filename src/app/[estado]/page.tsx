@@ -34,7 +34,7 @@ export async function generateMetadata({
   const estado = getEstado(slug);
   if (!estado) return {};
   return {
-    title: `Matrículas Abertas — ${estado.nome}`,
+    title: `Matrículas Abertas · ${estado.nome}`,
     description: `Escolas Adventistas em ${estado.nome}: ${estado.escolas.length} unidades com matrículas abertas. Encontre a mais próxima e garanta sua vaga.`,
   };
 }
@@ -82,7 +82,7 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
           >
             {estado.escolas.length}{" "}
             {estado.escolas.length === 1 ? "unidade" : "unidades"} da{" "}
-            {estado.associacao} esperando por você — da Educação Infantil ao
+            {estado.associacao} esperando por você, da Educação Infantil ao
             Ensino Médio.
           </p>
           <HeroCtas whatsapp={estado.whatsapp.link} />
@@ -112,7 +112,7 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
         <Diferenciais />
         <DepoimentosSection />
 
-        {/* Formulário — finale */}
+        {/* Formulário (finale) */}
         <section
           id="matricula"
           className="relative scroll-mt-10 overflow-hidden bg-brand-950"

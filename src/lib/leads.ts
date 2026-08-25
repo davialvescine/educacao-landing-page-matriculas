@@ -11,7 +11,7 @@ export interface LeadNovo {
   nivel: string;
 }
 
-// Pool do Postgres criado sob demanda — em dev sem DATABASE_URL usamos arquivo.
+// Pool do Postgres criado sob demanda; em dev sem DATABASE_URL usamos arquivo.
 type Pool = import("pg").Pool;
 let pool: Pool | null = null;
 

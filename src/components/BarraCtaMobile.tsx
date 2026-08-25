@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-/** Barra de CTA fixa na base — só no mobile, onde vive o tráfego de campanha. */
+/** Barra de CTA fixa na base, só no mobile, onde vive o tráfego de campanha. */
 export default function BarraCtaMobile() {
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 border-t border-brand-600/40 bg-brand-700/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md lg:hidden">

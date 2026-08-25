@@ -9,7 +9,7 @@ const CENAS = [
   { src: "/imagens/campanha/escola-musica.jpg", legenda: "Música e artes" },
 ];
 
-/** Um dia na escola — galeria de experiências. */
+/** Um dia na escola: galeria de experiências. */
 export default function UmDiaSection() {
   return (
     <section id="um-dia" className="scroll-mt-10 bg-surface">
@@ -20,7 +20,7 @@ export default function UmDiaSection() {
             Um dia na escola
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
-            Robótica, ciência, esporte, música e fé — todos os dias, em todas as
+            Robótica, ciência, esporte, música e fé, todos os dias, em todas as
             unidades.
           </p>
         </Reveal>

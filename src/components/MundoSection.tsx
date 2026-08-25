@@ -37,7 +37,7 @@ const CARTOES: { destaque: string; icone: React.ReactNode; texto: React.ReactNod
     texto: (
       <>
         No Brasil, desde 1896, a Educação Adventista tem educado gerações,
-        oferecendo ensino da Educação Infantil ao Ensino Superior — reconhecida
+        oferecendo ensino da Educação Infantil ao Ensino Superior, reconhecida
         entre as{" "}
         <strong className="font-bold text-white">
           maiores redes confessionais do mundo
@@ -48,7 +48,7 @@ const CARTOES: { destaque: string; icone: React.ReactNode; texto: React.ReactNod
   },
 ];
 
-/** Seção "Educação Adventista no mundo" — dark premium com globo 3D. */
+/** Seção "Educação Adventista no mundo": dark premium com globo 3D. */
 export default function MundoSection() {
   return (
     <section
