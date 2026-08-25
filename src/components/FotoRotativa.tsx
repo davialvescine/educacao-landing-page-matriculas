@@ -18,7 +18,7 @@ export default function FotoRotativa({ fotos }: { fotos: FotoAluno[] }) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const id = setInterval(() => {
       setAtiva((a) => (a + 1) % fotos.length);
-    }, 6000);
+    }, 12000);
     return () => clearInterval(id);
   }, [fotos.length]);
 
@@ -32,7 +32,7 @@ export default function FotoRotativa({ fotos }: { fotos: FotoAluno[] }) {
           width={f.w}
           height={f.h}
           priority={i === 0}
-          className={`absolute bottom-0 left-1/2 z-10 h-full w-auto max-w-none -translate-x-1/2 transition-opacity duration-1000 ease-in-out ${
+          className={`absolute bottom-0 left-1/2 z-10 h-full w-auto max-w-none -translate-x-1/2 transition-opacity duration-[2500ms] ease-in-out ${
             i === ativa ? "opacity-100" : "opacity-0"
           }`}
         />
