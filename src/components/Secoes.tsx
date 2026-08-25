@@ -25,19 +25,17 @@ export function Eyebrow({ children }: { children: React.ReactNode }) {
 export function StatsTiles() {
   const rede = getRede();
   return (
-    <div className="grid grid-cols-2 gap-4 text-center sm:grid-cols-3 lg:grid-cols-5">
-        {rede.estatisticas.map((s, i) => (
-          <Reveal key={s.rotulo} delay={i * 0.07} className="h-full">
-            <div className="flex h-full flex-col justify-center rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.09] to-white/[0.02] px-4 py-7 transition-colors duration-300 hover:border-gold-400/40">
-              <p className="text-3xl font-extrabold tracking-tighter text-gold-400 sm:text-4xl xl:text-[2.6rem]">
-                <CountUp valor={s.valor} />
-              </p>
-              <p className="mt-2 text-[11px] font-bold uppercase tracking-widest text-primary-foreground/60">
-                {s.rotulo}
-              </p>
-            </div>
-          </Reveal>
-        ))}
+    <div className="grid grid-cols-2 gap-y-8 text-center sm:grid-cols-3 lg:flex lg:justify-center lg:gap-y-0 lg:divide-x lg:divide-white/10">
+      {rede.estatisticas.map((s, i) => (
+        <Reveal key={s.rotulo} delay={i * 0.07} className="px-4 lg:px-12">
+          <p className="text-4xl font-extrabold tracking-tighter text-gold-400 xl:text-5xl">
+            <CountUp valor={s.valor} />
+          </p>
+          <p className="mt-2 text-[11px] font-bold uppercase tracking-widest text-primary-foreground/50">
+            {s.rotulo}
+          </p>
+        </Reveal>
+      ))}
     </div>
   );
 }

@@ -2,8 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import Reveal from "@/components/Reveal";
-import { MAPA_PATHS, MAPA_VIEWBOX } from "@/data/mapa-paths";
 import { StatsTiles } from "@/components/Secoes";
+import { MAPA_PATHS, MAPA_VIEWBOX } from "@/data/mapa-paths";
 import { getEstados } from "@/lib/rede";
 
 const OURO = "#f2b541";
@@ -15,23 +15,14 @@ const PINS: {
   x: number;
   y: number;
   delay: string;
-  largura: number;
 }[] = [
-  { slug: "oeste-mt", rotulo: "MT Oeste", x: 950, y: 640, delay: "0s", largura: 176 },
-  { slug: "leste-mt", rotulo: "MT Leste", x: 470, y: 950, delay: "0.4s", largura: 172 },
-  { slug: "tocantins", rotulo: "Tocantins", x: 1390, y: 380, delay: "0.8s", largura: 184 },
-  { slug: "goias", rotulo: "Goiás", x: 1250, y: 1260, delay: "1.2s", largura: 130 },
-  { slug: "distrito-federal", rotulo: "DF", x: 1620, y: 990, delay: "1.6s", largura: 88 },
-  { slug: "mato-grosso-do-sul", rotulo: "MS", x: 750, y: 1660, delay: "2s", largura: 92 },
+  { slug: "oeste-mt", rotulo: "MT Oeste", x: 950, y: 640, delay: "0s" },
+  { slug: "leste-mt", rotulo: "MT Leste", x: 470, y: 950, delay: "0.4s" },
+  { slug: "tocantins", rotulo: "Tocantins", x: 1390, y: 380, delay: "0.8s" },
+  { slug: "goias", rotulo: "Goiás", x: 1250, y: 1260, delay: "1.2s" },
+  { slug: "distrito-federal", rotulo: "DF", x: 1620, y: 990, delay: "1.6s" },
+  { slug: "mato-grosso-do-sul", rotulo: "MS", x: 750, y: 1660, delay: "2s" },
 ];
-
-/** Estados cuja forma inteira é clicável (MT navega pelos dois pinos). */
-const FORMAS_CLICAVEIS: Record<string, string> = {
-  to: "tocantins",
-  go: "goias",
-  df: "distrito-federal",
-  ms: "mato-grosso-do-sul",
-};
 
 function Forma({ chave }: { chave: string }) {
   const raso = chave === "df";
@@ -64,7 +55,6 @@ function Pin({ pin }: { pin: (typeof PINS)[number] }) {
     <Link href={`/${pin.slug}`} aria-label={`${pin.rotulo} — ${contagem} unidades`}>
       <g className="mapa-pin" style={{ cursor: "pointer" }}>
         <circle className="pin-pulso" cx={pin.x} cy={pin.y} r="34" fill="#f8c038" style={{ "--delay": pin.delay } as React.CSSProperties} />
-        {/* gota do pin */}
         <g transform={`translate(${pin.x}, ${pin.y})`}>
           <path
             d="M0,0 C-11,-20 -24,-28 -24,-46 a24,24 0 1,1 48,0 C24,-28 11,-20 0,0 Z"
@@ -75,7 +65,6 @@ function Pin({ pin }: { pin: (typeof PINS)[number] }) {
           />
           <circle cx="0" cy="-69" r="15" fill="#050c42" />
         </g>
-        {/* pill com nome e contagem */}
         <rect x={pin.x - largura / 2} y={pin.y + 22} rx="34" width={largura} height="68" fill="#050c42" opacity="0.94" stroke="rgba(248,192,56,0.5)" strokeWidth="2" />
         <text x={pin.x} y={pin.y + 68} textAnchor="middle" fontSize="38" fontWeight="800" fill="#ffffff" fontFamily="inherit">
           {rotulo}
@@ -85,7 +74,7 @@ function Pin({ pin }: { pin: (typeof PINS)[number] }) {
   );
 }
 
-/** Seção do seletor de regiões: mapa oficial vetorizado + lista sincronizada. */
+/** Seção do seletor de regiões: números editoriais, lista land-book e mapa em relevo. */
 export default function MapaRegioes() {
   const estados = getEstados();
   const totalEscolas = estados.reduce((n, e) => n + e.escolas.length, 0);
@@ -105,29 +94,63 @@ export default function MapaRegioes() {
       />
       <div
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-b from-brand-950/95 via-brand-950/30 to-brand-950/95"
+        className="absolute inset-0 bg-gradient-to-b from-brand-950/95 via-brand-950/40 to-brand-950/95"
       />
       <div className="relative mx-auto max-w-7xl px-4 py-24">
-        <Reveal className="mb-20">
+        <Reveal className="border-b border-white/10 pb-16">
           <StatsTiles />
         </Reveal>
-        <Reveal>
-          <p className="flex items-center justify-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-gold-400">
-            <span aria-hidden>✦</span> 6 regiões, {totalEscolas} escolas{" "}
-            <span aria-hidden>✦</span>
-          </p>
-          <h2 className="mt-4 text-center text-4xl font-extrabold tracking-tighter text-primary-foreground sm:text-5xl">
-            Toque no mapa e encontre
-            <br className="hidden sm:block" /> uma escola perto de você
-          </h2>
-        </Reveal>
-        <div className="mt-14 grid items-center gap-12 lg:grid-cols-12">
+        <div className="mt-20 grid items-center gap-x-16 gap-y-14 lg:grid-cols-12">
+          {/* Esquerda — título e lista */}
+          <div className="lg:col-span-5">
+            <Reveal>
+              <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-gold-400">
+                <span aria-hidden>✦</span> 6 regiões, {totalEscolas} escolas
+              </p>
+              <h2 className="mt-4 text-4xl font-extrabold leading-[1.02] tracking-tighter text-white sm:text-6xl">
+                Encontre uma
+                <br />
+                escola perto
+                <br />
+                de você
+              </h2>
+            </Reveal>
+            <Reveal delay={0.15} className="mt-10">
+              <div className="flex flex-col border-t border-white/10">
+                {estados.map((e, i) => (
+                  <Link
+                    key={e.slug}
+                    href={`/${e.slug}`}
+                    className="group relative flex items-center gap-5 border-b border-white/10 py-4 transition-all duration-300 hover:pl-4"
+                  >
+                    <span
+                      aria-hidden
+                      className="absolute bottom-0 left-0 h-px w-0 bg-gold-400 transition-all duration-500 group-hover:w-full"
+                    />
+                    <span className="w-8 text-sm font-extrabold text-white/30">
+                      0{i + 1}
+                    </span>
+                    <span className="flex-grow text-lg font-extrabold tracking-tight text-white">
+                      {e.nome}
+                    </span>
+                    <span className="text-xs font-bold uppercase tracking-widest text-white/40">
+                      {e.escolas.length} unidades
+                    </span>
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-300 group-hover:bg-gold-400 group-hover:text-brand-950">
+                      <ArrowRight aria-hidden className="size-4" />
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </Reveal>
+          </div>
+          {/* Direita — mapa em relevo */}
           <Reveal delay={0.1} className="lg:col-span-7">
             <svg
               viewBox={MAPA_VIEWBOX}
               role="img"
               aria-label="Mapa do Centro-Oeste com as regiões da Educação Adventista"
-              className="mx-auto w-full max-w-[620px] font-sans drop-shadow-[0_28px_48px_rgba(0,0,0,0.45)]"
+              className="mx-auto w-full max-w-[680px] font-sans drop-shadow-[0_28px_48px_rgba(0,0,0,0.45)]"
             >
               <defs>
                 <linearGradient id="ouro-mapa" x1="0" y1="0" x2="0" y2="1">
@@ -161,36 +184,6 @@ export default function MapaRegioes() {
                 <Pin key={p.slug} pin={p} />
               ))}
             </svg>
-          </Reveal>
-          <Reveal delay={0.2} className="lg:col-span-5">
-            <div className="overflow-hidden rounded-2xl border border-white/15 bg-brand-900/50 backdrop-blur-md shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
-              <p className="border-b border-white/10 px-6 py-4 text-sm font-extrabold uppercase tracking-widest text-gold-400">
-                Escolha a sua região
-              </p>
-              <div className="flex flex-col divide-y divide-white/10">
-              {estados.map((e) => (
-                <Link
-                  key={e.slug}
-                  href={`/${e.slug}`}
-                  className="group flex items-center gap-4 px-6 py-[1.15rem] transition-colors hover:bg-white/5"
-                >
-                  <span className="text-xs font-extrabold uppercase tracking-widest text-gold-400 w-14">
-                    {e.associacao}
-                  </span>
-                  <span className="flex-grow text-lg font-extrabold tracking-tight text-primary-foreground">
-                    {e.nome}
-                  </span>
-                  <span className="text-sm font-semibold text-primary-foreground/60">
-                    {e.escolas.length} unidades
-                  </span>
-                  <ArrowRight
-                    aria-hidden
-                    className="size-4 text-gold-400 transition-transform group-hover:translate-x-1.5"
-                  />
-                </Link>
-              ))}
-              </div>
-            </div>
           </Reveal>
         </div>
       </div>
