@@ -157,6 +157,12 @@ body {
 .anim-glow     { animation: glow-pulse 7s ease-in-out infinite; }
 .anim-bounce   { animation: bounce-soft 2.2s ease-in-out infinite; }
 .anim-marquee  { animation: marquee 26s linear infinite; }
+@keyframes orbita {
+  to { transform: rotate(360deg); }
+}
+.anim-orbita     { animation: orbita 36s linear infinite; }
+.anim-orbita-rev { animation: orbita 52s linear infinite reverse; }
+
 .anim-esteira        { animation: marquee 60s linear infinite; }
 .anim-esteira-rev    { animation: marquee-reverso 75s linear infinite; }
 .esteira-pausavel:hover .anim-esteira,
@@ -240,7 +246,7 @@ a:focus-visible .estado-topo { transform: translateY(-16px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .anim-kenburns, .anim-float, .anim-glow, .anim-bounce, .anim-marquee, .anim-chip, .pin-pulso, .anim-aurora, .anim-esteira, .anim-esteira-rev { animation: none; }
+  .anim-kenburns, .anim-float, .anim-glow, .anim-bounce, .anim-marquee, .anim-chip, .pin-pulso, .anim-aurora, .anim-esteira, .anim-esteira-rev, .anim-orbita, .anim-orbita-rev { animation: none; }
   .tarja::before { transform: scaleX(1); transition: none; }
   .hero-enter, .hero-pop { animation: none; opacity: 1; }
   .reveal { opacity: 1; transform: none; transition: none; }
