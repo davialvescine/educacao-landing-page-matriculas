@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import Hero, { HeroCtas } from "@/components/Hero";
 import LeadForm from "@/components/LeadForm";
 import Reveal from "@/components/Reveal";
+import BarraCtaMobile from "@/components/BarraCtaMobile";
 import UnidadeCard from "@/components/UnidadeCard";
 import { Diferenciais, Eyebrow, StatsStrip } from "@/components/Secoes";
 import { getEstado, getEstados, getFormEstados } from "@/lib/rede";
@@ -140,6 +141,7 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
           </div>
         </section>
       </main>
+      <BarraCtaMobile />
       <Footer />
     </>
   );

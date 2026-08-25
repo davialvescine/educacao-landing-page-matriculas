@@ -26,7 +26,7 @@ export default function Hero({
 }: Props) {
   return (
     <section className="relative isolate overflow-hidden bg-gold-400">
-      {/* Fundo — mosaico de rostos com o "A" (composição oficial do PSD) */}
+      {/* Fundo — mosaico oficial em vídeo (raios de luz varrendo); estático no mobile */}
       <div className="absolute inset-0 -z-20">
         <Image
           src="/imagens/campanha/hero-bg.jpg"
@@ -36,6 +36,17 @@ export default function Hero({
           decoding="sync"
           sizes="100vw"
           className="object-cover"
+        />
+        <video
+          src="/videos/hero.mp4"
+          poster="/imagens/campanha/hero-bg.jpg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-hidden
+          className="absolute inset-0 hidden h-full w-full object-cover sm:block"
         />
       </div>
       {/* Brilho pulsante */}

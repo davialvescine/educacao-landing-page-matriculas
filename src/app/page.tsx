@@ -6,6 +6,10 @@ import LeadForm from "@/components/LeadForm";
 import MapaRegioes from "@/components/MapaRegioes";
 import Marquee from "@/components/Marquee";
 import MundoSection from "@/components/MundoSection";
+import NiveisSection from "@/components/NiveisSection";
+import UmDiaSection from "@/components/UmDiaSection";
+import DepoimentosSection from "@/components/DepoimentosSection";
+import BarraCtaMobile from "@/components/BarraCtaMobile";
 import Reveal from "@/components/Reveal";
 import { Diferenciais, IabcDestaque, StatsStrip } from "@/components/Secoes";
 import { getEstados, getFormEstados } from "@/lib/rede";
@@ -52,8 +56,11 @@ export default function Home() {
 
         <MapaRegioes />
 
+        <NiveisSection />
         <Diferenciais />
+        <UmDiaSection />
         <MundoSection />
+        <DepoimentosSection />
         <IabcDestaque />
 
         {/* Formulário — finale */}
@@ -108,6 +115,7 @@ export default function Home() {
           </div>
         </section>
       </main>
+      <BarraCtaMobile />
       <Footer />
     </>
   );
