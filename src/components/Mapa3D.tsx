@@ -130,7 +130,7 @@ function Cena({ pins }: { pins: PinMapa[] }) {
     if (!externo.current) return;
     entrada.current = Math.min(entrada.current + delta, 1.4);
     const t = THREE.MathUtils.smoothstep(entrada.current / 1.4, 0, 1);
-    const alvoY = THREE.MathUtils.lerp(-0.5, 0, t);
+    const alvoY = THREE.MathUtils.lerp(-0.5, 0.14, t);
     const p = state.pointer;
     externo.current.rotation.x = THREE.MathUtils.damp(
       externo.current.rotation.x,
@@ -200,9 +200,9 @@ function Cena({ pins }: { pins: PinMapa[] }) {
  *  estados que levantam no hover e navegação por clique. */
 export default function Mapa3D({ pins }: { pins: PinMapa[] }) {
   return (
-    <div className="mx-auto h-[560px] w-full max-w-[720px] xl:h-[620px]">
+    <div className="mx-auto h-[600px] w-full max-w-[760px] xl:h-[660px]">
       <Canvas
-        camera={{ position: [0, 0, 4.1], fov: 38 }}
+        camera={{ position: [0, 0, 4.8], fov: 38 }}
         dpr={[1, 1.75]}
         gl={{ antialias: true, alpha: true }}
       >
