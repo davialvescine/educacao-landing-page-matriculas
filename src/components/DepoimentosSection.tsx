@@ -75,9 +75,6 @@ function CartaoDepoimento({ d }: { d: (typeof DEPOIMENTOS)[number] }) {
         <p className="text-xs text-muted-foreground">
           {d.papel} · {d.escola}
         </p>
-        <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-gold-600">
-          {d.fonte}
-        </p>
       </figcaption>
     </figure>
   );
@@ -121,7 +118,7 @@ export default function DepoimentosSection() {
             O que as famílias dizem
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
-            Avaliações públicas reais de famílias da rede, com fonte em cada uma.
+            Avaliações reais de famílias da rede.
           </p>
         </Reveal>
       </div>
