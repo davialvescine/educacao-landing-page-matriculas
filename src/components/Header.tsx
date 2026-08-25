@@ -12,7 +12,7 @@ const NAV = [
 /** Header transparente sobreposto ao hero, como no site oficial da campanha. */
 export default function Header() {
   return (
-    <header className="absolute inset-x-0 top-0 z-50">
+    <header className="absolute inset-x-0 top-0 z-50 border-b border-white/10 bg-brand-950/55 backdrop-blur-md">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4">
         <Link href="/" className="flex shrink-0 items-center" aria-label="Página inicial">
           <Image

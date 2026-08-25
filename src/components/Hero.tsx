@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import FotoRotativa, { type FotoAluno } from "@/components/FotoRotativa";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +9,8 @@ interface Props {
   foto?: string;
   fotoLargura?: number;
   fotoAltura?: number;
+  /** Várias fotos: rotação ambiente com crossfade (ignora `foto`). */
+  fotos?: FotoAluno[];
   /** Bloco central direito (lettering/título + CTAs), como na arte oficial. */
   children: React.ReactNode;
 }
@@ -22,12 +25,13 @@ export default function Hero({
   foto = "/imagens/campanha/amanda.webp",
   fotoLargura = 1435,
   fotoAltura = 2200,
+  fotos,
   children,
 }: Props) {
   return (
     <section className="relative isolate overflow-hidden bg-gold-400">
-      {/* Fundo — mosaico oficial estático com varredura de luz sutil */}
-      <div className="absolute inset-0 -z-20 overflow-hidden">
+      {/* Fundo — mosaico oficial estático */}
+      <div className="absolute inset-0 -z-20">
         <Image
           src="/imagens/campanha/hero-bg.jpg"
           alt=""
@@ -36,10 +40,6 @@ export default function Hero({
           decoding="sync"
           sizes="100vw"
           className="object-cover"
-        />
-        <div
-          aria-hidden
-          className="anim-varredura absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/10 to-transparent"
         />
       </div>
       {/* Brilho pulsante */}
@@ -82,9 +82,9 @@ export default function Hero({
 
             {children}
 
-            {/* Linha da base: hashtag + site */}
+            {/* Linha da base: hashtag */}
             <div
-              className="hero-enter flex flex-wrap items-center gap-x-8 gap-y-3 lg:justify-center"
+              className="hero-enter lg:self-center"
               style={{ "--delay": "0.55s" } as React.CSSProperties}
             >
               <Image
@@ -94,28 +94,30 @@ export default function Hero({
                 height={122}
                 className="h-4 w-auto"
               />
-              <Image
-                src="/imagens/campanha/site-url.png"
-                alt="educacaoadventista.org.br"
-                width={2165}
-                height={86}
-                className="h-2.5 w-auto"
-              />
             </div>
           </div>
 
           {/* Esquerda — aluno ancorado na base, como na arte */}
           <div className="relative flex items-end justify-center lg:order-first lg:col-span-5">
-            <Image
-              src={foto}
-              alt="Estudante da Educação Adventista"
-              width={fotoLargura}
-              height={fotoAltura}
-              priority
-              decoding="sync"
-              className="hero-enter relative z-10 w-auto max-h-[440px] sm:max-h-[520px] lg:max-h-[620px] xl:max-h-[680px]"
-              style={{ "--delay": "0.2s" } as React.CSSProperties}
-            />
+            {fotos && fotos.length > 1 ? (
+              <div
+                className="hero-enter w-full"
+                style={{ "--delay": "0.2s" } as React.CSSProperties}
+              >
+                <FotoRotativa fotos={fotos} />
+              </div>
+            ) : (
+              <Image
+                src={foto}
+                alt="Estudante da Educação Adventista"
+                width={fotoLargura}
+                height={fotoAltura}
+                priority
+                decoding="sync"
+                className="hero-enter relative z-10 w-auto max-h-[440px] sm:max-h-[520px] lg:max-h-[620px] xl:max-h-[680px]"
+                style={{ "--delay": "0.2s" } as React.CSSProperties}
+              />
+            )}
             <HeroChip classe="left-0 top-[24%]" delay="0s" valor="39" rotulo="escolas" />
             <HeroChip classe="-right-2 top-[40%]" delay="1.4s" valor="6" rotulo="regiões" />
             <HeroChip classe="left-2 bottom-[14%]" delay="2.4s" valor="1896" rotulo="desde" />

@@ -16,10 +16,10 @@ export default function Marquee() {
       {ITENS.map((t) => (
         <span
           key={t}
-          className="flex items-center gap-6 pr-6 text-sm font-extrabold uppercase tracking-[0.18em] text-primary-foreground"
+          className="flex items-center gap-8 pr-8 text-[11px] font-bold uppercase tracking-[0.22em] text-primary-foreground/75"
         >
           {t}
-          <span aria-hidden className="text-gold-400">
+          <span aria-hidden className="text-[9px] text-gold-400/80">
             ✦
           </span>
         </span>
@@ -27,7 +27,7 @@ export default function Marquee() {
     </div>
   );
   return (
-    <div className="relative z-10 -mt-1 overflow-hidden bg-brand-700 py-3.5 shadow-cta">
+    <div className="relative z-10 -mt-1 overflow-hidden bg-brand-800 py-2.5">
       <div className="anim-marquee flex w-max">
         {linha(false)}
         {linha(true)}

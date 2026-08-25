@@ -67,7 +67,7 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
             Matrículas Abertas!
           </span>
           <h1
-            className="hero-pop text-4xl font-extrabold leading-[1.05] tracking-tight text-brand-800 sm:text-5xl lg:text-6xl"
+            className="hero-pop brilho-letras text-4xl font-extrabold leading-[1.05] tracking-tight text-brand-800 sm:text-5xl lg:text-6xl"
             style={{ "--delay": "0.22s" } as React.CSSProperties}
           >
             Educação Adventista

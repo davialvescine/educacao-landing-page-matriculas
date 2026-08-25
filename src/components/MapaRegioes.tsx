@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import Reveal from "@/components/Reveal";
 import { MAPA_PATHS, MAPA_VIEWBOX } from "@/data/mapa-paths";
+import { StatsTiles } from "@/components/Secoes";
 import { getEstados } from "@/lib/rede";
 
 const OURO = "#f2b541";
@@ -106,7 +107,10 @@ export default function MapaRegioes() {
         aria-hidden
         className="absolute inset-0 bg-gradient-to-b from-brand-950/95 via-brand-950/30 to-brand-950/95"
       />
-      <div className="relative mx-auto max-w-7xl px-4 py-28">
+      <div className="relative mx-auto max-w-7xl px-4 py-24">
+        <Reveal className="mb-20">
+          <StatsTiles />
+        </Reveal>
         <Reveal>
           <p className="flex items-center justify-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-gold-400">
             <span aria-hidden>✦</span> 6 regiões, {totalEscolas} escolas{" "}

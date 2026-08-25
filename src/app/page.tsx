@@ -22,13 +22,20 @@ export default function Home() {
     <>
       <Header />
       <main>
-        <Hero>
+        <Hero
+          fotos={[
+            { src: "/imagens/campanha/amanda.webp", w: 1044, h: 1600 },
+            { src: "/imagens/campanha/pedro.webp", w: 1440, h: 1600 },
+            { src: "/imagens/campanha/camila.webp", w: 1467, h: 1600 },
+            { src: "/imagens/campanha/sofia.webp", w: 1352, h: 1600 },
+          ]}
+        >
           <h1 className="sr-only">
             Educando gerações com valores pra vida — Educação Adventista
             Centro-Oeste
           </h1>
           <div
-            className="hero-pop"
+            className="hero-pop brilho-letras"
             style={{ "--delay": "0.18s" } as React.CSSProperties}
           >
             <Image
@@ -52,7 +59,6 @@ export default function Home() {
         </Hero>
 
         <Marquee />
-        <StatsStrip />
 
         <MapaRegioes />
 
