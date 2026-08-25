@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { MapPin, MessageCircle } from "lucide-react";
+import { MapPin, MessageCircle, Navigation } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { nomeEscola, type Escola, type Estado } from "@/lib/rede";
@@ -39,20 +39,36 @@ export default function UnidadeCard({
             {escola.endereco}
           </p>
         )}
-        {estado.whatsapp.link && (
-          <a
-            href={estado.whatsapp.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn(
-              buttonVariants(),
-              "mt-auto h-10 w-fit rounded-full px-5 text-sm font-semibold",
-            )}
-          >
-            <MessageCircle aria-hidden className="size-4" />
-            Falar no WhatsApp
-          </a>
-        )}
+        <div className="mt-auto flex flex-wrap gap-2 pt-1">
+          {estado.whatsapp.link && (
+            <a
+              href={estado.whatsapp.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                buttonVariants(),
+                "h-10 rounded-full px-5 text-sm font-semibold",
+              )}
+            >
+              <MessageCircle aria-hidden className="size-4" />
+              Falar no WhatsApp
+            </a>
+          )}
+          {escola.endereco && (
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${nome}, ${escola.endereco}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "h-10 rounded-full border-2 border-brand-200 bg-transparent px-5 text-sm font-semibold text-brand-800 hover:border-brand-400 hover:bg-brand-50",
+              )}
+            >
+              <Navigation aria-hidden className="size-4" />
+              Como chegar
+            </a>
+          )}
+        </div>
       </div>
     </article>
   );

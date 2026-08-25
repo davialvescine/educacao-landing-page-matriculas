@@ -46,8 +46,11 @@ const CARTOES: { destaque: string; texto: React.ReactNode }[] = [
 /** Seção "Educação Adventista no mundo" com o globo 3D animado (Magnific). */
 export default function MundoSection() {
   return (
-    <section id="mundo" className="scroll-mt-10 bg-surface">
-      <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 py-28 lg:grid-cols-2">
+    <section id="mundo" className="relative scroll-mt-10 overflow-hidden bg-surface">
+      {/* Aurora de fundo */}
+      <div aria-hidden className="anim-aurora absolute -left-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-gold-300/35 blur-[110px]" />
+      <div aria-hidden className="anim-aurora absolute -bottom-48 -right-32 h-[36rem] w-[36rem] rounded-full bg-brand-300/25 blur-[120px]" style={{ animationDelay: "-9s" }} />
+      <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-4 py-28 lg:grid-cols-2">
         <div>
           <Reveal>
             <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-brand-500">
@@ -56,18 +59,18 @@ export default function MundoSection() {
               </span>
               Uma rede global
             </p>
-            <h2 className="mt-4 text-4xl font-extrabold tracking-tighter text-brand-900 sm:text-5xl">
-              Educação Adventista
+            <h2 className="mt-4 text-5xl font-extrabold leading-[1.02] tracking-tighter text-brand-900 sm:text-6xl">
+              Educação
               <br />
-              <span className="inline-block bg-gold-400 px-3 leading-snug text-brand-950">
-                no mundo
-              </span>
+              Adventista
+              <br />
+              <span className="tarja text-brand-950">no mundo</span>
             </h2>
           </Reveal>
           <div className="mt-10 flex flex-col gap-5">
             {CARTOES.map((c, i) => (
               <Reveal key={c.destaque} delay={i * 0.1}>
-                <div className="rounded-2xl border border-line bg-paper p-6 shadow-card transition-shadow duration-300 hover:shadow-card-hover">
+                <div className="rounded-2xl border border-white/70 bg-surface/70 p-6 shadow-card backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
                   <p className="text-xs font-extrabold uppercase tracking-widest text-gold-600">
                     {c.destaque}
                   </p>

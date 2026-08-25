@@ -153,6 +153,29 @@ body {
 .anim-bounce   { animation: bounce-soft 2.2s ease-in-out infinite; }
 .anim-marquee  { animation: marquee 26s linear infinite; }
 
+/* Aurora de degradês (manchas desfocadas derivando) */
+@keyframes aurora {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(48px, -36px) scale(1.12); }
+  66%      { transform: translate(-36px, 28px) scale(0.94); }
+}
+.anim-aurora { animation: aurora 18s ease-in-out infinite; }
+
+/* Tarja de destaque que varre ao revelar */
+.tarja { position: relative; display: inline-block; padding: 0 0.35em; }
+.tarja::before {
+  content: "";
+  position: absolute;
+  inset: 0.04em -0.05em;
+  background: linear-gradient(100deg, var(--color-gold-300), var(--color-gold-400) 60%, var(--color-gold-500));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.35s;
+  z-index: -1;
+  border-radius: 6px;
+}
+.is-visible .tarja::before { transform: scaleX(1); }
+
 /* Mapa interativo das regiões */
 @keyframes pin-pulse {
   0%   { transform: scale(0.6); opacity: 0.9; }
@@ -172,6 +195,14 @@ a:focus-visible .mapa-estado {
 }
 .mapa-pin { transition: transform 0.25s ease; transform-box: fill-box; transform-origin: center; }
 a:hover .mapa-pin { transform: scale(1.12); }
+
+/* Alto-relevo: cada estado tem base escura, meio e face superior */
+.estado-meio { transform: translateY(14px); transition: transform 0.3s ease; }
+.estado-topo { transform: translateY(0); transition: transform 0.3s ease; }
+a:hover .estado-meio,
+a:focus-visible .estado-meio { transform: translateY(7px); }
+a:hover .estado-topo,
+a:focus-visible .estado-topo { transform: translateY(-16px); }
 .anim-chip     { animation: float-chip 5s ease-in-out infinite; animation-delay: var(--delay, 0s); }
 
 .hero-enter {
@@ -200,7 +231,8 @@ a:hover .mapa-pin { transform: scale(1.12); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .anim-kenburns, .anim-float, .anim-glow, .anim-bounce, .anim-marquee, .anim-chip, .pin-pulso { animation: none; }
+  .anim-kenburns, .anim-float, .anim-glow, .anim-bounce, .anim-marquee, .anim-chip, .pin-pulso, .anim-aurora { animation: none; }
+  .tarja::before { transform: scaleX(1); transition: none; }
   .hero-enter, .hero-pop { animation: none; opacity: 1; }
   .reveal { opacity: 1; transform: none; transition: none; }
   html { scroll-behavior: auto; }

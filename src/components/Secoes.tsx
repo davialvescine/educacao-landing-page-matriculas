@@ -26,15 +26,17 @@ export function StatsStrip() {
   const rede = getRede();
   return (
     <section className="bg-brand-950">
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-10 px-4 py-16 text-center sm:grid-cols-3 lg:grid-cols-5">
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-14 text-center sm:grid-cols-3 lg:grid-cols-5">
         {rede.estatisticas.map((s, i) => (
-          <Reveal key={s.rotulo} delay={i * 0.07}>
-            <p className="text-4xl font-extrabold tracking-tighter text-gold-400 sm:text-5xl">
-              <CountUp valor={s.valor} />
-            </p>
-            <p className="mt-2 text-xs font-bold uppercase tracking-widest text-primary-foreground/60">
-              {s.rotulo}
-            </p>
+          <Reveal key={s.rotulo} delay={i * 0.07} className="h-full">
+            <div className="flex h-full flex-col justify-center rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.09] to-white/[0.02] px-4 py-7 transition-colors duration-300 hover:border-gold-400/40">
+              <p className="text-3xl font-extrabold tracking-tighter text-gold-400 sm:text-4xl xl:text-[2.6rem]">
+                <CountUp valor={s.valor} />
+              </p>
+              <p className="mt-2 text-[11px] font-bold uppercase tracking-widest text-primary-foreground/60">
+                {s.rotulo}
+              </p>
+            </div>
           </Reveal>
         ))}
       </div>

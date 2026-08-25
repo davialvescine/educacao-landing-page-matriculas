@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import Reveal from "@/components/Reveal";
@@ -35,8 +36,18 @@ function Forma({ chave }: { chave: string }) {
   return (
     <g className="mapa-estado">
       {MAPA_PATHS[chave].map((d, i) => (
-        <path key={i} d={d} fill={OURO} />
+        <path key={`base-${i}`} d={d} fill="#6e4c0f" transform="translate(0,28)" />
       ))}
+      <g className="estado-meio">
+        {MAPA_PATHS[chave].map((d, i) => (
+          <path key={`meio-${i}`} d={d} fill="#c28a1a" />
+        ))}
+      </g>
+      <g className="estado-topo">
+        {MAPA_PATHS[chave].map((d, i) => (
+          <path key={`topo-${i}`} d={d} fill={OURO} />
+        ))}
+      </g>
     </g>
   );
 }
@@ -65,9 +76,21 @@ export default function MapaRegioes() {
   return (
     <section
       id="regioes"
-      className="relative scroll-mt-10 overflow-hidden bg-brand-950 [background-image:radial-gradient(ellipse_700px_480px_at_38%_50%,rgba(46,79,216,0.35),transparent_70%),linear-gradient(rgba(83,114,236,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(83,114,236,0.06)_1px,transparent_1px)] [background-size:auto,44px_44px,44px_44px]"
+      className="relative scroll-mt-10 overflow-hidden bg-brand-950"
     >
-      <div className="mx-auto max-w-7xl px-4 py-28">
+      {/* Cerrado ao fundo (ipê-amarelo, chapadas) com véu azul */}
+      <Image
+        src="/imagens/campanha/fundo-cerrado.jpg"
+        alt=""
+        fill
+        sizes="100vw"
+        className="object-cover object-center opacity-60"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-gradient-to-b from-brand-950/90 via-brand-950/40 to-brand-950/90"
+      />
+      <div className="relative mx-auto max-w-7xl px-4 py-28">
         <Reveal>
           <p className="flex items-center justify-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-gold-400">
             <span aria-hidden>✦</span> 6 regiões, {totalEscolas} escolas{" "}
