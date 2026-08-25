@@ -10,7 +10,7 @@ import Reveal from "@/components/Reveal";
 import BarraCtaMobile from "@/components/BarraCtaMobile";
 import DepoimentosSection from "@/components/DepoimentosSection";
 import UnidadeCard from "@/components/UnidadeCard";
-import { Diferenciais, Eyebrow, StatsStrip } from "@/components/Secoes";
+import { Diferenciais, Eyebrow } from "@/components/Secoes";
 import { getEstado, getEstados, getFormEstados } from "@/lib/rede";
 
 /** Fotos oficiais da campanha, alternadas entre as regiões. */
@@ -50,19 +50,9 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
       <Header />
       <main>
         <Hero compacto foto={foto.src} fotoLargura={foto.w} fotoAltura={foto.h}>
-          <nav
-            aria-label="Trilha de navegação"
-            className="hero-enter text-sm font-semibold text-brand-950/60"
-            style={{ "--delay": "0.1s" } as React.CSSProperties}
-          >
-            <Link href="/" className="transition-colors hover:text-brand-800">
-              Início
-            </Link>{" "}
-            / {estado.nome}
-          </nav>
           <span
             className="hero-enter inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-extrabold uppercase tracking-wide text-primary-foreground shadow-cta"
-            style={{ "--delay": "0.15s" } as React.CSSProperties}
+            style={{ "--delay": "0.05s" } as React.CSSProperties}
           >
             Matrículas Abertas!
           </span>
@@ -108,7 +98,6 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
           </div>
         </section>
 
-        <StatsStrip />
         <Diferenciais />
         <DepoimentosSection />
 
