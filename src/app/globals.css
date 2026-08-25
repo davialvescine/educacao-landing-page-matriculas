@@ -200,7 +200,7 @@ body {
 .anim-aurora { animation: aurora 18s ease-in-out infinite; }
 
 /* Tarja de destaque que varre ao revelar */
-.tarja { position: relative; display: inline-block; padding: 0 0.35em; }
+.tarja { position: relative; display: inline-block; padding: 0 0.35em; isolation: isolate; }
 .tarja::before {
   content: "";
   position: absolute;
