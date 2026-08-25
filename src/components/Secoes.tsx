@@ -67,7 +67,7 @@ const DESCRICOES: Record<string, string> = {
 export function Diferenciais() {
   const rede = getRede();
   return (
-    <section id="diferenciais" className="scroll-mt-10 bg-surface">
+    <section id="diferenciais" className="scroll-mt-10 bg-paper">
       <div className="mx-auto max-w-7xl px-4 py-28">
         <Reveal>
           <Eyebrow>Nossos diferenciais</Eyebrow>
@@ -76,7 +76,7 @@ export function Diferenciais() {
             Adventista?
           </h2>
         </Reveal>
-        <div className="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-6 lg:auto-rows-[15rem]">
+        <div className="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-6 lg:auto-rows-[13.5rem]">
           {/* Tile foto — 2 colunas × 2 linhas */}
           <Reveal className="lg:col-span-2 lg:row-span-2">
             <div className="relative h-full min-h-[22rem] overflow-hidden rounded-2xl bg-gold-400">
@@ -104,14 +104,14 @@ export function Diferenciais() {
 
           {rede.diferenciais.map((d, i) => (
             <Reveal key={d} delay={(i % 2) * 0.08} className="lg:col-span-2">
-              <div className="group relative h-full overflow-hidden rounded-2xl border border-line bg-paper p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
+              <div className="group relative h-full overflow-hidden rounded-2xl border border-line bg-surface p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-card-hover">
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute -right-2 -top-6 text-[5.5rem] font-extrabold tracking-tighter text-brand-100/80 transition-colors duration-300 group-hover:text-gold-200"
+                  className="pointer-events-none absolute -right-1 -top-7 text-[6.5rem] font-extrabold tracking-tighter text-brand-50 transition-colors duration-300 group-hover:text-gold-200"
                 >
                   0{i + 1}
                 </span>
-                <div className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-gold-200">
+                <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gold-300 shadow-[0_6px_14px_rgba(248,160,16,0.35)]">
                   <Image
                     src={ICONES_DIFERENCIAIS[i % ICONES_DIFERENCIAIS.length]}
                     alt=""
@@ -130,18 +130,23 @@ export function Diferenciais() {
             </Reveal>
           ))}
 
-          {/* Tile CTA */}
-          <Reveal delay={0.12} className="lg:col-span-2">
+          {/* Tile CTA — ocupa o restante da linha */}
+          <Reveal delay={0.12} className="lg:col-span-4">
             <Link
               href="/#matricula"
-              className="group flex h-full min-h-[10rem] flex-col justify-between rounded-2xl bg-brand-700 p-6 text-primary-foreground shadow-cta transition-all duration-300 hover:-translate-y-1 hover:bg-brand-600"
+              className="group relative flex h-full min-h-[10rem] items-center justify-between gap-6 overflow-hidden rounded-2xl bg-gold-400 p-7 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
             >
-              <p className="text-xl font-extrabold leading-snug tracking-tight">
-                Pronto para fazer
-                <br />
-                parte dessa história?
+              <Image
+                src="/imagens/campanha/hero-bg.jpg"
+                alt=""
+                fill
+                sizes="(max-width: 1024px) 100vw, 66vw"
+                className="object-cover opacity-40"
+              />
+              <p className="relative max-w-md text-2xl font-extrabold leading-snug tracking-tight text-brand-950 sm:text-3xl">
+                Pronto para fazer parte dessa história?
               </p>
-              <span className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-gold-300">
+              <span className="relative flex shrink-0 items-center gap-3 rounded-full bg-brand-700 px-7 py-4 text-sm font-bold uppercase tracking-widest text-primary-foreground shadow-cta transition-colors group-hover:bg-brand-600">
                 Quero fazer parte
                 <ArrowRight
                   aria-hidden

@@ -137,29 +137,41 @@ export default function Home() {
             sizes="100vw"
             className="object-cover opacity-[0.07]"
           />
-          <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-4 py-28 lg:grid-cols-2">
-            <Reveal>
-              <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-gold-400">
-                <span aria-hidden>✦</span> Vagas limitadas
-              </p>
-              <h2 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tighter text-primary-foreground sm:text-6xl">
-                Agora é a<br />
-                sua vez!
-              </h2>
-              <p className="mt-6 max-w-md text-lg leading-relaxed text-primary-foreground/70">
-                Deixe seu contato e a equipe da unidade escolhida fala com você
-                pelo WhatsApp para garantir a vaga — rápido, sem compromisso e
-                sem fila.
-              </p>
-              <Image
-                src="/imagens/campanha/daniel.webp"
-                alt="Aluno do Ensino Médio da Educação Adventista"
-                width={2004}
-                height={2200}
-                className="mt-10 hidden h-auto w-full max-w-xs drop-shadow-foto lg:block"
-              />
-            </Reveal>
-            <Reveal delay={0.15}>
+          <div className="relative mx-auto grid max-w-7xl items-stretch gap-x-14 px-4 lg:grid-cols-2">
+            <div className="flex flex-col pt-28 lg:pb-0">
+              <Reveal>
+                <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-gold-400">
+                  <span aria-hidden>✦</span> Vagas limitadas
+                </p>
+                <h2 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tighter text-primary-foreground sm:text-6xl">
+                  Agora é a<br />
+                  sua vez!
+                </h2>
+                <p className="mt-6 max-w-md text-lg leading-relaxed text-primary-foreground/70">
+                  Deixe seu contato e a equipe da unidade escolhida fala com você
+                  pelo WhatsApp para garantir a vaga — rápido, sem compromisso e
+                  sem fila.
+                </p>
+              </Reveal>
+              {/* Dupla de alunos ancorada na base da seção, como na arte */}
+              <div className="relative mt-auto hidden items-end justify-center gap-0 pt-14 lg:flex">
+                <Image
+                  src="/imagens/campanha/pedro.webp"
+                  alt="Aluno do Ensino Médio da Educação Adventista"
+                  width={1440}
+                  height={1600}
+                  className="h-[26rem] w-auto"
+                />
+                <Image
+                  src="/imagens/campanha/malu.webp"
+                  alt="Aluna da Educação Infantil da Educação Adventista"
+                  width={1160}
+                  height={1600}
+                  className="-ml-28 h-[19rem] w-auto"
+                />
+              </div>
+            </div>
+            <Reveal delay={0.15} className="py-28">
               <LeadForm estados={getFormEstados()} />
             </Reveal>
           </div>

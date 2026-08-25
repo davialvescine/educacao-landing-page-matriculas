@@ -13,12 +13,12 @@ import { getEstado, getEstados, getFormEstados } from "@/lib/rede";
 
 /** Fotos oficiais da campanha, alternadas entre as regiões. */
 const FOTOS: Record<string, { src: string; w: number; h: number }> = {
-  "distrito-federal": { src: "/imagens/campanha/daniel.webp", w: 2004, h: 2200 },
-  goias: { src: "/imagens/campanha/camila.webp", w: 2016, h: 2200 },
-  "mato-grosso-do-sul": { src: "/imagens/campanha/amanda.webp", w: 1435, h: 2200 },
-  "oeste-mt": { src: "/imagens/campanha/daniel.webp", w: 2004, h: 2200 },
-  tocantins: { src: "/imagens/campanha/amanda.webp", w: 1435, h: 2200 },
-  "leste-mt": { src: "/imagens/campanha/camila.webp", w: 2016, h: 2200 },
+  "distrito-federal": { src: "/imagens/campanha/pedro.webp", w: 1440, h: 1600 },
+  goias: { src: "/imagens/campanha/camila.webp", w: 1467, h: 1600 },
+  "mato-grosso-do-sul": { src: "/imagens/campanha/daniel.webp", w: 1457, h: 1600 },
+  "oeste-mt": { src: "/imagens/campanha/sofia.webp", w: 1352, h: 1600 },
+  tocantins: { src: "/imagens/campanha/marlon.webp", w: 1088, h: 1600 },
+  "leste-mt": { src: "/imagens/campanha/malu.webp", w: 1160, h: 1600 },
 };
 
 export function generateStaticParams() {
