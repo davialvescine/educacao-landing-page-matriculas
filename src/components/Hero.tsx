@@ -27,18 +27,19 @@ export default function Hero({
   return (
     <section className="relative isolate overflow-hidden bg-gold-400">
       {/* Fundo — mosaico de rostos com o "A" (composição oficial do PSD) */}
-      <div className="absolute inset-0 -z-20 anim-kenburns">
+      <div className="absolute inset-0 -z-20">
         <Image
           src="/imagens/campanha/hero-bg.jpg"
           alt=""
           fill
           priority
+          decoding="sync"
           sizes="100vw"
           className="object-cover"
         />
       </div>
       {/* Brilho pulsante */}
-      <div className="absolute -left-32 top-1/4 -z-10 anim-glow">
+      <div className="absolute -left-32 top-1/4 -z-10 opacity-80">
         <Image
           src="/imagens/campanha/brilho.webp"
           alt=""
@@ -50,18 +51,6 @@ export default function Hero({
 
       <div className="mx-auto max-w-7xl px-4 pt-20">
         <div className="grid items-end gap-x-8 lg:min-h-[600px] lg:grid-cols-12 xl:min-h-[660px]">
-          {/* Esquerda — aluno ancorado na base, como na arte */}
-          <div className="order-last flex items-end justify-center lg:order-none lg:col-span-5">
-            <Image
-              src={foto}
-              alt="Estudante da Educação Adventista"
-              width={fotoLargura}
-              height={fotoAltura}
-              priority
-              className="hero-enter relative z-10 w-auto max-h-[440px] sm:max-h-[520px] lg:max-h-[620px] xl:max-h-[680px] drop-shadow-foto"
-              style={{ "--delay": "0.2s" } as React.CSSProperties}
-            />
-          </div>
 
           {/* Direita — pilha vertical central */}
           <div className="flex flex-col items-start gap-7 py-12 sm:py-14 lg:col-span-7 lg:items-center lg:self-center lg:py-24 lg:text-center">
@@ -110,9 +99,56 @@ export default function Hero({
               />
             </div>
           </div>
+
+          {/* Esquerda — aluno ancorado na base, como na arte */}
+          <div className="relative flex items-end justify-center lg:order-first lg:col-span-5">
+            <Image
+              src={foto}
+              alt="Estudante da Educação Adventista"
+              width={fotoLargura}
+              height={fotoAltura}
+              priority
+              decoding="sync"
+              className="hero-enter relative z-10 w-auto max-h-[440px] sm:max-h-[520px] lg:max-h-[620px] xl:max-h-[680px]"
+              style={{ "--delay": "0.2s" } as React.CSSProperties}
+            />
+            <HeroChip classe="left-0 top-[24%]" delay="0s" valor="39" rotulo="escolas" />
+            <HeroChip classe="-right-2 top-[40%]" delay="1.4s" valor="6" rotulo="regiões" />
+            <HeroChip classe="left-2 bottom-[14%]" delay="2.4s" valor="1896" rotulo="desde" />
+          </div>
         </div>
       </div>
     </section>
+  );
+}
+
+/** Chip glass flutuante com micro-estatística, ao redor da foto do hero. */
+function HeroChip({
+  classe,
+  delay,
+  valor,
+  rotulo,
+}: {
+  classe: string;
+  delay: string;
+  valor: string;
+  rotulo: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "anim-chip absolute z-20 hidden rounded-2xl border border-white/60 bg-white/90 px-4 py-2.5 text-center shadow-card lg:block",
+        classe,
+      )}
+      style={{ "--delay": delay } as React.CSSProperties}
+    >
+      <p className="text-xl font-extrabold leading-none tracking-tight text-brand-800">
+        {valor}
+      </p>
+      <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-brand-950/60">
+        {rotulo}
+      </p>
+    </div>
   );
 }
 

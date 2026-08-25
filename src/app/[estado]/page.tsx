@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
@@ -7,7 +8,7 @@ import Hero, { HeroCtas } from "@/components/Hero";
 import LeadForm from "@/components/LeadForm";
 import Reveal from "@/components/Reveal";
 import UnidadeCard from "@/components/UnidadeCard";
-import { Diferenciais, StatsStrip } from "@/components/Secoes";
+import { Diferenciais, Eyebrow, StatsStrip } from "@/components/Secoes";
 import { getEstado, getEstados, getFormEstados } from "@/lib/rede";
 
 /** Fotos oficiais da campanha, alternadas entre as regiões. */
@@ -88,7 +89,8 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
         {/* Unidades */}
         <section className="mx-auto max-w-7xl px-4 py-24">
           <Reveal>
-            <h2 className="text-center text-3xl font-extrabold tracking-tight text-brand-900 sm:text-4xl">
+            <Eyebrow>{estado.associacao}</Eyebrow>
+            <h2 className="mt-4 text-center text-4xl font-extrabold tracking-tighter text-brand-900 sm:text-5xl">
               Nossas unidades
             </h2>
             <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
@@ -107,14 +109,27 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
         <StatsStrip />
         <Diferenciais />
 
-        {/* Formulário */}
-        <section id="matricula" className="scroll-mt-20 bg-brand-50/60">
-          <div className="mx-auto max-w-2xl px-4 py-24">
+        {/* Formulário — finale */}
+        <section
+          id="matricula"
+          className="relative scroll-mt-10 overflow-hidden bg-brand-950"
+        >
+          <Image
+            src="/imagens/campanha/hero-bg.jpg"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover opacity-[0.07]"
+          />
+          <div className="relative mx-auto max-w-2xl px-4 py-28">
             <Reveal>
-              <h2 className="text-center text-3xl font-extrabold tracking-tight text-brand-900 sm:text-4xl">
+              <p className="flex items-center justify-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-gold-400">
+                <span aria-hidden>✦</span> Vagas limitadas
+              </p>
+              <h2 className="mt-4 text-center text-4xl font-extrabold tracking-tighter text-primary-foreground sm:text-5xl">
                 Garanta sua vaga em {estado.nome}
               </h2>
-              <p className="mt-3 text-center text-muted-foreground">
+              <p className="mt-4 text-center text-primary-foreground/70">
                 Deixe seu contato e a equipe da unidade fala com você pelo
                 WhatsApp.
               </p>
