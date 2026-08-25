@@ -15,10 +15,13 @@ export default function FotoRotativa({ fotos }: { fotos: FotoAluno[] }) {
 
   useEffect(() => {
     if (fotos.length < 2) return;
+    // Cada visita começa num aluno diferente (janela de 5 min define o rosto do momento)
+    const CINCO_MIN = 5 * 60 * 1000;
+    setAtiva(Math.floor(Date.now() / CINCO_MIN) % fotos.length);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const id = setInterval(() => {
       setAtiva((a) => (a + 1) % fotos.length);
-    }, 12000);
+    }, CINCO_MIN);
     return () => clearInterval(id);
   }, [fotos.length]);
 
