@@ -26,8 +26,8 @@ export default function Hero({
 }: Props) {
   return (
     <section className="relative isolate overflow-hidden bg-gold-400">
-      {/* Fundo — mosaico oficial em vídeo (raios de luz varrendo); estático no mobile */}
-      <div className="absolute inset-0 -z-20">
+      {/* Fundo — mosaico oficial estático com varredura de luz sutil */}
+      <div className="absolute inset-0 -z-20 overflow-hidden">
         <Image
           src="/imagens/campanha/hero-bg.jpg"
           alt=""
@@ -37,16 +37,9 @@ export default function Hero({
           sizes="100vw"
           className="object-cover"
         />
-        <video
-          src="/videos/hero.mp4"
-          poster="/imagens/campanha/hero-bg.jpg"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
+        <div
           aria-hidden
-          className="absolute inset-0 hidden h-full w-full object-cover sm:block"
+          className="anim-varredura absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/10 to-transparent"
         />
       </div>
       {/* Brilho pulsante */}
