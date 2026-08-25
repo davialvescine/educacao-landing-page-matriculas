@@ -38,7 +38,7 @@ export default function Footer() {
                   href={`/${e.slug}`}
                   className="transition-colors hover:text-primary-foreground"
                 >
-                  {e.nome} ({e.associacao})
+                  {e.nome} ({e.uf})
                 </Link>
               </li>
             ))}
