@@ -49,7 +49,7 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
     <>
       <Header />
       <main>
-        <Hero foto={foto.src} fotoLargura={foto.w} fotoAltura={foto.h}>
+        <Hero compacto foto={foto.src} fotoLargura={foto.w} fotoAltura={foto.h}>
           <nav
             aria-label="Trilha de navegação"
             className="hero-enter text-sm font-semibold text-brand-950/60"

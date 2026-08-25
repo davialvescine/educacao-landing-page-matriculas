@@ -11,6 +11,8 @@ interface Props {
   fotoAltura?: number;
   /** Várias fotos: rotação ambiente com crossfade (ignora `foto`). */
   fotos?: FotoAluno[];
+  /** Páginas de região: esconde logo, selos e chips para um hero limpo. */
+  compacto?: boolean;
   /** Bloco central direito (lettering/título + CTAs), como na arte oficial. */
   children: React.ReactNode;
 }
@@ -26,6 +28,7 @@ export default function Hero({
   fotoLargura = 1435,
   fotoAltura = 2200,
   fotos,
+  compacto = false,
   children,
 }: Props) {
   return (
@@ -59,6 +62,7 @@ export default function Hero({
           {/* Direita: pilha vertical central */}
           <div className="flex flex-col items-start gap-7 py-12 sm:py-14 lg:col-span-7 lg:items-center lg:self-center lg:py-24 lg:text-center">
             {/* Logo + selo 130 anos */}
+            {!compacto && (
             <div
               className="hero-enter flex flex-wrap items-center gap-x-7 gap-y-3 lg:justify-center"
               style={{ "--delay": "0.05s" } as React.CSSProperties}
@@ -79,22 +83,25 @@ export default function Hero({
                 className="h-9 w-auto xl:h-10"
               />
             </div>
+            )}
 
             {children}
 
             {/* Linha da base: hashtag */}
-            <div
-              className="hero-enter lg:self-center"
-              style={{ "--delay": "0.55s" } as React.CSSProperties}
-            >
-              <Image
-                src="/imagens/campanha/muito-alem-do-ensino.png"
-                alt="#MuitoAlémdoEnsino"
-                width={1617}
-                height={122}
-                className="h-4 w-auto"
-              />
-            </div>
+            {!compacto && (
+              <div
+                className="hero-enter lg:self-center"
+                style={{ "--delay": "0.55s" } as React.CSSProperties}
+              >
+                <Image
+                  src="/imagens/campanha/muito-alem-do-ensino.png"
+                  alt="#MuitoAlémdoEnsino"
+                  width={1617}
+                  height={122}
+                  className="h-4 w-auto"
+                />
+              </div>
+            )}
           </div>
 
           {/* Esquerda: aluno ancorado na base, como na arte */}
@@ -118,9 +125,13 @@ export default function Hero({
                 style={{ "--delay": "0.2s" } as React.CSSProperties}
               />
             )}
-            <HeroChip classe="left-0 top-[24%]" delay="0s" valor="39" rotulo="escolas" />
-            <HeroChip classe="-right-2 top-[40%]" delay="1.4s" valor="6" rotulo="regiões" />
-            <HeroChip classe="left-2 bottom-[14%]" delay="2.4s" valor="1896" rotulo="desde" />
+            {!compacto && (
+              <>
+                <HeroChip classe="left-0 top-[24%]" delay="0s" valor="39" rotulo="escolas" />
+                <HeroChip classe="-right-2 top-[40%]" delay="1.4s" valor="6" rotulo="regiões" />
+                <HeroChip classe="left-2 bottom-[14%]" delay="2.4s" valor="1896" rotulo="desde" />
+              </>
+            )}
           </div>
         </div>
       </div>
