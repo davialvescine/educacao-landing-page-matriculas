@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import MapaInterativo from "@/components/MapaInterativo";
 import Reveal from "@/components/Reveal";
 import { StatsTiles } from "@/components/Secoes";
 import { MAPA_PATHS, MAPA_VIEWBOX } from "@/data/mapa-paths";
@@ -16,8 +17,8 @@ const PINS: {
   y: number;
   delay: string;
 }[] = [
-  { slug: "oeste-mt", rotulo: "MT Oeste", x: 950, y: 640, delay: "0s" },
-  { slug: "leste-mt", rotulo: "MT Leste", x: 470, y: 950, delay: "0.4s" },
+  { slug: "oeste-mt", rotulo: "Oeste Matogrossense", x: 950, y: 640, delay: "0s" },
+  { slug: "leste-mt", rotulo: "Leste Matogrossense", x: 470, y: 950, delay: "0.4s" },
   { slug: "tocantins", rotulo: "Tocantins", x: 1390, y: 380, delay: "0.8s" },
   { slug: "goias", rotulo: "Goiás", x: 1250, y: 1260, delay: "1.2s" },
   { slug: "distrito-federal", rotulo: "DF", x: 1620, y: 990, delay: "1.6s" },
@@ -146,6 +147,16 @@ export default function MapaRegioes() {
           </div>
           {/* Direita — mapa em relevo */}
           <Reveal delay={0.1} className="lg:col-span-7">
+            <MapaInterativo
+              pins={PINS.map((p) => ({
+                slug: p.slug,
+                rotulo: p.rotulo,
+                contagem:
+                  estados.find((e) => e.slug === p.slug)?.escolas.length ?? 0,
+                x: p.x,
+                y: p.y,
+              }))}
+              fallback={
             <svg
               viewBox={MAPA_VIEWBOX}
               role="img"
@@ -184,6 +195,8 @@ export default function MapaRegioes() {
                 <Pin key={p.slug} pin={p} />
               ))}
             </svg>
+              }
+            />
           </Reveal>
         </div>
       </div>
