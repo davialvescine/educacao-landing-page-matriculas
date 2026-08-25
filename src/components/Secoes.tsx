@@ -75,7 +75,10 @@ const DESCRICOES: Record<string, string> = {
 export function Diferenciais() {
   const rede = getRede();
   return (
-    <section id="diferenciais" className="scroll-mt-10 bg-paper">
+    <section
+      id="diferenciais"
+      className="scroll-mt-10 border-y border-brand-100 bg-brand-50 [background-image:linear-gradient(rgba(83,114,236,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(83,114,236,0.05)_1px,transparent_1px)] [background-size:44px_44px]"
+    >
       <div className="mx-auto max-w-7xl px-4 py-28">
         <Reveal>
           <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
@@ -199,8 +202,19 @@ export function Diferenciais() {
 export function IabcDestaque() {
   const rede = getRede();
   return (
-    <section id="iabc" className="scroll-mt-10 bg-brand-950">
-      <div className="mx-auto flex max-w-7xl flex-col items-center gap-10 px-4 py-20 md:flex-row">
+    <section id="iabc" className="relative scroll-mt-10 overflow-hidden bg-brand-950">
+      <Image
+        src="/imagens/campanha/fundo-cerrado.jpg"
+        alt=""
+        fill
+        sizes="100vw"
+        className="object-cover object-[center_35%] opacity-50"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-gradient-to-r from-brand-950/95 via-brand-950/60 to-brand-950/95"
+      />
+      <div className="relative mx-auto flex max-w-7xl flex-col items-center gap-10 px-4 py-24 md:flex-row">
         <Reveal>
           <Image
             src="/imagens/logos/Logo-IABC.png"

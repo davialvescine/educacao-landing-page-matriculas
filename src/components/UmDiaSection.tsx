@@ -12,7 +12,7 @@ const CENAS = [
 /** Um dia na escola: galeria de experiências. */
 export default function UmDiaSection() {
   return (
-    <section id="um-dia" className="scroll-mt-10 bg-surface">
+    <section id="um-dia" className="relative scroll-mt-10 overflow-hidden bg-surface [background-image:radial-gradient(ellipse_600px_320px_at_50%_0%,rgba(248,192,56,0.18),transparent_70%)]">
       <div className="mx-auto max-w-7xl px-4 py-28">
         <Reveal>
           <Eyebrow>Muito além da sala de aula</Eyebrow>

@@ -42,8 +42,9 @@ const NIVEIS = [
 /** Da Educação Infantil ao Ensino Médio, com os alunos da campanha. */
 export default function NiveisSection() {
   return (
-    <section id="niveis" className="scroll-mt-10 bg-paper">
-      <div className="mx-auto max-w-7xl px-4 py-28">
+    <section id="niveis" className="relative scroll-mt-10 overflow-hidden bg-gradient-to-b from-paper via-gold-100/60 to-paper">
+      <div aria-hidden className="anim-aurora absolute -left-40 top-20 h-[26rem] w-[26rem] rounded-full bg-gold-300/50 blur-[110px]" />
+      <div className="relative mx-auto max-w-7xl px-4 py-28">
         <Reveal>
           <Eyebrow>Para cada fase, um caminho</Eyebrow>
           <h2 className="mt-4 text-center text-4xl font-extrabold tracking-tighter text-brand-900 sm:text-5xl">
