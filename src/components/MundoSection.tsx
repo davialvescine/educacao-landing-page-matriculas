@@ -1,4 +1,5 @@
 import { Globe2, HeartHandshake, Landmark } from "lucide-react";
+import Constelacao from "@/components/Constelacao";
 import CountUp from "@/components/CountUp";
 import Reveal from "@/components/Reveal";
 
@@ -53,8 +54,10 @@ export default function MundoSection() {
   return (
     <section
       id="mundo"
-      className="relative scroll-mt-10 overflow-hidden bg-brand-950"
+      className="relative scroll-mt-10 overflow-hidden border-t border-dashed border-white/10 bg-brand-950"
     >
+      {/* Constelação de partículas ao fundo */}
+      <Constelacao className="opacity-70" />
       {/* Auroras */}
       <div
         aria-hidden
@@ -100,6 +103,7 @@ export default function MundoSection() {
           </div>
         </div>
         <Reveal delay={0.15} className="relative mx-auto w-full max-w-[460px]">
+          <div className="anim-flutuar relative">
           <div
             aria-hidden
             className="absolute -inset-8 rounded-full bg-gold-400/20 blur-[60px]"
@@ -142,6 +146,7 @@ export default function MundoSection() {
             <span className="whitespace-nowrap text-xs font-bold uppercase tracking-widest text-white/60">
               alunos no mundo
             </span>
+          </div>
           </div>
         </Reveal>
       </div>

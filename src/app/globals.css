@@ -180,6 +180,12 @@ body {
 }
 .anim-varredura { animation: varredura 9.5s ease-in-out infinite; }
 
+@keyframes flutuar {
+  from { transform: translateY(6px); }
+  to   { transform: translateY(-8px); }
+}
+.anim-flutuar { animation: flutuar 7s ease-in-out infinite alternate; }
+
 @keyframes zoom-lento {
   from { transform: scale(1); }
   to   { transform: scale(1.07); }
@@ -281,7 +287,7 @@ a:focus-visible .estado-topo { transform: translateY(-16px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .anim-kenburns, .anim-float, .anim-glow, .anim-bounce, .anim-marquee, .anim-chip, .pin-pulso, .anim-aurora, .anim-esteira, .anim-esteira-rev, .anim-orbita, .anim-orbita-rev, .anim-varredura, .ponto-digitando, .anim-zoom-lento { animation: none; }
+  .anim-kenburns, .anim-float, .anim-glow, .anim-bounce, .anim-marquee, .anim-chip, .pin-pulso, .anim-aurora, .anim-esteira, .anim-esteira-rev, .anim-orbita, .anim-orbita-rev, .anim-varredura, .ponto-digitando, .anim-zoom-lento, .anim-flutuar { animation: none; }
   .brilho-letras::after { animation: none; opacity: 0; }
   .tarja::before { transform: scaleX(1); transition: none; }
   .hero-enter, .hero-pop { animation: none; opacity: 1; }

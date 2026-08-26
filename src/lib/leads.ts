@@ -36,20 +36,8 @@ export interface FiltroLeads {
   limite?: number;
 }
 
-// Pool do Postgres criado sob demanda; em dev sem DATABASE_URL usamos arquivo.
-type Pool = import("pg").Pool;
-let pool: Pool | null = null;
-
-function getPool(): Pool | null {
-  const url = process.env.DATABASE_URL;
-  if (!url) return null;
-  if (!pool) {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { Pool: PgPool } = require("pg") as typeof import("pg");
-    pool = new PgPool({ connectionString: url, max: 5 });
-  }
-  return pool;
-}
+// Pool do Postgres compartilhado; em dev sem DATABASE_URL usamos arquivo.
+import { getPool } from "@/lib/db";
 
 const ARQUIVO_DEV = path.join(process.cwd(), "var", "leads.jsonl");
 
