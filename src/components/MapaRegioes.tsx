@@ -17,8 +17,8 @@ const PINS: {
   y: number;
   delay: string;
 }[] = [
-  { slug: "oeste-mt", rotulo: "Oeste Matogrossense", x: 950, y: 640, delay: "0s" },
-  { slug: "leste-mt", rotulo: "Leste Matogrossense", x: 470, y: 950, delay: "0.4s" },
+  { slug: "oeste-mt", rotulo: "Oeste Mato-Grossense", x: 950, y: 640, delay: "0s" },
+  { slug: "leste-mt", rotulo: "Leste Mato-Grossense", x: 470, y: 950, delay: "0.4s" },
   { slug: "tocantins", rotulo: "Tocantins", x: 1390, y: 380, delay: "0.8s" },
   { slug: "goias", rotulo: "Goiás", x: 1250, y: 1260, delay: "1.2s" },
   { slug: "distrito-federal", rotulo: "DF", x: 1620, y: 990, delay: "1.6s" },

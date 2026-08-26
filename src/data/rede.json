@@ -286,7 +286,7 @@
     },
     {
       "slug": "oeste-mt",
-      "nome": "Oeste Matogrossense",
+      "nome": "Oeste Mato-Grossense",
       "uf": "MT",
       "whatsapp": {
         "numero": "+55 65 9942-1370",
@@ -387,7 +387,7 @@
     },
     {
       "slug": "leste-mt",
-      "nome": "Leste Matogrossense",
+      "nome": "Leste Mato-Grossense",
       "uf": "MT",
       "associacao": "ALM",
       "whatsapp": {
@@ -473,7 +473,7 @@
       "APLAC": "Distrito Federal",
       "ABC": "Goiás",
       "ASM": "Mato Grosso do Sul",
-      "AOM": "Oeste Matogrossense",
+      "AOM": "Oeste Mato-Grossense",
       "MTO": "Tocantins",
       "ALM": "Mato Grosso (Cuiabá/Rondonópolis)"
     }
