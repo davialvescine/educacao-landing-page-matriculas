@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { FormEstado } from "@/lib/rede";
+import { eventoLead, lerUtm } from "@/lib/campanha-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -73,11 +74,14 @@ export default function LeadForm({
   async function onSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     const form = ev.currentTarget;
-    const dados = Object.fromEntries(new FormData(form).entries());
+    const dados: Record<string, unknown> = Object.fromEntries(
+      new FormData(form).entries(),
+    );
     dados.estado = estado;
     dados.escola = escola;
     dados.nivel = nivel;
     dados.whatsapp = whatsapp;
+    dados.utm = lerUtm();
     setEnviando(true);
     setErro("");
     try {
@@ -90,6 +94,7 @@ export default function LeadForm({
         const body = await res.json().catch(() => null);
         throw new Error(body?.erro ?? "Não foi possível enviar. Tente novamente.");
       }
+      eventoLead({ regiao: estado, nivel, escola });
       router.push(`/obrigado?regiao=${estado}`);
     } catch (e) {
       setEnviando(false);

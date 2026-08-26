@@ -22,6 +22,10 @@ Stack: Next.js 16 (App Router, páginas estáticas + `/api/leads` dinâmica), Po
    | `PAINEL_SENHA` | sim (produção) | Senha do painel de leads em `/painel` (sessão de 12h via cookie assinado). |
    | `LEAD_WEBHOOK_URL` | não | Fallback: webhook genérico usado apenas se `SEVENBEE_TOKEN` não estiver definido. |
    | `LEAD_WEBHOOK_TOKEN` | não | Se definido, vai como `Authorization: Bearer <token>` no webhook genérico. |
+   | `CRON_SEGREDO` | recomendada | Segredo da tarefa de reenvio automático. Agende no Coolify (Scheduled Tasks) um `curl -fsS "https://<dominio>/api/tarefas/reenviar-falhas?segredo=<valor>"` a cada 10 minutos. |
+   | `NEXT_PUBLIC_GA_ID` | não | ID do GA4 (padrão embutido: `G-8ZSKJGD105`). |
+   | `NEXT_PUBLIC_META_PIXEL_ID` | quando houver ads | Meta Pixel para campanhas de Facebook/Instagram; dispara `PageView`, `Lead` e `Contact`. |
+   | `NEXT_PUBLIC_SITE_URL` | não | URL canônica (padrão embutido: `https://educaadventistacentrooeste.com.br`). |
    | `SEVENBEE_WEBHOOK_SEGREDO` | recomendada | Segredo do webhook de retorno do Sevenbee (status de atendimento). Cadastre no Sevenbee (Ajustes > Integrações > Webhooks) a URL `https://<dominio>/api/sevenbee/webhook?segredo=<valor>` assinando os eventos `SESSION_CREATED`, `SESSION_UPDATED` e `SESSION_ENDED`. |
 
    O fluxo do lead é **push**: ao enviar o formulário, o lead é salvo no

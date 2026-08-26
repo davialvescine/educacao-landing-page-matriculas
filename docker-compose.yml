@@ -29,6 +29,7 @@ services:
       DATABASE_URL: postgres://matriculas:matriculas-local@db:5432/matriculas
       PAINEL_SENHA: matriculas2027
       SEVENBEE_WEBHOOK_SEGREDO: teste-segredo-123
+      CRON_SEGREDO: teste-cron-123
       # Para testar o envio real ao Sevenbee, descomente e cole o token:
       # SEVENBEE_TOKEN: pn_xxxxxxxxxxxxxxxxxxxxxx
     ports:

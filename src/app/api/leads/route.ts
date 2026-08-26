@@ -9,6 +9,27 @@ function limpar(v: unknown, max: number): string {
   return typeof v === "string" ? v.trim().slice(0, max) : "";
 }
 
+const CHAVES_UTM = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_term",
+  "utm_content",
+  "gclid",
+  "fbclid",
+] as const;
+
+function limparUtm(v: unknown): Record<string, string> | null {
+  if (!v || typeof v !== "object") return null;
+  const bruto = v as Record<string, unknown>;
+  const utm: Record<string, string> = {};
+  for (const chave of CHAVES_UTM) {
+    const valor = limpar(bruto[chave], 200);
+    if (valor) utm[chave] = valor;
+  }
+  return Object.keys(utm).length ? utm : null;
+}
+
 export async function POST(req: Request) {
   let body: Record<string, unknown>;
   try {
@@ -24,6 +45,7 @@ export async function POST(req: Request) {
     estado: limpar(body.estado, 40),
     escola: limpar(body.escola, 120),
     nivel: limpar(body.nivel, 60),
+    utm: limparUtm(body.utm),
   };
 
   if (!lead.nome || !lead.whatsapp) {

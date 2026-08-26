@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { X } from "lucide-react";
+import { eventoWhats } from "@/lib/campanha-client";
 
 export interface RegiaoWhats {
   slug: string;
@@ -161,7 +162,10 @@ export default function WhatsFlutuante({
                           href={`${r.link}?text=${MENSAGEM}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          onClick={() => setAberto(false)}
+                          onClick={() => {
+                            eventoWhats(r.slug);
+                            setAberto(false);
+                          }}
                           className="hero-enter rounded-full border-2 border-[#25D366] bg-white px-4 py-2 text-sm font-bold text-[#075E54] shadow-sm transition-all hover:bg-[#25D366] hover:text-white"
                           style={{ "--delay": `${0.08 * i}s` } as React.CSSProperties}
                         >
@@ -193,6 +197,7 @@ export default function WhatsFlutuante({
           href={urlDireta}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => eventoWhats("regiao-atual")}
           aria-label="Falar no WhatsApp"
           className="group relative flex h-15 w-15 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_12px_28px_rgba(37,211,102,0.45)] transition-transform hover:scale-105 active:scale-95"
         >

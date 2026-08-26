@@ -37,11 +37,17 @@ export async function enviarLeadSevenbee(
 
   const estado = getEstado(lead.estado);
   const tagBase = process.env.SEVENBEE_TAG ?? "Matrículas 2027";
+  const origem = lead.utm
+    ? [lead.utm.utm_source, lead.utm.utm_medium, lead.utm.utm_campaign]
+        .filter(Boolean)
+        .join(" / ")
+    : "";
   const anotacao = [
     `Lead da landing de matrículas (${new Date().toLocaleDateString("pt-BR")}).`,
     estado ? `Região: ${estado.nome} (${estado.associacao})` : null,
     lead.escola ? `Escola de interesse: ${lead.escola}` : null,
     lead.nivel ? `Série / nível: ${lead.nivel}` : null,
+    origem ? `Campanha: ${origem}` : null,
   ]
     .filter(Boolean)
     .join("\n");
@@ -67,6 +73,7 @@ export async function enviarLeadSevenbee(
           associacao: estado?.associacao ?? "",
           escola: lead.escola,
           nivel: lead.nivel,
+          ...(lead.utm ?? {}),
         },
         options: { upsert: true },
       }),

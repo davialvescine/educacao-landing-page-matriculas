@@ -15,12 +15,16 @@ CREATE TABLE IF NOT EXISTS leads (
   webhook_tentativas int  NOT NULL DEFAULT 0,
   enviado_em         timestamptz,
   atendimento_status text NOT NULL DEFAULT 'aguardando', -- aguardando | em_atendimento | atendido
-  atendimento_em     timestamptz
+  atendimento_em     timestamptz,
+  utm                jsonb                               -- origem de campanha
 );
 
 -- Colunas de atendimento para bancos criados antes desta versão.
 ALTER TABLE leads ADD COLUMN IF NOT EXISTS atendimento_status text NOT NULL DEFAULT 'aguardando';
 ALTER TABLE leads ADD COLUMN IF NOT EXISTS atendimento_em timestamptz;
+
+-- Origem de campanha (utm_source, utm_medium, utm_campaign, gclid, fbclid...).
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS utm jsonb;
 
 CREATE INDEX IF NOT EXISTS leads_estado_idx ON leads (estado);
 CREATE INDEX IF NOT EXISTS leads_criado_em_idx ON leads (criado_em DESC);

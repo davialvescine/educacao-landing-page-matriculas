@@ -3,7 +3,9 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { GA_ID, SITE_NOME, SITE_URL } from "@/lib/site";
+import CapturaUtm from "@/components/CapturaUtm";
+import MetaPixel from "@/components/MetaPixel";
+import { GA_ID, META_PIXEL_ID, SITE_NOME, SITE_URL } from "@/lib/site";
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -71,7 +73,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="pt-BR" className={cn("h-full antialiased font-sans", jakarta.variable)}>
       <body className="min-h-full flex flex-col font-sans">
         {children}
+        <CapturaUtm />
         {GA_ID ? <GoogleAnalytics gaId={GA_ID} /> : null}
+        {META_PIXEL_ID ? <MetaPixel pixelId={META_PIXEL_ID} /> : null}
       </body>
     </html>
   );

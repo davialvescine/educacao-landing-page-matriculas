@@ -9,6 +9,8 @@ export interface LeadNovo {
   estado: string;
   escola: string;
   nivel: string;
+  /** Origem de campanha: utm_source, utm_medium, utm_campaign, gclid... */
+  utm?: Record<string, string> | null;
 }
 
 export interface LeadRegistro extends LeadNovo {
@@ -56,9 +58,18 @@ export async function salvarLead(lead: LeadNovo): Promise<string> {
   const db = getPool();
   if (db) {
     await db.query(
-      `INSERT INTO leads (id, nome, whatsapp, email, estado, escola, nivel)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [id, lead.nome, lead.whatsapp, lead.email, lead.estado, lead.escola, lead.nivel],
+      `INSERT INTO leads (id, nome, whatsapp, email, estado, escola, nivel, utm)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [
+        id,
+        lead.nome,
+        lead.whatsapp,
+        lead.email,
+        lead.estado,
+        lead.escola,
+        lead.nivel,
+        lead.utm ? JSON.stringify(lead.utm) : null,
+      ],
     );
   } else {
     await mkdir(path.dirname(ARQUIVO_DEV), { recursive: true });
@@ -145,6 +156,10 @@ async function lerArquivoDev(): Promise<LeadRegistro[]> {
       enviado_em: null,
       atendimento_status: "aguardando",
       atendimento_em: null,
+      utm:
+        obj.utm && typeof obj.utm === "object"
+          ? (obj.utm as Record<string, string>)
+          : null,
     });
   }
   return [...porId.values()].reverse(); // mais recentes primeiro
@@ -166,7 +181,7 @@ export async function listarLeads(filtro: FiltroLeads = {}): Promise<LeadRegistr
     valores.push(limite);
     const sql = `SELECT id, nome, whatsapp, email, estado, escola, nivel,
                         criado_em, webhook_status, webhook_tentativas, enviado_em,
-                        atendimento_status, atendimento_em
+                        atendimento_status, atendimento_em, utm
                  FROM leads
                  ${clausulas.length ? `WHERE ${clausulas.join(" AND ")}` : ""}
                  ORDER BY criado_em DESC
@@ -198,7 +213,7 @@ export async function obterLead(id: string): Promise<LeadRegistro | null> {
     const { rows } = await db.query(
       `SELECT id, nome, whatsapp, email, estado, escola, nivel,
               criado_em, webhook_status, webhook_tentativas, enviado_em,
-              atendimento_status, atendimento_em
+              atendimento_status, atendimento_em, utm
        FROM leads WHERE id = $1`,
       [id],
     );

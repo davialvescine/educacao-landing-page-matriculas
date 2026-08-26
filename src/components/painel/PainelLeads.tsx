@@ -170,6 +170,27 @@ export default function PainelLeads({
     }
   }
 
+  async function reenviarTodos() {
+    setReenviando("todos");
+    setAviso("");
+    try {
+      const res = await fetch("/api/painel/reenviar-todos", { method: "POST" });
+      const dados = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setAviso(dados.erro ?? "Não foi possível reprocessar.");
+      } else {
+        setAviso(
+          `Reprocessamento concluído: ${dados.enviados ?? 0} enviados, ${dados.falhas ?? 0} ainda com falha.`,
+        );
+      }
+      router.refresh();
+    } catch {
+      setAviso("Falha de conexão ao reprocessar.");
+    } finally {
+      setReenviando(null);
+    }
+  }
+
   async function sair() {
     await fetch("/api/painel/sessao", { method: "DELETE" }).catch(() => {});
     router.refresh();
@@ -288,6 +309,19 @@ export default function PainelLeads({
               </option>
             ))}
           </select>
+          {integracaoConfigurada && resumo.pendentes + resumo.falhas > 0 ? (
+            <Button
+              variant="outline"
+              disabled={reenviando === "todos"}
+              onClick={reenviarTodos}
+              className="ml-auto h-9 rounded-full text-sm font-bold"
+            >
+              <RefreshCw aria-hidden className="size-4" />
+              {reenviando === "todos"
+                ? "Reprocessando..."
+                : `Reenviar todos (${resumo.pendentes + resumo.falhas})`}
+            </Button>
+          ) : null}
         </div>
 
         {/* Tabela */}
@@ -515,6 +549,23 @@ export default function PainelLeads({
                     : "Ainda não enviado"}
                 </dd>
               </div>
+              {selecionado.utm && Object.keys(selecionado.utm).length ? (
+                <div className="sm:col-span-2">
+                  <dt className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    Origem da campanha
+                  </dt>
+                  <dd className="mt-1 flex flex-wrap gap-2">
+                    {Object.entries(selecionado.utm).map(([chave, valor]) => (
+                      <span
+                        key={chave}
+                        className="rounded-full bg-brand-100 px-2.5 py-1 text-xs font-bold text-brand-800"
+                      >
+                        {chave.replace("utm_", "")}: {valor}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              ) : null}
               <div className="sm:col-span-2">
                 <dt className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                   Atendimento no Sevenbee
