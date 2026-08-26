@@ -442,15 +442,14 @@
           "nome": "Colégio Adventista de Rondonópolis",
           "nome_oficial": "Colégio Adventista de Rondonópolis",
           "endereco": "R. Afonso Pena, 806 – Centro, Rondonópolis – MT, CEP 78700-070",
-          "foto": null,
-          "foto_propria": false,
-          "pendencias": [
-            "foto"
-          ],
+          "foto": "imagens/unidades/leste-mt/colegio-adventista-de-rondonopolis.jpg",
+          "foto_propria": true,
+          "pendencias": [],
           "telefone": "(66) 3024-5106",
           "whatsapp_escola": "(66) 99936-4657",
           "site": "https://rondonopolis.educacaoadventista.org.br/",
-          "fonte_endereco": "site oficial da escola (educacaoadventista.org.br), 25/08/2026"
+          "fonte_endereco": "site oficial da escola (educacaoadventista.org.br), 25/08/2026",
+          "fonte_foto": "Google Maps (contribuidor Alexandre Pacheco, set/2021), extraída a pedido do cliente em 26/08/2026; confirmar autorização de uso"
         }
       ]
     }
