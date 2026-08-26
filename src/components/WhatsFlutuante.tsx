@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, X } from "lucide-react";
+import { X } from "lucide-react";
 
 export interface RegiaoWhats {
   slug: string;
@@ -22,8 +23,8 @@ function IconeWhatsApp({ className }: { className?: string }) {
   );
 }
 
-/** Botão flutuante de WhatsApp: pulsa no canto e direciona ao número
- *  da região (seletor na home; direto nas páginas de região). */
+/** Botão flutuante de WhatsApp com mini-chat de boas-vindas:
+ *  a pessoa escolhe a região como resposta rápida e cai no número certo. */
 export default function WhatsFlutuante({
   regioes,
   linkDireto,
@@ -32,12 +33,20 @@ export default function WhatsFlutuante({
   linkDireto?: string | null;
 }) {
   const [aberto, setAberto] = useState(false);
+  const [digitando, setDigitando] = useState(true);
 
   const urlDireta = linkDireto ? `${linkDireto}?text=${MENSAGEM}` : null;
 
+  useEffect(() => {
+    if (!aberto) return;
+    setDigitando(true);
+    const id = setTimeout(() => setDigitando(false), 1100);
+    return () => clearTimeout(id);
+  }, [aberto]);
+
   return (
     <div className="fixed bottom-20 right-4 z-50 flex flex-col items-end gap-3 lg:bottom-6 lg:right-6">
-      {/* Seletor de região */}
+      {/* Mini-chat */}
       {aberto && !urlDireta && regioes && (
         <>
           <button
@@ -45,50 +54,81 @@ export default function WhatsFlutuante({
             className="fixed inset-0 -z-10 cursor-default"
             onClick={() => setAberto(false)}
           />
-          <div className="w-72 overflow-hidden rounded-2xl border border-line bg-surface shadow-card-hover">
-            <div className="flex items-center justify-between bg-[#075E54] px-4 py-3">
-              <p className="text-sm font-extrabold text-white">
-                De qual região você é?
-              </p>
+          <div className="hero-pop w-[21rem] overflow-hidden rounded-3xl border border-black/5 shadow-[0_24px_64px_rgba(0,0,0,0.28)]">
+            {/* Cabeçalho */}
+            <div className="flex items-center gap-3 bg-[#075E54] px-4 py-3.5">
+              <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-white">
+                <Image
+                  src="/imagens/campanha/logo-ea.png"
+                  alt=""
+                  width={857}
+                  height={178}
+                  className="h-4 w-auto"
+                />
+                <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-[#075E54] bg-[#25D366]" />
+              </span>
+              <div className="flex-grow">
+                <p className="text-sm font-extrabold leading-tight text-white">
+                  Educação Adventista
+                </p>
+                <p className="text-xs text-white/75">online agora</p>
+              </div>
               <button
-                aria-label="Fechar"
+                aria-label="Fechar conversa"
                 onClick={() => setAberto(false)}
-                className="text-white/80 transition-colors hover:text-white"
+                className="text-white/70 transition-colors hover:text-white"
               >
                 <X className="size-4" />
               </button>
             </div>
-            <div className="flex flex-col divide-y divide-line">
-              {regioes.map((r) =>
-                r.link ? (
-                  <a
-                    key={r.slug}
-                    href={`${r.link}?text=${MENSAGEM}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center justify-between px-4 py-3 text-sm font-bold text-brand-900 transition-colors hover:bg-brand-50"
-                    onClick={() => setAberto(false)}
-                  >
-                    {r.nome}
-                    <ArrowRight
-                      aria-hidden
-                      className="size-4 text-[#25D366] transition-transform group-hover:translate-x-1"
-                    />
-                  </a>
-                ) : (
-                  <Link
-                    key={r.slug}
-                    href="#matricula"
-                    className="group flex items-center justify-between px-4 py-3 text-sm font-bold text-brand-900 transition-colors hover:bg-brand-50"
-                    onClick={() => setAberto(false)}
-                  >
-                    {r.nome}
-                    <ArrowRight
-                      aria-hidden
-                      className="size-4 text-brand-400 transition-transform group-hover:translate-x-1"
-                    />
-                  </Link>
-                ),
+            {/* Conversa */}
+            <div className="flex max-h-[26rem] flex-col gap-3 overflow-y-auto bg-[#ECE5DD] p-4 [background-image:radial-gradient(rgba(0,0,0,0.03)_1px,transparent_1px)] [background-size:16px_16px]">
+              {digitando ? (
+                <div className="w-fit rounded-2xl rounded-tl-md bg-white px-4 py-3 shadow-sm">
+                  <span className="flex gap-1.5">
+                    <span className="ponto-digitando h-2 w-2 rounded-full bg-brand-300" />
+                    <span className="ponto-digitando h-2 w-2 rounded-full bg-brand-300" style={{ animationDelay: "0.15s" }} />
+                    <span className="ponto-digitando h-2 w-2 rounded-full bg-brand-300" style={{ animationDelay: "0.3s" }} />
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <div className="hero-enter w-fit max-w-[85%] rounded-2xl rounded-tl-md bg-white px-4 py-3 shadow-sm">
+                    <p className="text-sm leading-relaxed text-ink">
+                      Olá! 👋 Que alegria ter você aqui. Para falar com a equipe
+                      certa, me conta:{" "}
+                      <strong className="font-bold">de qual região você é?</strong>
+                    </p>
+                    <p className="mt-1 text-right text-[10px] text-ink/40">agora</p>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    {regioes.map((r, i) =>
+                      r.link ? (
+                        <a
+                          key={r.slug}
+                          href={`${r.link}?text=${MENSAGEM}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => setAberto(false)}
+                          className="hero-enter rounded-full border-2 border-[#25D366] bg-white px-4 py-2 text-sm font-bold text-[#075E54] shadow-sm transition-all hover:bg-[#25D366] hover:text-white"
+                          style={{ "--delay": `${0.08 * i}s` } as React.CSSProperties}
+                        >
+                          {r.nome}
+                        </a>
+                      ) : (
+                        <Link
+                          key={r.slug}
+                          href="#matricula"
+                          onClick={() => setAberto(false)}
+                          className="hero-enter rounded-full border-2 border-brand-200 bg-white px-4 py-2 text-sm font-bold text-brand-700 shadow-sm transition-all hover:bg-brand-700 hover:text-white"
+                          style={{ "--delay": `${0.08 * i}s` } as React.CSSProperties}
+                        >
+                          {r.nome}
+                        </Link>
+                      ),
+                    )}
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -124,6 +164,11 @@ export default function WhatsFlutuante({
             className="absolute inset-0 animate-ping rounded-full bg-[#25D366]/60 motion-reduce:hidden"
             style={{ animationDuration: "2.4s" }}
           />
+          {!aberto && (
+            <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[11px] font-extrabold text-white shadow">
+              1
+            </span>
+          )}
           <IconeWhatsApp className="relative size-8" />
         </button>
       )}
