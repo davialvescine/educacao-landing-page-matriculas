@@ -13,9 +13,11 @@ import {
   MessageCircle,
   RefreshCw,
   Send,
+  Users,
   TriangleAlert,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import { signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -242,6 +244,14 @@ export default function PainelLeads({
             >
               <RefreshCw aria-hidden className="size-4" /> Atualizar
             </button>
+            {usuario.papel === "admin" ? (
+              <Link
+                href="/painel/equipe"
+                className="inline-flex h-9 items-center gap-2 rounded-full border border-white/25 px-4 text-sm font-bold text-white transition-colors hover:bg-white/10"
+              >
+                <Users aria-hidden className="size-4" /> Equipe
+              </Link>
+            ) : null}
             <button
               type="button"
               onClick={sair}
