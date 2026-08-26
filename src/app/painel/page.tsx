@@ -8,6 +8,7 @@ import {
   usuarioLogado,
 } from "@/lib/painel-auth";
 import { integracaoConfigurada } from "@/lib/webhook";
+import { emailConfigurado } from "@/lib/email";
 import LoginPainel from "@/components/painel/LoginPainel";
 import PainelLeads from "@/components/painel/PainelLeads";
 
@@ -34,6 +35,7 @@ export default async function PainelPage({ searchParams }: Props) {
       <LoginPainel
         configurado={autenticacaoConfigurada()}
         primeiroAcesso={!(await existeAdmin())}
+        emailConfigurado={emailConfigurado()}
       />
     );
   }

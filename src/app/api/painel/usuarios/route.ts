@@ -114,7 +114,7 @@ export async function POST(req: Request) {
     await registrarAcesso("criou_usuario", {
       usuarioId: admin.id,
       usuarioNome: admin.nome,
-      detalhe: `${nome} <${email}> como ${papel}`,
+      detalhe: `${nome} como ${papel}`,
     });
     return NextResponse.json({ ok: true });
   } catch (e) {
@@ -154,6 +154,22 @@ export async function PATCH(req: Request) {
   }
 
   const cabecalhos = await headers();
+
+  // Nome de quem está sendo alterado: o registro guarda gente, não códigos.
+  let alvo = "usuário";
+  try {
+    const lista = await auth.api.listUsers({
+      query: { limit: 200 },
+      headers: cabecalhos,
+    });
+    const achado = ((lista as { users?: unknown[] }).users ?? []).find(
+      (u) => (u as { id?: string }).id === id,
+    ) as { name?: string } | undefined;
+    if (achado?.name) alvo = achado.name;
+  } catch {
+    // sem o nome, segue com o rótulo genérico
+  }
+
   const feito: string[] = [];
   try {
     if (body.papel === "admin" || body.papel === "coordenador") {
@@ -220,7 +236,7 @@ export async function PATCH(req: Request) {
   await registrarAcesso("alterou_usuario", {
     usuarioId: admin.id,
     usuarioNome: admin.nome,
-    detalhe: `${id}: ${feito.join(", ")}`,
+    detalhe: `${alvo}: ${feito.join(", ")}`,
   });
   return NextResponse.json({ ok: true });
 }

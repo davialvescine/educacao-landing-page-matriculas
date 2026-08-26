@@ -22,15 +22,29 @@ services:
       timeout: 3s
       retries: 10
 
+  # Servidor de e-mail de testes: nada sai para a internet.
+  # Caixa de entrada em http://localhost:8025
+  email:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+
   web:
     build: .
     depends_on:
       db:
         condition: service_healthy
+      email:
+        condition: service_started
     environment:
       DATABASE_URL: postgres://matriculas:matriculas-local@db:5432/matriculas
       BETTER_AUTH_SECRET: segredo-local-de-desenvolvimento-32-chars
       BETTER_AUTH_URL: http://localhost:3300
+      SMTP_HOST: email
+      SMTP_PORTA: "1025"
+      SMTP_USUARIO: painel@educaadventistacentrooeste.com.br
+      SMTP_SENHA: local
+      SMTP_REMETENTE: "Educação Adventista Centro-Oeste <painel@educaadventistacentrooeste.com.br>"
       SEVENBEE_WEBHOOK_SEGREDO: teste-segredo-123
       CRON_SEGREDO: teste-cron-123
       # Para testar o envio real ao Sevenbee, descomente e cole o token:

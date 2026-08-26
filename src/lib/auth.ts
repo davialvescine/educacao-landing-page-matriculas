@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins";
 import { Pool } from "pg";
+import { enviarRedefinicaoSenha } from "@/lib/email";
 
 /**
  * Autenticação do painel (Better Auth).
@@ -31,6 +32,14 @@ export const auth = betterAuth({
     // bloqueada no handler (src/app/api/auth/[...all]/route.ts).
     disableSignUp: false,
     minPasswordLength: 8,
+
+    // "Esqueci minha senha": o link chega por e-mail e vale 1 hora.
+    // Sem SMTP configurado, o envio é ignorado (o administrador cadastra
+    // a senha manualmente pelo painel).
+    resetPasswordTokenExpiresIn: 60 * 60,
+    sendResetPassword: async ({ user, url }) => {
+      await enviarRedefinicaoSenha(user.email, user.name ?? "", url);
+    },
   },
 
   session: {
