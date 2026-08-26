@@ -1,0 +1,38 @@
+# Ambiente local idêntico ao de produção (Coolify): app + Postgres.
+# Subir:  docker compose up -d --build
+# Parar:  docker compose down            (com -v apaga também o banco)
+# Site:   http://localhost:3300          Painel: /painel (senha abaixo)
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: matriculas
+      POSTGRES_PASSWORD: matriculas-local
+      POSTGRES_DB: matriculas
+    volumes:
+      - dados-db:/var/lib/postgresql/data
+      # Cria a tabela de leads na primeira subida.
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U matriculas -d matriculas"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://matriculas:matriculas-local@db:5432/matriculas
+      PAINEL_SENHA: matriculas2027
+      SEVENBEE_WEBHOOK_SEGREDO: teste-segredo-123
+      # Para testar o envio real ao Sevenbee, descomente e cole o token:
+      # SEVENBEE_TOKEN: pn_xxxxxxxxxxxxxxxxxxxxxx
+    ports:
+      - "3300:3000"
+
+volumes:
+  dados-db:

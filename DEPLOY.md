@@ -29,6 +29,20 @@ Stack: Next.js 16 (App Router, páginas estáticas + `/api/leads` dinâmica), Po
    resultado fica em `webhook_status` (`enviado` / `falhou:*`), visível no
    painel `/painel`, que também permite reenviar manualmente os que falharem.
 
+## Teste local com Docker (espelho da produção)
+
+Roda o mesmo container do Coolify + Postgres com a tabela criada
+automaticamente:
+
+```bash
+docker compose up -d --build   # site em http://localhost:3300
+docker compose down            # parar (com -v apaga o banco)
+```
+
+Painel em `http://localhost:3300/painel` (senha local: `matriculas2027`).
+Para testar o envio real ao Sevenbee, descomente `SEVENBEE_TOKEN` no
+`docker-compose.yml` e cole o token.
+
 ## 2. Cloudflare (na frente da VPS)
 
 1. Nameservers do domínio → Cloudflare; registro `A` → IP da VPS com **proxy ligado** (nuvem laranja).
