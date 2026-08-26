@@ -2,14 +2,16 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Download,
   Inbox,
   LogOut,
+  MessageCircle,
   RefreshCw,
   Send,
   TriangleAlert,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -39,6 +41,15 @@ function formatarData(iso: string): string {
     month: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
+  }).format(d);
+}
+
+function formatarDataLonga(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "long",
+    timeStyle: "short",
   }).format(d);
 }
 
@@ -78,7 +89,22 @@ export default function PainelLeads({
   const router = useRouter();
   const [reenviando, setReenviando] = useState<string | null>(null);
   const [aviso, setAviso] = useState("");
+  const [selecionado, setSelecionado] = useState<LeadRegistro | null>(null);
   const nomeRegiao = new Map(regioes.map((r) => [r.slug, r.nome]));
+
+  // Fecha o modal com Esc e trava o scroll da página enquanto ele está aberto.
+  useEffect(() => {
+    if (!selecionado) return;
+    const aoTeclar = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelecionado(null);
+    };
+    document.addEventListener("keydown", aoTeclar);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", aoTeclar);
+      document.body.style.overflow = "";
+    };
+  }, [selecionado]);
 
   function aplicarFiltro(regiao: string, status: string) {
     const q = new URLSearchParams();
@@ -98,6 +124,18 @@ export default function PainelLeads({
       });
       const dados = await res.json().catch(() => ({}));
       if (!res.ok) setAviso(dados.erro ?? "Não foi possível reenviar.");
+      // Reflete o novo status no modal aberto sem esperar o refresh.
+      if (dados.status) {
+        setSelecionado((atual) =>
+          atual && atual.id === id
+            ? {
+                ...atual,
+                webhook_status: dados.status,
+                webhook_tentativas: atual.webhook_tentativas + 1,
+              }
+            : atual,
+        );
+      }
       router.refresh();
     } catch {
       setAviso("Falha de conexão ao reenviar.");
@@ -119,7 +157,7 @@ export default function PainelLeads({
   ];
 
   return (
-    <main className="min-h-dvh bg-paper">
+    <main className="flex min-h-dvh flex-col bg-paper">
       {/* Barra superior */}
       <header className="bg-brand-950">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
@@ -160,7 +198,7 @@ export default function PainelLeads({
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-4 py-8">
+      <div className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
         {/* Resumo */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {cartoes.map((c) => (
@@ -252,7 +290,11 @@ export default function PainelLeads({
                 </tr>
               ) : (
                 leads.map((l) => (
-                  <tr key={l.id} className="border-b border-line/60 last:border-0">
+                  <tr
+                    key={l.id}
+                    onClick={() => setSelecionado(l)}
+                    className="cursor-pointer border-b border-line/60 transition-colors last:border-0 hover:bg-brand-50/60"
+                  >
                     <td
                       className="whitespace-nowrap px-4 py-3 text-muted-foreground"
                       suppressHydrationWarning
@@ -272,6 +314,7 @@ export default function PainelLeads({
                         href={`https://wa.me/55${l.whatsapp.replace(/\D/g, "")}`}
                         target="_blank"
                         rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
                         className="font-bold text-emerald-700 hover:underline"
                       >
                         {l.whatsapp}
@@ -305,7 +348,10 @@ export default function PainelLeads({
                           size="sm"
                           variant="outline"
                           disabled={reenviando === l.id}
-                          onClick={() => reenviar(l.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            reenviar(l.id);
+                          }}
                           className="h-8 rounded-full text-xs font-bold"
                         >
                           {reenviando === l.id ? "Enviando..." : "Reenviar"}
@@ -323,6 +369,153 @@ export default function PainelLeads({
           {filtroRegiao || filtroStatus ? " com os filtros aplicados" : ""}.
         </p>
       </div>
+
+      {/* Rodapé */}
+      <footer className="mt-8 bg-brand-950">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 sm:flex-row">
+          <Image
+            src="/imagens/logos/logo_colegio.png"
+            alt="Educação Adventista Centro-Oeste"
+            width={502}
+            height={150}
+            className="h-8 w-auto"
+          />
+          <p className="text-center text-xs text-white/60">
+            © {new Date().getFullYear()} Educação Adventista Centro-Oeste.
+            Todos os direitos reservados. · Painel interno de matrículas, acesso
+            restrito.
+          </p>
+        </div>
+      </footer>
+
+      {/* Modal de detalhes do lead */}
+      {selecionado ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-brand-950/60 p-4 backdrop-blur-sm"
+          onClick={() => setSelecionado(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Detalhes do lead ${selecionado.nome}`}
+        >
+          <div
+            className="w-full max-w-2xl overflow-hidden rounded-3xl bg-surface shadow-card-hover"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4 border-b border-line bg-brand-50/60 px-8 py-6">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  Lead · {nomeRegiao.get(selecionado.estado) ?? selecionado.estado}
+                </p>
+                <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-brand-950">
+                  {selecionado.nome}
+                </h2>
+                <div className="mt-2">
+                  <BadgeStatus status={selecionado.webhook_status} />
+                  {selecionado.webhook_tentativas > 0 ? (
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      {selecionado.webhook_tentativas}{" "}
+                      {selecionado.webhook_tentativas === 1
+                        ? "tentativa"
+                        : "tentativas"}{" "}
+                      de envio
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelecionado(null)}
+                aria-label="Fechar"
+                className="flex size-10 shrink-0 items-center justify-center rounded-full border border-line text-muted-foreground transition-colors hover:bg-brand-50 hover:text-brand-900"
+              >
+                <X aria-hidden className="size-5" />
+              </button>
+            </div>
+
+            <dl className="grid gap-x-8 gap-y-5 px-8 py-7 sm:grid-cols-2">
+              <div>
+                <dt className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  WhatsApp
+                </dt>
+                <dd className="mt-1 text-lg font-bold text-brand-950">
+                  {selecionado.whatsapp}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  E-mail
+                </dt>
+                <dd className="mt-1 break-all font-medium text-brand-950">
+                  {selecionado.email || "Não informado"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  Escola de interesse
+                </dt>
+                <dd className="mt-1 font-medium text-brand-950">
+                  {selecionado.escola || "Ainda não sei / qualquer unidade"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  Série / nível
+                </dt>
+                <dd className="mt-1 font-medium text-brand-950">
+                  {selecionado.nivel || "Não informado"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  Recebido em
+                </dt>
+                <dd className="mt-1 font-medium text-brand-950" suppressHydrationWarning>
+                  {formatarDataLonga(selecionado.criado_em)}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  Enviado ao sistema em
+                </dt>
+                <dd className="mt-1 font-medium text-brand-950" suppressHydrationWarning>
+                  {selecionado.enviado_em
+                    ? formatarDataLonga(selecionado.enviado_em)
+                    : "Ainda não enviado"}
+                </dd>
+              </div>
+            </dl>
+
+            <div className="flex flex-wrap items-center gap-3 border-t border-line bg-brand-50/40 px-8 py-6">
+              <a
+                href={`https://wa.me/55${selecionado.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá, ${selecionado.nome.split(" ")[0]}! Recebemos seu interesse na Educação Adventista. Podemos conversar sobre a matrícula?`)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex h-11 items-center gap-2 rounded-full bg-[#25D366] px-6 text-sm font-extrabold text-white transition-opacity hover:opacity-90"
+              >
+                <MessageCircle aria-hidden className="size-4" />
+                Chamar no WhatsApp
+              </a>
+              {integracaoConfigurada &&
+              selecionado.webhook_status !== "enviado" ? (
+                <Button
+                  variant="outline"
+                  disabled={reenviando === selecionado.id}
+                  onClick={() => reenviar(selecionado.id)}
+                  className="h-11 rounded-full px-6 text-sm font-bold"
+                >
+                  <RefreshCw aria-hidden className="size-4" />
+                  {reenviando === selecionado.id
+                    ? "Enviando..."
+                    : "Reenviar ao sistema"}
+                </Button>
+              ) : null}
+              <span className="ml-auto text-[11px] text-muted-foreground">
+                ID: {selecionado.id}
+              </span>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
