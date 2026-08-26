@@ -17,6 +17,15 @@ export interface LeadRegistro extends LeadNovo {
   webhook_status: string; // pendente | enviado | falhou:*
   webhook_tentativas: number;
   enviado_em: string | null;
+  atendimento_status: string; // aguardando | em_atendimento | atendido
+  atendimento_em: string | null;
+}
+
+/** Telefone reduzido a dígitos, sem o DDI 55, para casar lead × Sevenbee. */
+export function normalizarTelefone(telefone: string): string {
+  let d = telefone.replace(/\D/g, "");
+  if (d.startsWith("55") && d.length >= 12) d = d.slice(2);
+  return d;
 }
 
 export interface FiltroLeads {
@@ -108,6 +117,20 @@ async function lerArquivoDev(): Promise<LeadRegistro[]> {
       }
       continue;
     }
+    if (obj.tipo === "atendimento") {
+      const alvo = obj.id
+        ? porId.get(String(obj.id))
+        : [...porId.values()].find(
+            (l) =>
+              normalizarTelefone(l.whatsapp) ===
+              normalizarTelefone(String(obj.telefone ?? "")),
+          );
+      if (alvo) {
+        alvo.atendimento_status = String(obj.status);
+        alvo.atendimento_em = String(obj.em);
+      }
+      continue;
+    }
     porId.set(String(obj.id), {
       id: String(obj.id),
       nome: String(obj.nome ?? ""),
@@ -120,6 +143,8 @@ async function lerArquivoDev(): Promise<LeadRegistro[]> {
       webhook_status: "pendente",
       webhook_tentativas: 0,
       enviado_em: null,
+      atendimento_status: "aguardando",
+      atendimento_em: null,
     });
   }
   return [...porId.values()].reverse(); // mais recentes primeiro
@@ -140,7 +165,8 @@ export async function listarLeads(filtro: FiltroLeads = {}): Promise<LeadRegistr
     if (filtro.status === "falhou") clausulas.push(`webhook_status LIKE 'falhou:%'`);
     valores.push(limite);
     const sql = `SELECT id, nome, whatsapp, email, estado, escola, nivel,
-                        criado_em, webhook_status, webhook_tentativas, enviado_em
+                        criado_em, webhook_status, webhook_tentativas, enviado_em,
+                        atendimento_status, atendimento_em
                  FROM leads
                  ${clausulas.length ? `WHERE ${clausulas.join(" AND ")}` : ""}
                  ORDER BY criado_em DESC
@@ -150,6 +176,9 @@ export async function listarLeads(filtro: FiltroLeads = {}): Promise<LeadRegistr
       ...r,
       criado_em: new Date(r.criado_em).toISOString(),
       enviado_em: r.enviado_em ? new Date(r.enviado_em).toISOString() : null,
+      atendimento_em: r.atendimento_em
+        ? new Date(r.atendimento_em).toISOString()
+        : null,
     }));
   }
   let leads = await lerArquivoDev();
@@ -168,7 +197,8 @@ export async function obterLead(id: string): Promise<LeadRegistro | null> {
   if (db) {
     const { rows } = await db.query(
       `SELECT id, nome, whatsapp, email, estado, escola, nivel,
-              criado_em, webhook_status, webhook_tentativas, enviado_em
+              criado_em, webhook_status, webhook_tentativas, enviado_em,
+              atendimento_status, atendimento_em
        FROM leads WHERE id = $1`,
       [id],
     );
@@ -179,10 +209,68 @@ export async function obterLead(id: string): Promise<LeadRegistro | null> {
       enviado_em: rows[0].enviado_em
         ? new Date(rows[0].enviado_em).toISOString()
         : null,
+      atendimento_em: rows[0].atendimento_em
+        ? new Date(rows[0].atendimento_em).toISOString()
+        : null,
     };
   }
   const leads = await lerArquivoDev();
   return leads.find((l) => l.id === id) ?? null;
+}
+
+/**
+ * Atualiza o status de atendimento (eventos do Sevenbee). Casa pelo id do
+ * lead quando disponível nos metadados do contato; senão, pelo telefone.
+ * Retorna quantos leads foram atualizados.
+ */
+export async function atualizarAtendimento(opcoes: {
+  id?: string;
+  telefone?: string;
+  status: "aguardando" | "em_atendimento" | "atendido";
+}): Promise<number> {
+  const { id, telefone, status } = opcoes;
+  if (!id && !telefone) return 0;
+  const db = getPool();
+  if (db) {
+    if (id) {
+      const r = await db.query(
+        `UPDATE leads SET atendimento_status = $2, atendimento_em = now() WHERE id = $1`,
+        [id, status],
+      );
+      if (r.rowCount) return r.rowCount;
+    }
+    if (telefone) {
+      const digitos = normalizarTelefone(telefone);
+      if (!digitos) return 0;
+      const r = await db.query(
+        `UPDATE leads SET atendimento_status = $2, atendimento_em = now()
+         WHERE regexp_replace(whatsapp, '[^0-9]', '', 'g') = $1
+            OR regexp_replace(whatsapp, '[^0-9]', '', 'g') = '55' || $1`,
+        [digitos, status],
+      );
+      return r.rowCount ?? 0;
+    }
+    return 0;
+  }
+  // Fallback em arquivo: linha de atualização consolidada na leitura.
+  const leads = await lerArquivoDev();
+  const alvo = id
+    ? leads.find((l) => l.id === id)
+    : leads.find(
+        (l) =>
+          normalizarTelefone(l.whatsapp) === normalizarTelefone(telefone ?? ""),
+      );
+  if (!alvo) return 0;
+  await appendFile(
+    ARQUIVO_DEV,
+    JSON.stringify({
+      tipo: "atendimento",
+      id: alvo.id,
+      status,
+      em: new Date().toISOString(),
+    }) + "\n",
+  );
+  return 1;
 }
 
 export interface ResumoLeads {
@@ -191,6 +279,7 @@ export interface ResumoLeads {
   enviados: number;
   pendentes: number;
   falhas: number;
+  atendidos: number;
   porEstado: Record<string, number>;
 }
 
@@ -204,6 +293,7 @@ export async function resumoLeads(): Promise<ResumoLeads> {
     enviados: 0,
     pendentes: 0,
     falhas: 0,
+    atendidos: 0,
     porEstado: {},
   };
   for (const l of leads) {
@@ -211,6 +301,7 @@ export async function resumoLeads(): Promise<ResumoLeads> {
     if (l.webhook_status === "enviado") resumo.enviados += 1;
     else if (l.webhook_status === "pendente") resumo.pendentes += 1;
     else resumo.falhas += 1;
+    if (l.atendimento_status === "atendido") resumo.atendidos += 1;
     resumo.porEstado[l.estado] = (resumo.porEstado[l.estado] ?? 0) + 1;
   }
   return resumo;

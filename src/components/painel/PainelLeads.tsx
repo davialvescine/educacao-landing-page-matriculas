@@ -4,7 +4,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
+  CheckCheck,
+  Clock,
   Download,
+  Headset,
   Inbox,
   LogOut,
   MessageCircle,
@@ -74,6 +77,29 @@ function BadgeStatus({ status }: { status: string }) {
       title={status}
     >
       <TriangleAlert aria-hidden className="size-3" /> Falha no envio
+    </span>
+  );
+}
+
+/** Situação do lead dentro do Sevenbee, alimentada pelos webhooks deles. */
+function BadgeAtendimento({ status }: { status: string }) {
+  if (status === "atendido") {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-800">
+        <CheckCheck aria-hidden className="size-3" /> Atendido
+      </span>
+    );
+  }
+  if (status === "em_atendimento") {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800">
+        <Headset aria-hidden className="size-3" /> Em atendimento
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">
+      <Clock aria-hidden className="size-3" /> Aguardando
     </span>
   );
 }
@@ -154,6 +180,7 @@ export default function PainelLeads({
     { rotulo: "Hoje", valor: resumo.hoje },
     { rotulo: "Enviados ao sistema", valor: resumo.enviados },
     { rotulo: "Aguardando envio", valor: resumo.pendentes + resumo.falhas },
+    { rotulo: "Atendidos", valor: resumo.atendidos },
   ];
 
   return (
@@ -200,7 +227,7 @@ export default function PainelLeads({
 
       <div className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
         {/* Resumo */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {cartoes.map((c) => (
             <div
               key={c.rotulo}
@@ -265,7 +292,7 @@ export default function PainelLeads({
 
         {/* Tabela */}
         <div className="mt-4 overflow-x-auto rounded-2xl border border-line bg-surface shadow-card">
-          <table className="w-full min-w-[900px] text-left text-sm">
+          <table className="w-full min-w-[1000px] text-left text-sm">
             <thead>
               <tr className="border-b border-line text-xs font-bold uppercase tracking-widest text-muted-foreground">
                 <th className="px-4 py-3">Data</th>
@@ -274,6 +301,7 @@ export default function PainelLeads({
                 <th className="px-4 py-3">Região</th>
                 <th className="px-4 py-3">Escola / nível</th>
                 <th className="px-4 py-3">Status de envio</th>
+                <th className="px-4 py-3">Atendimento</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -281,7 +309,7 @@ export default function PainelLeads({
               {leads.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={8}
                     className="px-4 py-12 text-center text-muted-foreground"
                   >
                     Nenhum lead por aqui ainda. Assim que alguém preencher o
@@ -340,6 +368,9 @@ export default function PainelLeads({
                           {l.webhook_tentativas}x
                         </span>
                       ) : null}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3">
+                      <BadgeAtendimento status={l.atendimento_status} />
                     </td>
                     <td className="whitespace-nowrap px-4 py-3 text-right">
                       {integracaoConfigurada &&
@@ -409,8 +440,9 @@ export default function PainelLeads({
                 <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-brand-950">
                   {selecionado.nome}
                 </h2>
-                <div className="mt-2">
+                <div className="mt-2 flex flex-wrap items-center gap-2">
                   <BadgeStatus status={selecionado.webhook_status} />
+                  <BadgeAtendimento status={selecionado.atendimento_status} />
                   {selecionado.webhook_tentativas > 0 ? (
                     <span className="ml-2 text-xs text-muted-foreground">
                       {selecionado.webhook_tentativas}{" "}
@@ -481,6 +513,18 @@ export default function PainelLeads({
                   {selecionado.enviado_em
                     ? formatarDataLonga(selecionado.enviado_em)
                     : "Ainda não enviado"}
+                </dd>
+              </div>
+              <div className="sm:col-span-2">
+                <dt className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  Atendimento no Sevenbee
+                </dt>
+                <dd className="mt-1 font-medium text-brand-950" suppressHydrationWarning>
+                  {selecionado.atendimento_status === "atendido"
+                    ? `Atendido em ${formatarDataLonga(selecionado.atendimento_em ?? "")}`
+                    : selecionado.atendimento_status === "em_atendimento"
+                      ? `Em atendimento desde ${formatarDataLonga(selecionado.atendimento_em ?? "")}`
+                      : "Aguardando o primeiro atendimento"}
                 </dd>
               </div>
             </dl>

@@ -22,6 +22,7 @@ Stack: Next.js 16 (App Router, páginas estáticas + `/api/leads` dinâmica), Po
    | `PAINEL_SENHA` | sim (produção) | Senha do painel de leads em `/painel` (sessão de 12h via cookie assinado). |
    | `LEAD_WEBHOOK_URL` | não | Fallback: webhook genérico usado apenas se `SEVENBEE_TOKEN` não estiver definido. |
    | `LEAD_WEBHOOK_TOKEN` | não | Se definido, vai como `Authorization: Bearer <token>` no webhook genérico. |
+   | `SEVENBEE_WEBHOOK_SEGREDO` | recomendada | Segredo do webhook de retorno do Sevenbee (status de atendimento). Cadastre no Sevenbee (Ajustes > Integrações > Webhooks) a URL `https://<dominio>/api/sevenbee/webhook?segredo=<valor>` assinando os eventos `SESSION_CREATED`, `SESSION_UPDATED` e `SESSION_ENDED`. |
 
    O fluxo do lead é **push**: ao enviar o formulário, o lead é salvo no
    Postgres e, na sequência, enviado ao Sevenbee na mesma requisição. O
