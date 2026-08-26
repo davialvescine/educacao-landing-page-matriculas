@@ -19,7 +19,8 @@ Stack: Next.js 16 (App Router, páginas estáticas + `/api/leads` dinâmica), Po
    | `DATABASE_URL` | sim (produção) | URL do Postgres do Coolify. Sem ela, leads caem em `var/leads.jsonl` (somente dev). |
    | `SEVENBEE_TOKEN` | recomendada | Token da API do Sevenbee (Configurações > Integrações > Integração API). Com ele, cada lead vira um contato via `POST /core/v1/contact` com upsert por telefone. |
    | `SEVENBEE_TAG` | não | Etiqueta base aplicada aos contatos (padrão: `Matrículas 2027`). A região entra como segunda etiqueta. |
-   | `PAINEL_SENHA` | sim (produção) | Senha do painel de leads em `/painel` (sessão de 12h via cookie assinado). |
+   | `BETTER_AUTH_SECRET` | sim (produção) | Chave de assinatura das sessões do painel. Gere com `openssl rand -base64 32`. |
+   | `BETTER_AUTH_URL` | sim (produção) | URL pública do site (callbacks e cookies), ex.: `https://educaadventistacentrooeste.com.br`. |
    | `LEAD_WEBHOOK_URL` | não | Fallback: webhook genérico usado apenas se `SEVENBEE_TOKEN` não estiver definido. |
    | `LEAD_WEBHOOK_TOKEN` | não | Se definido, vai como `Authorization: Bearer <token>` no webhook genérico. |
    | `CRON_SEGREDO` | recomendada | Segredo da tarefa de reenvio automático. Agende no Coolify (Scheduled Tasks) um `curl -fsS "https://<dominio>/api/tarefas/reenviar-falhas?segredo=<valor>"` a cada 10 minutos. |
@@ -28,6 +29,12 @@ Stack: Next.js 16 (App Router, páginas estáticas + `/api/leads` dinâmica), Po
    | `NEXT_PUBLIC_SITE_URL` | não | URL canônica (padrão embutido: `https://educaadventistacentrooeste.com.br`). |
    | `SMTP_HOST`, `SMTP_PORTA`, `SMTP_USUARIO`, `SMTP_SENHA`, `SMTP_REMETENTE` | recomendada | Envio do "esqueci minha senha" do painel. Com Google Workspace: `smtp.gmail.com`, porta 587, usuário = e-mail da conta e senha = **senha de app** gerada na conta Google. Sem isso, o link some e o administrador cadastra a senha manualmente. |
    | `SEVENBEE_WEBHOOK_SEGREDO` | recomendada | Segredo do webhook de retorno do Sevenbee (status de atendimento). Cadastre no Sevenbee (Ajustes > Integrações > Webhooks) a URL `https://<dominio>/api/sevenbee/webhook?segredo=<valor>` assinando os eventos `SESSION_CREATED`, `SESSION_UPDATED` e `SESSION_ENDED`. |
+
+   **Primeiro acesso ao painel:** com o banco vazio, abra
+   `https://<dominio>/painel` e crie a conta de administrador (nome, e-mail e
+   senha). A partir daí, os demais usuários são cadastrados dentro do painel,
+   em **Equipe**, com papel (administrador ou coordenador) e as regiões que
+   cada um pode ver. A tela de primeiro acesso desaparece depois disso.
 
    O fluxo do lead é **push**: ao enviar o formulário, o lead é salvo no
    Postgres e, na sequência, enviado ao Sevenbee na mesma requisição. O
