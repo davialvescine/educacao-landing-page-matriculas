@@ -21,6 +21,8 @@ interface Props {
   estados: FormEstado[];
   /** Slug do estado pré-selecionado (páginas de região). */
   estadoInicial?: string;
+  /** Nome da escola pré-selecionada (páginas de unidade). */
+  escolaInicial?: string;
 }
 
 const NIVEIS = [
@@ -40,11 +42,15 @@ function mascaraWhatsApp(v: string): string {
 }
 
 /** Formulário de lead em 2 etapas: leve primeiro, contato depois. */
-export default function LeadForm({ estados, estadoInicial }: Props) {
+export default function LeadForm({
+  estados,
+  estadoInicial,
+  escolaInicial,
+}: Props) {
   const router = useRouter();
   const [etapa, setEtapa] = useState<1 | 2>(1);
   const [estado, setEstado] = useState(estadoInicial ?? "");
-  const [escola, setEscola] = useState("");
+  const [escola, setEscola] = useState(escolaInicial ?? "");
   const [nivel, setNivel] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [enviando, setEnviando] = useState(false);

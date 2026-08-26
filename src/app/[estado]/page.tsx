@@ -11,8 +11,17 @@ import BarraCtaMobile from "@/components/BarraCtaMobile";
 import WhatsFlutuante from "@/components/WhatsFlutuante";
 import DepoimentosSection from "@/components/DepoimentosSection";
 import UnidadeCard from "@/components/UnidadeCard";
+import JsonLd from "@/components/JsonLd";
 import { Diferenciais, Eyebrow } from "@/components/Secoes";
-import { getEstado, getEstados, getFormEstados } from "@/lib/rede";
+import {
+  cidadeEscola,
+  getEstado,
+  getEstados,
+  getFormEstados,
+  nomeEscola,
+  slugEscola,
+} from "@/lib/rede";
+import { SITE_URL } from "@/lib/site";
 
 /** Fotos oficiais da campanha, alternadas entre as regiões. */
 const FOTOS: Record<string, { src: string; w: number; h: number }> = {
@@ -34,9 +43,13 @@ export async function generateMetadata({
   const { estado: slug } = await params;
   const estado = getEstado(slug);
   if (!estado) return {};
+  const cidades = [...new Set(estado.escolas.map(cidadeEscola))]
+    .slice(0, 6)
+    .join(", ");
   return {
-    title: `Matrículas Abertas · ${estado.nome}`,
-    description: `Escolas Adventistas em ${estado.nome}: ${estado.escolas.length} unidades com matrículas abertas. Encontre a mais próxima e garanta sua vaga.`,
+    title: `Escolas Adventistas: ${estado.nome} · Matrículas 2027`,
+    description: `Escola particular cristã em ${cidades}: ${estado.escolas.length} unidades da Educação Adventista em ${estado.nome}, da Educação Infantil ao Ensino Médio. Matrículas abertas, fale no WhatsApp.`,
+    alternates: { canonical: `${SITE_URL}/${estado.slug}` },
   };
 }
 
@@ -48,6 +61,19 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
 
   return (
     <>
+      <JsonLd
+        dados={{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: `Escolas Adventistas em ${estado.nome}`,
+          itemListElement: estado.escolas.map((s, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            name: nomeEscola(s),
+            url: `${SITE_URL}/${estado.slug}/${slugEscola(s)}`,
+          })),
+        }}
+      />
       <Header />
       <main>
         <Hero compacto foto={foto.src} fotoLargura={foto.w} fotoAltura={foto.h}>

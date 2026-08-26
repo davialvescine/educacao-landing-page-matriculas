@@ -1,4 +1,5 @@
 import dados from "@/data/rede.json";
+import { slugificar } from "@/lib/site";
 
 export interface Escola {
   nome: string;
@@ -65,6 +66,29 @@ export function nomeEscola(escola: Escola): string {
 /** Nome legível de uma região a partir do slug (fallback: o próprio slug). */
 export function nomeRegiao(slug: string): string {
   return getEstado(slug)?.nome ?? slug;
+}
+
+/** Slug de URL de uma escola (a partir do nome oficial). */
+export function slugEscola(escola: Escola): string {
+  return slugificar(nomeEscola(escola));
+}
+
+/** Localiza uma escola pelo slug dentro de um estado. */
+export function getEscola(
+  estadoSlug: string,
+  escolaSlug: string,
+): { estado: Estado; escola: Escola } | undefined {
+  const estado = getEstado(estadoSlug);
+  if (!estado) return undefined;
+  const escola = estado.escolas.find((s) => slugEscola(s) === escolaSlug);
+  return escola ? { estado, escola } : undefined;
+}
+
+/** Cidade aproximada a partir do nome oficial ("Colégio Adventista de X" → "X"). */
+export function cidadeEscola(escola: Escola): string {
+  return nomeEscola(escola)
+    .replace(/^(Colégio|Escola|Instituto) Adventista (de |do |da |dos |em )?/i, "")
+    .trim();
 }
 
 /** Dados enxutos para o formulário de leads (client component). */

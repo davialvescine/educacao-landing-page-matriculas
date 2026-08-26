@@ -1,8 +1,9 @@
 import Image from "next/image";
-import { MapPin, MessageCircle, Navigation } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, MapPin, MessageCircle } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { nomeEscola, type Escola, type Estado } from "@/lib/rede";
+import { nomeEscola, slugEscola, type Escola, type Estado } from "@/lib/rede";
 
 export default function UnidadeCard({
   escola,
@@ -13,9 +14,10 @@ export default function UnidadeCard({
 }) {
   const nome = nomeEscola(escola);
   const temWhats = Boolean(estado.whatsapp.link);
+  const href = `/${estado.slug}/${slugEscola(escola)}`;
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-surface shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:border-gold-400/60 hover:shadow-card-hover">
-      <div className="relative aspect-[16/10] overflow-hidden bg-brand-900">
+      <Link href={href} className="relative block aspect-[16/10] overflow-hidden bg-brand-900">
         {escola.foto ? (
           <Image
             src={`/${escola.foto}`}
@@ -48,7 +50,7 @@ export default function UnidadeCard({
         <h3 className="absolute inset-x-5 bottom-4 text-lg font-extrabold leading-snug tracking-tight text-white">
           {nome}
         </h3>
-      </div>
+      </Link>
       <div className="flex flex-1 flex-col gap-4 p-5">
         {escola.endereco && (
           <p className="flex items-start gap-2 text-sm leading-relaxed text-muted-foreground">
@@ -71,20 +73,16 @@ export default function UnidadeCard({
               WhatsApp
             </a>
           )}
-          {escola.endereco && (
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${nome}, ${escola.endereco}`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={cn(
-                buttonVariants({ variant: "outline" }),
-                "h-11 flex-1 rounded-full border-2 border-brand-200 bg-transparent text-sm font-bold text-brand-800 hover:border-brand-400 hover:bg-brand-50",
-              )}
-            >
-              <Navigation aria-hidden className="size-4" />
-              Como chegar
-            </a>
-          )}
+          <Link
+            href={href}
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "h-11 flex-1 rounded-full border-2 border-brand-200 bg-transparent text-sm font-bold text-brand-800 hover:border-brand-400 hover:bg-brand-50",
+            )}
+          >
+            Conhecer
+            <ArrowRight aria-hidden className="size-4" />
+          </Link>
         </div>
       </div>
     </article>

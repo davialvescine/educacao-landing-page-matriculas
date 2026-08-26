@@ -10,11 +10,14 @@ import MundoSection from "@/components/MundoSection";
 import NiveisSection from "@/components/NiveisSection";
 import UmDiaSection from "@/components/UmDiaSection";
 import DepoimentosSection from "@/components/DepoimentosSection";
+import FaqSection from "@/components/FaqSection";
+import JsonLd from "@/components/JsonLd";
 import BarraCtaMobile from "@/components/BarraCtaMobile";
 import WhatsFlutuante from "@/components/WhatsFlutuante";
 import Reveal from "@/components/Reveal";
 import { Diferenciais, IabcDestaque, StatsStrip } from "@/components/Secoes";
 import { getEstados, getFormEstados } from "@/lib/rede";
+import { SITE_NOME, SITE_URL } from "@/lib/site";
 
 export default function Home() {
   const estados = getEstados();
@@ -22,6 +25,20 @@ export default function Home() {
 
   return (
     <>
+      <JsonLd
+        dados={{
+          "@context": "https://schema.org",
+          "@type": "EducationalOrganization",
+          name: SITE_NOME,
+          url: SITE_URL,
+          logo: `${SITE_URL}/imagens/campanha/logo-ea.png`,
+          description:
+            "Rede de Educação Adventista no Centro-Oeste brasileiro: 39 escolas particulares cristãs da Educação Infantil ao Ensino Médio no DF, GO, MS, MT e TO.",
+          areaServed: ["DF", "GO", "MS", "MT", "TO"],
+          sameAs: ["https://www.educacaoadventista.org.br/"],
+          numberOfEmployees: { "@type": "QuantitativeValue", minValue: 1000 },
+        }}
+      />
       <Header />
       <main>
         <Hero
@@ -70,6 +87,7 @@ export default function Home() {
         <MundoSection />
         <DepoimentosSection />
         <IabcDestaque />
+        <FaqSection />
 
         {/* Formulário (finale): minimalista, centrado, foco total no form */}
         <section
