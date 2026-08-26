@@ -71,80 +71,61 @@ export default function Home() {
         <DepoimentosSection />
         <IabcDestaque />
 
-        {/* Formulário (finale) */}
+        {/* Formulário (finale): minimalista, centrado, foco total no form */}
         <section
           id="matricula"
-          className="relative scroll-mt-10 overflow-hidden bg-brand-950"
+          className="relative scroll-mt-10 overflow-hidden bg-paper"
         >
-          <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0">
             <Image
               src="/imagens/campanha/escola-robotica.jpg"
               alt=""
               fill
               sizes="100vw"
-              className="anim-zoom-lento object-cover opacity-50"
+              className="anim-zoom-lento object-cover opacity-25"
             />
             <div
               aria-hidden
-              className="absolute inset-0 bg-gradient-to-b from-brand-950/95 via-brand-950/60 to-brand-950/95"
+              className="absolute inset-0 bg-gradient-to-b from-paper via-paper/85 to-paper"
             />
           </div>
-          <div className="relative mx-auto grid max-w-7xl items-stretch gap-x-14 px-4 lg:grid-cols-2">
-            <div className="flex flex-col pt-28 lg:pb-0">
-              <Reveal>
-                <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-gold-400">
-                  <span aria-hidden>✦</span> Vagas limitadas
-                </p>
-                <h2 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tighter text-primary-foreground sm:text-6xl">
-                  Agora é a<br />
-                  <span className="bg-gradient-to-r from-gold-300 via-gold-400 to-gold-600 bg-clip-text text-transparent">
-                    sua vez!
-                  </span>
-                </h2>
-                <p className="mt-6 max-w-md text-lg leading-relaxed text-primary-foreground/70">
-                  Deixe seu contato e a equipe da unidade escolhida fala com você
-                  pelo WhatsApp para garantir a vaga.
-                </p>
-                <ul className="mt-7 flex flex-col gap-3">
-                  {[
-                    "Resposta rápida no WhatsApp da sua região",
-                    "Atendimento humano, sem compromisso",
-                    "Vagas limitadas por turma",
-                  ].map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-center gap-3 text-primary-foreground/85"
-                    >
-                      <CheckCircle2
-                        aria-hidden
-                        className="size-5 shrink-0 text-gold-400"
-                      />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </Reveal>
-              {/* Dupla de alunos ancorada na base da seção, como na arte */}
-              <div className="relative mt-auto hidden items-end justify-center gap-0 pt-14 lg:flex">
-                <Image
-                  src="/imagens/campanha/pedro.webp"
-                  alt="Aluno do Ensino Médio da Educação Adventista"
-                  width={1440}
-                  height={1600}
-                  className="h-[26rem] w-auto"
-                />
-                <Image
-                  src="/imagens/campanha/malu.webp"
-                  alt="Aluna da Educação Infantil da Educação Adventista"
-                  width={1160}
-                  height={1600}
-                  className="-ml-28 h-[19rem] w-auto"
-                />
-              </div>
-            </div>
-            <Reveal delay={0.15} className="py-28">
+          <div className="relative mx-auto max-w-2xl px-4 py-28">
+            <Reveal>
+              <p className="flex items-center justify-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-gold-600">
+                <span aria-hidden>✦</span> Vagas limitadas
+              </p>
+              <h2 className="mt-4 text-center text-4xl font-extrabold leading-[1.05] tracking-tighter text-brand-950 sm:text-6xl">
+                Agora é a{" "}
+                <span className="bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 bg-clip-text text-transparent">
+                  sua vez!
+                </span>
+              </h2>
+              <p className="mx-auto mt-5 max-w-md text-center text-lg leading-relaxed text-muted-foreground">
+                Deixe seu contato e a equipe da unidade escolhida fala com você
+                pelo WhatsApp para garantir a vaga.
+              </p>
+            </Reveal>
+            <Reveal delay={0.12} className="mt-10">
               <LeadForm estados={getFormEstados()} />
             </Reveal>
+            <ul className="relative mt-8 flex flex-wrap items-center justify-center gap-x-7 gap-y-2">
+              {[
+                "Resposta rápida no WhatsApp",
+                "Atendimento humano, sem compromisso",
+                "Vagas limitadas por turma",
+              ].map((item) => (
+                <li
+                  key={item}
+                  className="flex items-center gap-2 text-sm text-muted-foreground"
+                >
+                  <CheckCircle2
+                    aria-hidden
+                    className="size-4 shrink-0 text-gold-600"
+                  />
+                  {item}
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
       </main>

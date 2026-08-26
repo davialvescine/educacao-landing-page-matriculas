@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getEstado } from "@/lib/rede";
-import { salvarLead, marcarWebhook, type LeadNovo } from "@/lib/leads";
+import { salvarLead, type LeadNovo } from "@/lib/leads";
+import { enviarLeadWebhook } from "@/lib/webhook";
 
 export const runtime = "nodejs";
 
@@ -55,32 +56,7 @@ export async function POST(req: Request) {
   }
 
   // Dispara para o sistema externo depois de salvar: lead nunca se perde.
-  const webhookUrl = process.env.LEAD_WEBHOOK_URL;
-  if (webhookUrl) {
-    try {
-      const res = await fetch(webhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(process.env.LEAD_WEBHOOK_TOKEN
-            ? { Authorization: `Bearer ${process.env.LEAD_WEBHOOK_TOKEN}` }
-            : {}),
-        },
-        body: JSON.stringify({
-          id,
-          ...lead,
-          estado_nome: estado.nome,
-          associacao: estado.associacao,
-          origem: "landing-matriculas",
-        }),
-        signal: AbortSignal.timeout(8000),
-      });
-      await marcarWebhook(id, res.ok ? "enviado" : `falhou:${res.status}`);
-    } catch (e) {
-      console.error("[leads] webhook falhou:", e);
-      await marcarWebhook(id, "falhou:erro-de-rede").catch(() => {});
-    }
-  }
+  await enviarLeadWebhook(id, lead);
 
   return NextResponse.json({ ok: true, id });
 }

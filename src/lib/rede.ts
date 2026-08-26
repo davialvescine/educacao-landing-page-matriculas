@@ -62,6 +62,11 @@ export function nomeEscola(escola: Escola): string {
   return escola.nome_oficial ?? escola.nome;
 }
 
+/** Nome legível de uma região a partir do slug (fallback: o próprio slug). */
+export function nomeRegiao(slug: string): string {
+  return getEstado(slug)?.nome ?? slug;
+}
+
 /** Dados enxutos para o formulário de leads (client component). */
 export function getFormEstados() {
   return rede.estados.map((e) => ({

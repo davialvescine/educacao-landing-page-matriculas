@@ -17,8 +17,16 @@ Stack: Next.js 16 (App Router, páginas estáticas + `/api/leads` dinâmica), Po
    | Variável | Obrigatória | Descrição |
    |---|---|---|
    | `DATABASE_URL` | sim (produção) | URL do Postgres do Coolify. Sem ela, leads caem em `var/leads.jsonl` (somente dev). |
-   | `LEAD_WEBHOOK_URL` | não | URL que o sistema deles vai fornecer. Sem ela, o lead só é salvo no banco (status `pendente`). |
-   | `LEAD_WEBHOOK_TOKEN` | não | Se definido, vai como `Authorization: Bearer <token>` no webhook. |
+   | `SEVENBEE_TOKEN` | recomendada | Token da API do Sevenbee (Configurações > Integrações > Integração API). Com ele, cada lead vira um contato via `POST /core/v1/contact` com upsert por telefone. |
+   | `SEVENBEE_TAG` | não | Etiqueta base aplicada aos contatos (padrão: `Matrículas 2027`). A região entra como segunda etiqueta. |
+   | `PAINEL_SENHA` | sim (produção) | Senha do painel de leads em `/painel` (sessão de 12h via cookie assinado). |
+   | `LEAD_WEBHOOK_URL` | não | Fallback: webhook genérico usado apenas se `SEVENBEE_TOKEN` não estiver definido. |
+   | `LEAD_WEBHOOK_TOKEN` | não | Se definido, vai como `Authorization: Bearer <token>` no webhook genérico. |
+
+   O fluxo do lead é **push**: ao enviar o formulário, o lead é salvo no
+   Postgres e, na sequência, enviado ao Sevenbee na mesma requisição. O
+   resultado fica em `webhook_status` (`enviado` / `falhou:*`), visível no
+   painel `/painel`, que também permite reenviar manualmente os que falharem.
 
 ## 2. Cloudflare (na frente da VPS)
 

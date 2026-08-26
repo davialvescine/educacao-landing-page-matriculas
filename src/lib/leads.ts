@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { appendFile, mkdir } from "node:fs/promises";
+import { appendFile, mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 export interface LeadNovo {
@@ -9,6 +9,20 @@ export interface LeadNovo {
   estado: string;
   escola: string;
   nivel: string;
+}
+
+export interface LeadRegistro extends LeadNovo {
+  id: string;
+  criado_em: string;
+  webhook_status: string; // pendente | enviado | falhou:*
+  webhook_tentativas: number;
+  enviado_em: string | null;
+}
+
+export interface FiltroLeads {
+  estado?: string;
+  status?: "pendente" | "enviado" | "falhou";
+  limite?: number;
 }
 
 // Pool do Postgres criado sob demanda; em dev sem DATABASE_URL usamos arquivo.
@@ -49,13 +63,155 @@ export async function salvarLead(lead: LeadNovo): Promise<string> {
 
 export async function marcarWebhook(id: string, status: string): Promise<void> {
   const db = getPool();
-  if (!db) return;
-  await db.query(
-    `UPDATE leads
-     SET webhook_status = $2,
-         webhook_tentativas = webhook_tentativas + 1,
-         enviado_em = CASE WHEN $2 = 'enviado' THEN now() ELSE enviado_em END
-     WHERE id = $1`,
-    [id, status],
+  if (db) {
+    await db.query(
+      `UPDATE leads
+       SET webhook_status = $2,
+           webhook_tentativas = webhook_tentativas + 1,
+           enviado_em = CASE WHEN $2 = 'enviado' THEN now() ELSE enviado_em END
+       WHERE id = $1`,
+      [id, status],
+    );
+    return;
+  }
+  // Arquivo é append-only: o status vira uma linha de atualização,
+  // consolidada na leitura por lerArquivoDev().
+  await mkdir(path.dirname(ARQUIVO_DEV), { recursive: true });
+  await appendFile(
+    ARQUIVO_DEV,
+    JSON.stringify({ tipo: "webhook", id, status, em: new Date().toISOString() }) + "\n",
   );
+}
+
+async function lerArquivoDev(): Promise<LeadRegistro[]> {
+  let bruto: string;
+  try {
+    bruto = await readFile(ARQUIVO_DEV, "utf8");
+  } catch {
+    return [];
+  }
+  const porId = new Map<string, LeadRegistro>();
+  for (const linha of bruto.split("\n")) {
+    if (!linha.trim()) continue;
+    let obj: Record<string, unknown>;
+    try {
+      obj = JSON.parse(linha);
+    } catch {
+      continue;
+    }
+    if (obj.tipo === "webhook") {
+      const lead = porId.get(String(obj.id));
+      if (lead) {
+        lead.webhook_status = String(obj.status);
+        lead.webhook_tentativas += 1;
+        if (obj.status === "enviado") lead.enviado_em = String(obj.em);
+      }
+      continue;
+    }
+    porId.set(String(obj.id), {
+      id: String(obj.id),
+      nome: String(obj.nome ?? ""),
+      whatsapp: String(obj.whatsapp ?? ""),
+      email: String(obj.email ?? ""),
+      estado: String(obj.estado ?? ""),
+      escola: String(obj.escola ?? ""),
+      nivel: String(obj.nivel ?? ""),
+      criado_em: String(obj.criado_em ?? ""),
+      webhook_status: "pendente",
+      webhook_tentativas: 0,
+      enviado_em: null,
+    });
+  }
+  return [...porId.values()].reverse(); // mais recentes primeiro
+}
+
+export async function listarLeads(filtro: FiltroLeads = {}): Promise<LeadRegistro[]> {
+  const limite = Math.min(filtro.limite ?? 500, 2000);
+  const db = getPool();
+  if (db) {
+    const clausulas: string[] = [];
+    const valores: unknown[] = [];
+    if (filtro.estado) {
+      valores.push(filtro.estado);
+      clausulas.push(`estado = $${valores.length}`);
+    }
+    if (filtro.status === "enviado") clausulas.push(`webhook_status = 'enviado'`);
+    if (filtro.status === "pendente") clausulas.push(`webhook_status = 'pendente'`);
+    if (filtro.status === "falhou") clausulas.push(`webhook_status LIKE 'falhou:%'`);
+    valores.push(limite);
+    const sql = `SELECT id, nome, whatsapp, email, estado, escola, nivel,
+                        criado_em, webhook_status, webhook_tentativas, enviado_em
+                 FROM leads
+                 ${clausulas.length ? `WHERE ${clausulas.join(" AND ")}` : ""}
+                 ORDER BY criado_em DESC
+                 LIMIT $${valores.length}`;
+    const { rows } = await db.query(sql, valores);
+    return rows.map((r) => ({
+      ...r,
+      criado_em: new Date(r.criado_em).toISOString(),
+      enviado_em: r.enviado_em ? new Date(r.enviado_em).toISOString() : null,
+    }));
+  }
+  let leads = await lerArquivoDev();
+  if (filtro.estado) leads = leads.filter((l) => l.estado === filtro.estado);
+  if (filtro.status === "enviado")
+    leads = leads.filter((l) => l.webhook_status === "enviado");
+  if (filtro.status === "pendente")
+    leads = leads.filter((l) => l.webhook_status === "pendente");
+  if (filtro.status === "falhou")
+    leads = leads.filter((l) => l.webhook_status.startsWith("falhou"));
+  return leads.slice(0, limite);
+}
+
+export async function obterLead(id: string): Promise<LeadRegistro | null> {
+  const db = getPool();
+  if (db) {
+    const { rows } = await db.query(
+      `SELECT id, nome, whatsapp, email, estado, escola, nivel,
+              criado_em, webhook_status, webhook_tentativas, enviado_em
+       FROM leads WHERE id = $1`,
+      [id],
+    );
+    if (!rows[0]) return null;
+    return {
+      ...rows[0],
+      criado_em: new Date(rows[0].criado_em).toISOString(),
+      enviado_em: rows[0].enviado_em
+        ? new Date(rows[0].enviado_em).toISOString()
+        : null,
+    };
+  }
+  const leads = await lerArquivoDev();
+  return leads.find((l) => l.id === id) ?? null;
+}
+
+export interface ResumoLeads {
+  total: number;
+  hoje: number;
+  enviados: number;
+  pendentes: number;
+  falhas: number;
+  porEstado: Record<string, number>;
+}
+
+export async function resumoLeads(): Promise<ResumoLeads> {
+  const leads = await listarLeads({ limite: 2000 });
+  const inicioHoje = new Date();
+  inicioHoje.setHours(0, 0, 0, 0);
+  const resumo: ResumoLeads = {
+    total: leads.length,
+    hoje: 0,
+    enviados: 0,
+    pendentes: 0,
+    falhas: 0,
+    porEstado: {},
+  };
+  for (const l of leads) {
+    if (new Date(l.criado_em) >= inicioHoje) resumo.hoje += 1;
+    if (l.webhook_status === "enviado") resumo.enviados += 1;
+    else if (l.webhook_status === "pendente") resumo.pendentes += 1;
+    else resumo.falhas += 1;
+    resumo.porEstado[l.estado] = (resumo.porEstado[l.estado] ?? 0) + 1;
+  }
+  return resumo;
 }
