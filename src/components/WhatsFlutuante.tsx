@@ -34,11 +34,28 @@ export default function WhatsFlutuante({
 }) {
   const [aberto, setAberto] = useState(false);
   const [digitando, setDigitando] = useState(true);
+  const [teaser, setTeaser] = useState(false);
 
   const urlDireta = linkDireto ? `${linkDireto}?text=${MENSAGEM}` : null;
 
   useEffect(() => {
+    try {
+      if (sessionStorage.getItem("whats-teaser-fechado")) return;
+    } catch {}
+    const id = setTimeout(() => setTeaser(true), 2500);
+    return () => clearTimeout(id);
+  }, []);
+
+  function fecharTeaser() {
+    setTeaser(false);
+    try {
+      sessionStorage.setItem("whats-teaser-fechado", "1");
+    } catch {}
+  }
+
+  useEffect(() => {
     if (!aberto) return;
+    setTeaser(false);
     setDigitando(true);
     const id = setTimeout(() => setDigitando(false), 1100);
     return () => clearTimeout(id);
@@ -46,6 +63,41 @@ export default function WhatsFlutuante({
 
   return (
     <div className="fixed bottom-20 right-4 z-50 flex flex-col items-end gap-3 lg:bottom-6 lg:right-6">
+      {/* Balão-convite antes do clique */}
+      {teaser && !aberto && (
+        <div className="hero-pop relative max-w-[15rem] rounded-2xl rounded-br-md border border-black/5 bg-white px-4 py-3 shadow-[0_16px_40px_rgba(0,0,0,0.18)]">
+          <button
+            aria-label="Dispensar"
+            onClick={fecharTeaser}
+            className="absolute -left-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full border border-line bg-white text-ink/50 shadow transition-colors hover:text-ink"
+          >
+            <X className="size-3" />
+          </button>
+          {urlDireta ? (
+            <a
+              href={urlDireta}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={fecharTeaser}
+              className="block text-sm font-semibold leading-snug text-ink"
+            >
+              Olá! 👋 Posso te ajudar com a matrícula?
+            </a>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setAberto(true)}
+              className="block text-left text-sm font-semibold leading-snug text-ink"
+            >
+              Olá! 👋 Posso te ajudar com a matrícula?
+            </button>
+          )}
+          <span
+            aria-hidden
+            className="absolute -bottom-1.5 right-6 h-3 w-3 rotate-45 border-b border-r border-black/5 bg-white"
+          />
+        </div>
+      )}
       {/* Mini-chat */}
       {aberto && !urlDireta && regioes && (
         <>
