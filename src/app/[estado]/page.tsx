@@ -107,13 +107,19 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
           id="matricula"
           className="relative scroll-mt-10 overflow-hidden bg-brand-950"
         >
-          <Image
-            src="/imagens/campanha/hero-bg.jpg"
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover opacity-[0.07]"
-          />
+          <div className="absolute inset-0 overflow-hidden">
+            <Image
+              src="/imagens/campanha/escola-ciencias.jpg"
+              alt=""
+              fill
+              sizes="100vw"
+              className="anim-zoom-lento object-cover opacity-50"
+            />
+            <div
+              aria-hidden
+              className="absolute inset-0 bg-gradient-to-b from-brand-950/95 via-brand-950/60 to-brand-950/95"
+            />
+          </div>
           <div className="relative mx-auto max-w-2xl px-4 py-28">
             <Reveal>
               <p className="flex items-center justify-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-gold-400">
