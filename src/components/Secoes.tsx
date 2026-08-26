@@ -274,6 +274,73 @@ export function IabcDestaque() {
           </a>
         </Reveal>
       </div>
+
+      {/* Mosaico: a vida no internato, com fotos reais do campus */}
+      <div className="relative mx-auto max-w-7xl px-4 pb-24">
+        <div className="grid auto-rows-[11rem] grid-cols-2 gap-4 sm:auto-rows-[13rem] lg:grid-cols-4">
+          {[
+            {
+              src: "/imagens/iabc/campus-aereo.jpg",
+              legenda: "Um campus inteiro para viver e estudar",
+              classe: "col-span-2 row-span-2",
+            },
+            {
+              src: "/imagens/iabc/vida-esporte.jpg",
+              legenda: "Esporte e conquistas",
+              classe: "",
+            },
+            {
+              src: "/imagens/iabc/vida-musica.jpg",
+              legenda: "Música e louvor",
+              classe: "row-span-2",
+            },
+            {
+              src: "/imagens/iabc/vida-estudo.jpg",
+              legenda: "Estudo com propósito",
+              classe: "",
+            },
+            {
+              src: "/imagens/iabc/vida-natacao.jpg",
+              legenda: "Esportes aquáticos",
+              classe: "",
+            },
+            {
+              src: "/imagens/iabc/vida-amizade.jpg",
+              legenda: "Amizades para a vida",
+              classe: "",
+            },
+            {
+              src: "/imagens/iabc/campus-dormitorio.jpg",
+              legenda: "Dormitórios modernos",
+              classe: "",
+            },
+            {
+              src: "/imagens/iabc/vida-missao.jpg",
+              legenda: "Missão e serviço",
+              classe: "",
+            },
+          ].map((f, i) => (
+            <Reveal key={f.src} delay={(i % 4) * 0.07} className={`h-full ${f.classe}`}>
+              <figure className="group relative h-full w-full overflow-hidden rounded-2xl">
+                <Image
+                  src={f.src}
+                  alt={f.legenda}
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                />
+                <div
+                  aria-hidden
+                  className="absolute inset-0 bg-gradient-to-t from-brand-950/75 via-transparent to-transparent"
+                />
+                <figcaption className="absolute inset-x-4 bottom-3 text-sm font-extrabold tracking-tight text-white">
+                  {f.legenda}
+                </figcaption>
+              </figure>
+            </Reveal>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
