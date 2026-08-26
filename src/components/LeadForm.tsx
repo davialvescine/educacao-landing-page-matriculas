@@ -30,8 +30,6 @@ const NIVEIS = [
   "Ensino Médio",
 ];
 
-const QUALQUER_UNIDADE = "__qualquer__";
-
 /** Máscara (61) 99999-9999 aplicada em tempo real. */
 function mascaraWhatsApp(v: string): string {
   const d = v.replace(/\D/g, "").slice(0, 11);
@@ -46,7 +44,7 @@ export default function LeadForm({ estados, estadoInicial }: Props) {
   const router = useRouter();
   const [etapa, setEtapa] = useState<1 | 2>(1);
   const [estado, setEstado] = useState(estadoInicial ?? "");
-  const [escola, setEscola] = useState(QUALQUER_UNIDADE);
+  const [escola, setEscola] = useState("");
   const [nivel, setNivel] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -71,7 +69,7 @@ export default function LeadForm({ estados, estadoInicial }: Props) {
     const form = ev.currentTarget;
     const dados = Object.fromEntries(new FormData(form).entries());
     dados.estado = estado;
-    dados.escola = escola === QUALQUER_UNIDADE ? "" : escola;
+    dados.escola = escola;
     dados.nivel = nivel;
     dados.whatsapp = whatsapp;
     setEnviando(true);
@@ -125,7 +123,7 @@ export default function LeadForm({ estados, estadoInicial }: Props) {
                 value={estado || undefined}
                 onValueChange={(v) => {
                   setEstado(v ?? "");
-                  setEscola(QUALQUER_UNIDADE);
+                  setEscola("");
                   setErro("");
                 }}
               >
@@ -159,17 +157,14 @@ export default function LeadForm({ estados, estadoInicial }: Props) {
             <div className="grid gap-2">
               <Label>Escola de interesse</Label>
               <Select
-                value={escola}
-                onValueChange={(v) => setEscola(v ?? QUALQUER_UNIDADE)}
+                value={escola || undefined}
+                onValueChange={(v) => setEscola(v ?? "")}
                 disabled={escolas.length === 0}
               >
                 <SelectTrigger className="h-12 w-full rounded-xl">
-                  <SelectValue placeholder="Ainda não sei" />
+                  <SelectValue placeholder="Ainda não sei / qualquer unidade" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={QUALQUER_UNIDADE}>
-                    Ainda não sei / qualquer unidade
-                  </SelectItem>
                   {escolas.map((s) => (
                     <SelectItem key={s} value={s}>
                       {s}

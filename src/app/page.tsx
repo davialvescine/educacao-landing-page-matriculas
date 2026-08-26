@@ -90,13 +90,32 @@ export default function Home() {
                 </p>
                 <h2 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tighter text-primary-foreground sm:text-6xl">
                   Agora é a<br />
-                  sua vez!
+                  <span className="bg-gradient-to-r from-gold-300 via-gold-400 to-gold-600 bg-clip-text text-transparent">
+                    sua vez!
+                  </span>
                 </h2>
                 <p className="mt-6 max-w-md text-lg leading-relaxed text-primary-foreground/70">
                   Deixe seu contato e a equipe da unidade escolhida fala com você
-                  pelo WhatsApp para garantir a vaga: rápido, sem compromisso e
-                  sem fila.
+                  pelo WhatsApp para garantir a vaga.
                 </p>
+                <ul className="mt-7 flex flex-col gap-3">
+                  {[
+                    "Resposta rápida no WhatsApp da sua região",
+                    "Atendimento humano, sem compromisso",
+                    "Vagas limitadas por turma",
+                  ].map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-center gap-3 text-primary-foreground/85"
+                    >
+                      <CheckCircle2
+                        aria-hidden
+                        className="size-5 shrink-0 text-gold-400"
+                      />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </Reveal>
               {/* Dupla de alunos ancorada na base da seção, como na arte */}
               <div className="relative mt-auto hidden items-end justify-center gap-0 pt-14 lg:flex">
