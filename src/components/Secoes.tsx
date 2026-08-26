@@ -40,6 +40,34 @@ export function StatsTiles() {
   );
 }
 
+/** Seção-destaque da rede mundial: a frase como título e os números como prova. */
+export function RedeMundialSection() {
+  return (
+    <section className="relative overflow-hidden border-b border-dashed border-white/10 bg-gradient-to-b from-brand-900 via-brand-950 to-brand-950 py-20">
+      <div
+        aria-hidden
+        className="anim-aurora absolute -top-32 left-1/2 h-[22rem] w-[40rem] -translate-x-1/2 rounded-full bg-gold-400/10 blur-[110px]"
+      />
+      <div className="relative mx-auto max-w-7xl px-4">
+        <Reveal>
+          <p className="flex items-center justify-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-gold-400">
+            <span aria-hidden>✦</span> Uma decisão maior do que parece
+          </p>
+          <h2 className="mx-auto mt-4 max-w-3xl text-center text-3xl font-extrabold leading-tight tracking-tighter text-white sm:text-4xl">
+            Você não está matriculando em uma escola.{" "}
+            <span className="bg-gradient-to-r from-gold-300 via-gold-400 to-gold-600 bg-clip-text text-transparent">
+              Está entrando em uma rede mundial.
+            </span>
+          </h2>
+        </Reveal>
+        <div className="mt-12">
+          <StatsTiles />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function StatsStrip() {
   return (
     <section className="bg-brand-950">

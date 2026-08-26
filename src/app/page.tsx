@@ -15,7 +15,11 @@ import JsonLd from "@/components/JsonLd";
 import BarraCtaMobile from "@/components/BarraCtaMobile";
 import WhatsFlutuante from "@/components/WhatsFlutuante";
 import Reveal from "@/components/Reveal";
-import { Diferenciais, IabcDestaque, StatsStrip } from "@/components/Secoes";
+import {
+  Diferenciais,
+  IabcDestaque,
+  RedeMundialSection,
+} from "@/components/Secoes";
 import { getEstados, getFormEstados } from "@/lib/rede";
 import { SITE_NOME, SITE_URL } from "@/lib/site";
 
@@ -78,6 +82,8 @@ export default function Home() {
         </Hero>
 
         <Marquee />
+
+        <RedeMundialSection />
 
         <MapaRegioes />
 
