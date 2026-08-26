@@ -121,6 +121,9 @@ export default function LeadForm({ estados, estadoInicial }: Props) {
               <Label>Região*</Label>
               <Select
                 value={estado || undefined}
+                items={Object.fromEntries(
+                  estados.map((e) => [e.slug, `${e.nome} (${e.uf})`]),
+                )}
                 onValueChange={(v) => {
                   setEstado(v ?? "");
                   setEscola("");
@@ -133,7 +136,7 @@ export default function LeadForm({ estados, estadoInicial }: Props) {
                 <SelectContent>
                   {estados.map((e) => (
                     <SelectItem key={e.slug} value={e.slug}>
-                      {e.nome}
+                      {e.nome} ({e.uf})
                     </SelectItem>
                   ))}
                 </SelectContent>
