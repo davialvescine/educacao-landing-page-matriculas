@@ -7,6 +7,9 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://educaadventistacentrooeste.com.br"
 ).replace(/\/$/, "");
 
+/** ID de medição do GA4 (propriedade Matrículas, conta UCOB - Educacional). */
+export const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? "G-8ZSKJGD105";
+
 /** Slug de URL a partir de um nome (ex.: "Colégio Adventista de Taguatinga"). */
 export function slugificar(nome: string): string {
   return nome

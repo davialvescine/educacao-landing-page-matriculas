@@ -3,7 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { SITE_NOME, SITE_URL } from "@/lib/site";
+import { GA_ID, SITE_NOME, SITE_URL } from "@/lib/site";
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -67,12 +67,11 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
-  const gaId = process.env.NEXT_PUBLIC_GA_ID;
   return (
     <html lang="pt-BR" className={cn("h-full antialiased font-sans", jakarta.variable)}>
       <body className="min-h-full flex flex-col font-sans">
         {children}
-        {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
+        {GA_ID ? <GoogleAnalytics gaId={GA_ID} /> : null}
       </body>
     </html>
   );
