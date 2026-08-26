@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import CountUp from "@/components/CountUp";
+import CtaIabc from "@/components/CtaIabc";
 import Reveal from "@/components/Reveal";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -83,6 +84,18 @@ export function StatsStrip() {
     </section>
   );
 }
+
+/** Fotos reais do campus do IABC para o carrossel do internato. */
+const FOTOS_IABC = [
+  { src: "/imagens/iabc/campus-aereo.jpg", legenda: "Um campus inteiro para viver e estudar" },
+  { src: "/imagens/iabc/vida-esporte.jpg", legenda: "Esporte e conquistas" },
+  { src: "/imagens/iabc/vida-musica.jpg", legenda: "Música e louvor" },
+  { src: "/imagens/iabc/vida-estudo.jpg", legenda: "Estudo com propósito" },
+  { src: "/imagens/iabc/vida-natacao.jpg", legenda: "Esportes aquáticos" },
+  { src: "/imagens/iabc/vida-amizade.jpg", legenda: "Amizades para a vida" },
+  { src: "/imagens/iabc/campus-dormitorio.jpg", legenda: "Dormitórios modernos" },
+  { src: "/imagens/iabc/vida-missao.jpg", legenda: "Missão e serviço" },
+];
 
 const ICONES_DIFERENCIAIS = [
   "/imagens/icones/icon1.png",
@@ -259,87 +272,67 @@ export function IabcDestaque() {
             aluno vive, estuda e cresce com propósito.
           </p>
         </Reveal>
-        <Reveal delay={0.2}>
+        <Reveal delay={0.2} className="flex shrink-0 flex-col items-center gap-3 sm:flex-row">
+          <CtaIabc />
           <a
             href={rede.iabc.site}
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
-              buttonVariants({ size: "lg" }),
-              "h-13 shrink-0 rounded-full bg-gold-400 px-7 font-bold text-brand-950 hover:bg-gold-300",
+              buttonVariants({ variant: "outline", size: "lg" }),
+              "h-13 shrink-0 rounded-full border-2 border-white/30 bg-transparent px-6 font-bold text-white hover:bg-white/10",
             )}
           >
-            Visitar o IABC
+            Conhecer o site
             <ExternalLink aria-hidden className="size-4" />
           </a>
         </Reveal>
       </div>
 
-      {/* Mosaico: a vida no internato, com fotos reais do campus */}
-      <div className="relative mx-auto max-w-7xl px-4 pb-24">
-        <div className="grid auto-rows-[11rem] grid-cols-2 gap-4 sm:auto-rows-[13rem] lg:grid-cols-4">
-          {[
-            {
-              src: "/imagens/iabc/campus-aereo.jpg",
-              legenda: "Um campus inteiro para viver e estudar",
-              classe: "col-span-2 row-span-2",
-            },
-            {
-              src: "/imagens/iabc/vida-esporte.jpg",
-              legenda: "Esporte e conquistas",
-              classe: "",
-            },
-            {
-              src: "/imagens/iabc/vida-musica.jpg",
-              legenda: "Música e louvor",
-              classe: "row-span-2",
-            },
-            {
-              src: "/imagens/iabc/vida-estudo.jpg",
-              legenda: "Estudo com propósito",
-              classe: "",
-            },
-            {
-              src: "/imagens/iabc/vida-natacao.jpg",
-              legenda: "Esportes aquáticos",
-              classe: "",
-            },
-            {
-              src: "/imagens/iabc/vida-amizade.jpg",
-              legenda: "Amizades para a vida",
-              classe: "",
-            },
-            {
-              src: "/imagens/iabc/campus-dormitorio.jpg",
-              legenda: "Dormitórios modernos",
-              classe: "",
-            },
-            {
-              src: "/imagens/iabc/vida-missao.jpg",
-              legenda: "Missão e serviço",
-              classe: "",
-            },
-          ].map((f, i) => (
-            <Reveal key={f.src} delay={(i % 4) * 0.07} className={`h-full ${f.classe}`}>
-              <figure className="group relative h-full w-full overflow-hidden rounded-2xl">
-                <Image
-                  src={f.src}
-                  alt={f.legenda}
-                  fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
-                />
-                <div
-                  aria-hidden
-                  className="absolute inset-0 bg-gradient-to-t from-brand-950/75 via-transparent to-transparent"
-                />
-                <figcaption className="absolute inset-x-4 bottom-3 text-sm font-extrabold tracking-tight text-white">
-                  {f.legenda}
-                </figcaption>
-              </figure>
-            </Reveal>
-          ))}
+      {/* Carrossel: a vida no internato passando em fotos reais do campus */}
+      <div className="esteira-pausavel relative pb-24">
+        <div className="overflow-hidden">
+          <div className="anim-esteira flex w-max gap-4 pr-4">
+            {[false, true].map((duplicada) => (
+              <div
+                key={String(duplicada)}
+                aria-hidden={duplicada || undefined}
+                className="flex shrink-0 gap-4"
+              >
+                {FOTOS_IABC.map((f) => (
+                  <figure
+                    key={f.src}
+                    className="group relative h-56 w-[19rem] shrink-0 overflow-hidden rounded-2xl sm:h-64 sm:w-[23rem]"
+                  >
+                    <Image
+                      src={f.src}
+                      alt={duplicada ? "" : f.legenda}
+                      fill
+                      sizes="368px"
+                      className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                    />
+                    <div
+                      aria-hidden
+                      className="absolute inset-0 bg-gradient-to-t from-brand-950/75 via-transparent to-transparent"
+                    />
+                    <figcaption className="absolute inset-x-4 bottom-3 text-sm font-extrabold tracking-tight text-white">
+                      {f.legenda}
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
+        {/* Fades nas bordas */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-brand-950/80 to-transparent"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-brand-950/80 to-transparent"
+        />
       </div>
     </section>
   );

@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { getEstado } from "@/lib/rede";
+import { getRegiaoLead } from "@/lib/rede";
 
 export const metadata: Metadata = {
   title: "Recebemos seu interesse!",
@@ -20,7 +20,7 @@ export default async function Obrigado({
   searchParams: Promise<{ regiao?: string }>;
 }) {
   const { regiao } = await searchParams;
-  const estado = regiao ? getEstado(regiao) : undefined;
+  const estado = regiao ? getRegiaoLead(regiao) : undefined;
 
   return (
     <>

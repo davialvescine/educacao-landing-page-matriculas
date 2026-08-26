@@ -1,5 +1,5 @@
 import type { LeadNovo } from "@/lib/leads";
-import { getEstado } from "@/lib/rede";
+import { getRegiaoLead } from "@/lib/rede";
 
 /**
  * Integração com o Sevenbee (https://sevenbee.readme.io).
@@ -35,7 +35,7 @@ export async function enviarLeadSevenbee(
   const token = process.env.SEVENBEE_TOKEN;
   if (!token) return { ok: false, status: "pendente" };
 
-  const estado = getEstado(lead.estado);
+  const estado = getRegiaoLead(lead.estado);
   const tagBase = process.env.SEVENBEE_TAG ?? "Matrículas 2027";
   const origem = lead.utm
     ? [lead.utm.utm_source, lead.utm.utm_medium, lead.utm.utm_campaign]

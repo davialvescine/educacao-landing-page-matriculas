@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getEstado } from "@/lib/rede";
+import { getRegiaoLead } from "@/lib/rede";
 import { salvarLead, type LeadNovo } from "@/lib/leads";
 import { enviarLeadWebhook } from "@/lib/webhook";
 
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
-  const estado = getEstado(lead.estado);
+  const estado = getRegiaoLead(lead.estado);
   if (!estado) {
     return NextResponse.json({ erro: "Selecione a região." }, { status: 400 });
   }

@@ -41,7 +41,10 @@ export default async function PainelPage({ searchParams }: Props) {
     <PainelLeads
       leads={leads}
       resumo={resumo}
-      regioes={getEstados().map((e) => ({ slug: e.slug, nome: e.nome }))}
+      regioes={[
+        ...getEstados().map((e) => ({ slug: e.slug, nome: e.nome })),
+        { slug: "iabc", nome: "IABC (Internato)" },
+      ]}
       filtroRegiao={regiao ?? ""}
       filtroStatus={status ?? ""}
       integracaoConfigurada={integracaoConfigurada()}

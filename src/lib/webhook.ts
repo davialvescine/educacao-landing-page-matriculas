@@ -1,4 +1,4 @@
-import { getEstado } from "@/lib/rede";
+import { getRegiaoLead } from "@/lib/rede";
 import { marcarWebhook, type LeadNovo } from "@/lib/leads";
 import { enviarLeadSevenbee, sevenbeeConfigurado } from "@/lib/sevenbee";
 
@@ -30,7 +30,7 @@ export async function enviarLeadWebhook(
   const webhookUrl = process.env.LEAD_WEBHOOK_URL;
   if (!webhookUrl) return { configurado: false, ok: false, status: "pendente" };
 
-  const estado = getEstado(lead.estado);
+  const estado = getRegiaoLead(lead.estado);
   let status: string;
   try {
     const res = await fetch(webhookUrl, {

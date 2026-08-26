@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { FormEstado } from "@/lib/rede";
@@ -61,6 +61,27 @@ export default function LeadForm({
     () => estados.find((e) => e.slug === estado)?.escolas ?? [],
     [estados, estado],
   );
+
+  // Pré-seleção via hash (#matricula-<slug>), ex.: CTA do internato leva a
+  // #matricula-iabc. Funciona no clique na mesma página e vindo de outra.
+  useEffect(() => {
+    const aplicar = () => {
+      const m = window.location.hash.match(/^#matricula-([a-z0-9-]+)$/);
+      if (!m) return;
+      const slug = m[1];
+      if (estados.some((e) => e.slug === slug)) {
+        setEstado(slug);
+        setEscola("");
+        document
+          .getElementById("matricula")
+          ?.scrollIntoView({ behavior: "smooth" });
+      }
+    };
+    aplicar();
+    window.addEventListener("hashchange", aplicar);
+    return () => window.removeEventListener("hashchange", aplicar);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function avancar() {
     if (!estado) {
@@ -131,6 +152,7 @@ export default function LeadForm({
             <div className="grid gap-2">
               <Label>Região*</Label>
               <Select
+                key={estado || "sem-regiao"}
                 value={estado || undefined}
                 items={Object.fromEntries(
                   estados.map((e) => [e.slug, `${e.nome} (${e.uf})`]),

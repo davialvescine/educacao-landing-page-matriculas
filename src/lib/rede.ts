@@ -63,9 +63,39 @@ export function nomeEscola(escola: Escola): string {
   return escola.nome_oficial ?? escola.nome;
 }
 
+/** Pseudo-região do IABC: o internato também capta leads pelo formulário. */
+export const IABC_SLUG = "iabc";
+
+const REGIAO_IABC: Estado = {
+  slug: IABC_SLUG,
+  nome: "IABC (Internato)",
+  uf: "GO",
+  associacao: "UCOB",
+  whatsapp: {
+    numero: "(62) 3395-8000",
+    link: "https://wa.me/556233958000",
+    confirmar_numero: true,
+  },
+  total_escolas: 1,
+  escolas: [
+    {
+      nome: "IABC, Instituto Adventista Brasil Central",
+      endereco:
+        "Rodovia BR 414, km 411, Planalmira, Abadiânia (GO), CEP 72940-000",
+      foto: null,
+    },
+  ],
+};
+
+/** Região válida para leads: os 6 estados + o internato IABC. */
+export function getRegiaoLead(slug: string): Estado | undefined {
+  if (slug === IABC_SLUG) return REGIAO_IABC;
+  return getEstado(slug);
+}
+
 /** Nome legível de uma região a partir do slug (fallback: o próprio slug). */
 export function nomeRegiao(slug: string): string {
-  return getEstado(slug)?.nome ?? slug;
+  return getRegiaoLead(slug)?.nome ?? slug;
 }
 
 /** Slug de URL de uma escola (a partir do nome oficial). */
@@ -93,12 +123,20 @@ export function cidadeEscola(escola: Escola): string {
 
 /** Dados enxutos para o formulário de leads (client component). */
 export function getFormEstados() {
-  return rede.estados.map((e) => ({
-    slug: e.slug,
-    nome: e.nome,
-    uf: e.uf,
-    escolas: e.escolas.map((s) => nomeEscola(s)),
-  }));
+  return [
+    ...rede.estados.map((e) => ({
+      slug: e.slug,
+      nome: e.nome,
+      uf: e.uf,
+      escolas: e.escolas.map((s) => nomeEscola(s)),
+    })),
+    {
+      slug: REGIAO_IABC.slug,
+      nome: REGIAO_IABC.nome,
+      uf: REGIAO_IABC.uf,
+      escolas: REGIAO_IABC.escolas.map((s) => nomeEscola(s)),
+    },
+  ];
 }
 
 export type FormEstado = ReturnType<typeof getFormEstados>[number];
