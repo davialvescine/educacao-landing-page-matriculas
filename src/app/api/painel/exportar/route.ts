@@ -1,6 +1,7 @@
 import { listarLeads } from "@/lib/leads";
 import { nomeRegiao } from "@/lib/rede";
-import { sessaoValida } from "@/lib/painel-auth";
+import { regioesPermitidas, usuarioLogado } from "@/lib/painel-auth";
+import { registrarAcesso } from "@/lib/usuarios";
 
 export const runtime = "nodejs";
 
@@ -9,10 +10,19 @@ function celula(v: string): string {
 }
 
 export async function GET() {
-  if (!(await sessaoValida())) {
+  const usuario = await usuarioLogado();
+  if (!usuario) {
     return new Response("Não autorizado.", { status: 401 });
   }
-  const leads = await listarLeads({ limite: 2000 });
+  const leads = await listarLeads({
+    limite: 2000,
+    regioesPermitidas: regioesPermitidas(usuario),
+  });
+  await registrarAcesso("exportou", {
+    usuarioId: usuario.id,
+    usuarioNome: usuario.nome,
+    detalhe: `${leads.length} leads`,
+  });
   const linhas = [
     [
       "data",

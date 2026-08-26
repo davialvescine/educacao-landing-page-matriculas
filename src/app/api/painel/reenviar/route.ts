@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { obterLead } from "@/lib/leads";
 import { enviarLeadWebhook } from "@/lib/webhook";
-import { sessaoValida } from "@/lib/painel-auth";
+import { regioesPermitidas, usuarioLogado } from "@/lib/painel-auth";
+import { registrarAcesso } from "@/lib/usuarios";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
-  if (!(await sessaoValida())) {
+  const usuario = await usuarioLogado();
+  if (!usuario) {
     return NextResponse.json({ erro: "Não autorizado." }, { status: 401 });
   }
   let body: Record<string, unknown>;
@@ -20,6 +22,15 @@ export async function POST(req: Request) {
   if (!lead) {
     return NextResponse.json({ erro: "Lead não encontrado." }, { status: 404 });
   }
+  const permitidas = regioesPermitidas(usuario);
+  if (permitidas && !permitidas.includes(lead.estado)) {
+    return NextResponse.json({ erro: "Não autorizado." }, { status: 403 });
+  }
+  await registrarAcesso("reenviou", {
+    usuarioId: usuario.id,
+    usuarioNome: usuario.nome,
+    detalhe: `${lead.nome} (${lead.estado})`,
+  });
   const resultado = await enviarLeadWebhook(lead.id, {
     nome: lead.nome,
     whatsapp: lead.whatsapp,

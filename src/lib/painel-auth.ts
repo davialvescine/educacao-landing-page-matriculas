@@ -1,51 +1,88 @@
-import { createHash, createHmac, timingSafeEqual } from "node:crypto";
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
 
-export const COOKIE_SESSAO = "painel_sessao";
-export const DURACAO_SESSAO_S = 12 * 60 * 60; // 12 horas
+/**
+ * Camada fina sobre o Better Auth com as regras do painel:
+ * papel (admin/coordenador) e quais regiões cada pessoa enxerga.
+ */
 
-function chave(): string {
-  return process.env.PAINEL_SENHA ?? "";
+export type Papel = "admin" | "coordenador";
+
+export interface UsuarioPainel {
+  id: string;
+  nome: string;
+  email: string;
+  papel: Papel;
+  regioes: string[];
 }
 
-export function painelConfigurado(): boolean {
-  return Boolean(chave());
+export function autenticacaoConfigurada(): boolean {
+  return Boolean(process.env.BETTER_AUTH_SECRET && process.env.DATABASE_URL);
 }
 
-function assinar(exp: number): string {
-  return createHmac("sha256", chave()).update(String(exp)).digest("hex");
-}
-
-export function criarToken(): string {
-  const exp = Date.now() + DURACAO_SESSAO_S * 1000;
-  return `${exp}.${assinar(exp)}`;
-}
-
-export function senhaConfere(tentativa: string): boolean {
-  if (!painelConfigurado()) return false;
-  // Hash dos dois lados para comparar em tempo constante sem vazar tamanho.
-  const a = createHash("sha256").update(tentativa).digest();
-  const b = createHash("sha256").update(chave()).digest();
-  return timingSafeEqual(a, b);
-}
-
-export function tokenValido(token: string | undefined): boolean {
-  if (!token || !painelConfigurado()) return false;
-  const [expStr, assinatura] = token.split(".");
-  const exp = Number(expStr);
-  if (!Number.isFinite(exp) || exp < Date.now()) return false;
-  const esperada = assinar(exp);
+/** Usuário da sessão atual, ou null. Banido conta como sem acesso. */
+export async function usuarioLogado(): Promise<UsuarioPainel | null> {
+  if (!autenticacaoConfigurada()) return null;
+  let sessao;
   try {
-    return timingSafeEqual(
-      Buffer.from(assinatura ?? "", "utf8"),
-      Buffer.from(esperada, "utf8"),
-    );
-  } catch {
-    return false;
+    sessao = await auth.api.getSession({ headers: await headers() });
+  } catch (e) {
+    console.error("[painel-auth] falha ao ler sessão:", e);
+    return null;
   }
+  const u = sessao?.user as
+    | {
+        id: string;
+        name: string;
+        email: string;
+        role?: string | null;
+        banned?: boolean | null;
+        regioes?: unknown;
+      }
+    | undefined;
+  if (!u || u.banned) return null;
+
+  return {
+    id: u.id,
+    nome: u.name,
+    email: u.email,
+    papel: u.role === "admin" ? "admin" : "coordenador", // "user" no banco
+    regioes: Array.isArray(u.regioes)
+      ? (u.regioes as unknown[]).filter(
+          (r): r is string => typeof r === "string",
+        )
+      : [],
+  };
 }
 
-export async function sessaoValida(): Promise<boolean> {
-  const jar = await cookies();
-  return tokenValido(jar.get(COOKIE_SESSAO)?.value);
+/** Usuário com o papel exigido, ou null. */
+export async function exigirPapel(
+  papel: Papel,
+): Promise<UsuarioPainel | null> {
+  const usuario = await usuarioLogado();
+  if (!usuario) return null;
+  if (papel === "admin" && usuario.papel !== "admin") return null;
+  return usuario;
+}
+
+/** Regiões que o usuário pode ver. null = todas (admin). */
+export function regioesPermitidas(usuario: UsuarioPainel): string[] | null {
+  return usuario.papel === "admin" ? null : usuario.regioes;
+}
+
+/** Já existe algum administrador? Define se o painel pede o 1º cadastro. */
+export async function existeAdmin(): Promise<boolean> {
+  if (!autenticacaoConfigurada()) return false;
+  try {
+    const { Pool } = await import("pg");
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 1 });
+    const { rows } = await pool.query(
+      `SELECT 1 FROM "user" WHERE role = 'admin' AND (banned IS NOT TRUE) LIMIT 1`,
+    );
+    await pool.end();
+    return rows.length > 0;
+  } catch (e) {
+    console.error("[painel-auth] falha ao checar admin:", e);
+    return true; // no erro, não expõe o cadastro aberto
+  }
 }

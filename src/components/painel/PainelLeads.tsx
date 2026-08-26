@@ -16,6 +16,7 @@ import {
   TriangleAlert,
   X,
 } from "lucide-react";
+import { signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { LeadRegistro, ResumoLeads } from "@/lib/leads";
@@ -27,6 +28,7 @@ interface Props {
   filtroRegiao: string;
   filtroStatus: string;
   integracaoConfigurada: boolean;
+  usuario: { nome: string; papel: "admin" | "coordenador" };
 }
 
 const STATUS_FILTROS = [
@@ -111,6 +113,7 @@ export default function PainelLeads({
   filtroRegiao,
   filtroStatus,
   integracaoConfigurada,
+  usuario,
 }: Props) {
   const router = useRouter();
   const [reenviando, setReenviando] = useState<string | null>(null);
@@ -192,7 +195,7 @@ export default function PainelLeads({
   }
 
   async function sair() {
-    await fetch("/api/painel/sessao", { method: "DELETE" }).catch(() => {});
+    await signOut().catch(() => {});
     router.refresh();
   }
 
@@ -219,6 +222,10 @@ export default function PainelLeads({
             />
             <span className="hidden text-sm font-bold uppercase tracking-widest text-white/70 sm:block">
               Painel de leads
+            </span>
+            <span className="hidden rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white/80 lg:block">
+              {usuario.nome}
+              {usuario.papel === "admin" ? " · admin" : ""}
             </span>
           </div>
           <div className="flex items-center gap-2">

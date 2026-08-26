@@ -34,6 +34,8 @@ export interface FiltroLeads {
   estado?: string;
   status?: "pendente" | "enviado" | "falhou";
   limite?: number;
+  /** Restringe às regiões do usuário (null/undefined = todas). */
+  regioesPermitidas?: string[] | null;
 }
 
 // Pool do Postgres compartilhado; em dev sem DATABASE_URL usamos arquivo.
@@ -166,6 +168,11 @@ export async function listarLeads(filtro: FiltroLeads = {}): Promise<LeadRegistr
     if (filtro.status === "enviado") clausulas.push(`webhook_status = 'enviado'`);
     if (filtro.status === "pendente") clausulas.push(`webhook_status = 'pendente'`);
     if (filtro.status === "falhou") clausulas.push(`webhook_status LIKE 'falhou:%'`);
+    if (filtro.regioesPermitidas) {
+      if (!filtro.regioesPermitidas.length) return []; // sem região = sem leads
+      valores.push(filtro.regioesPermitidas);
+      clausulas.push(`estado = ANY($${valores.length})`);
+    }
     valores.push(limite);
     const sql = `SELECT id, nome, whatsapp, email, estado, escola, nivel,
                         criado_em, webhook_status, webhook_tentativas, enviado_em,
@@ -185,6 +192,10 @@ export async function listarLeads(filtro: FiltroLeads = {}): Promise<LeadRegistr
     }));
   }
   let leads = await lerArquivoDev();
+  if (filtro.regioesPermitidas) {
+    const permitidas = new Set(filtro.regioesPermitidas);
+    leads = leads.filter((l) => permitidas.has(l.estado));
+  }
   if (filtro.estado) leads = leads.filter((l) => l.estado === filtro.estado);
   if (filtro.status === "enviado")
     leads = leads.filter((l) => l.webhook_status === "enviado");
@@ -286,8 +297,10 @@ export interface ResumoLeads {
   porEstado: Record<string, number>;
 }
 
-export async function resumoLeads(): Promise<ResumoLeads> {
-  const leads = await listarLeads({ limite: 2000 });
+export async function resumoLeads(
+  regioesPermitidas?: string[] | null,
+): Promise<ResumoLeads> {
+  const leads = await listarLeads({ limite: 2000, regioesPermitidas });
   const inicioHoje = new Date();
   inicioHoje.setHours(0, 0, 0, 0);
   const resumo: ResumoLeads = {

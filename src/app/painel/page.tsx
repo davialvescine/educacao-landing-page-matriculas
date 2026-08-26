@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { listarLeads, resumoLeads } from "@/lib/leads";
 import { getEstados } from "@/lib/rede";
-import { painelConfigurado, sessaoValida } from "@/lib/painel-auth";
+import {
+  autenticacaoConfigurada,
+  existeAdmin,
+  regioesPermitidas,
+  usuarioLogado,
+} from "@/lib/painel-auth";
 import { integracaoConfigurada } from "@/lib/webhook";
 import LoginPainel from "@/components/painel/LoginPainel";
 import PainelLeads from "@/components/painel/PainelLeads";
@@ -13,17 +18,39 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+const TODAS_REGIOES = [
+  ...getEstados().map((e) => ({ slug: e.slug, nome: e.nome })),
+  { slug: "iabc", nome: "IABC (Internato)" },
+];
+
 interface Props {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export default async function PainelPage({ searchParams }: Props) {
-  if (!(await sessaoValida())) {
-    return <LoginPainel configurado={painelConfigurado()} />;
+  const usuario = await usuarioLogado();
+  if (!usuario) {
+    return (
+      <LoginPainel
+        configurado={autenticacaoConfigurada()}
+        primeiroAcesso={!(await existeAdmin())}
+      />
+    );
   }
 
   const params = await searchParams;
-  const regiao = typeof params.regiao === "string" ? params.regiao : undefined;
+  const permitidas = regioesPermitidas(usuario);
+  const regioesVisiveis = permitidas
+    ? TODAS_REGIOES.filter((r) => permitidas.includes(r.slug))
+    : TODAS_REGIOES;
+
+  const regiaoBruta = typeof params.regiao === "string" ? params.regiao : "";
+  // Coordenador só filtra dentro das próprias regiões.
+  const regiao =
+    regiaoBruta && regioesVisiveis.some((r) => r.slug === regiaoBruta)
+      ? regiaoBruta
+      : undefined;
+
   const statusBruto = typeof params.status === "string" ? params.status : "";
   const status =
     statusBruto === "enviado" ||
@@ -33,21 +60,22 @@ export default async function PainelPage({ searchParams }: Props) {
       : undefined;
 
   const [leads, resumo] = await Promise.all([
-    listarLeads({ estado: regiao, status }),
-    resumoLeads(),
+    listarLeads({ estado: regiao, status, regioesPermitidas: permitidas }),
+    resumoLeads(permitidas),
   ]);
 
   return (
     <PainelLeads
       leads={leads}
       resumo={resumo}
-      regioes={[
-        ...getEstados().map((e) => ({ slug: e.slug, nome: e.nome })),
-        { slug: "iabc", nome: "IABC (Internato)" },
-      ]}
+      regioes={regioesVisiveis}
       filtroRegiao={regiao ?? ""}
       filtroStatus={status ?? ""}
       integracaoConfigurada={integracaoConfigurada()}
+      usuario={{
+        nome: usuario.nome,
+        papel: usuario.papel,
+      }}
     />
   );
 }

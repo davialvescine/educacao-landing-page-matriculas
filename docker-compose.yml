@@ -14,6 +14,8 @@ services:
       - dados-db:/var/lib/postgresql/data
       # Cria a tabela de leads na primeira subida.
       - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    ports:
+      - "5433:5432"   # acesso do host (psql, CLI do Better Auth)
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U matriculas -d matriculas"]
       interval: 5s
@@ -27,7 +29,8 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgres://matriculas:matriculas-local@db:5432/matriculas
-      PAINEL_SENHA: matriculas2027
+      BETTER_AUTH_SECRET: segredo-local-de-desenvolvimento-32-chars
+      BETTER_AUTH_URL: http://localhost:3300
       SEVENBEE_WEBHOOK_SEGREDO: teste-segredo-123
       CRON_SEGREDO: teste-cron-123
       # Para testar o envio real ao Sevenbee, descomente e cole o token:
