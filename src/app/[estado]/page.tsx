@@ -8,6 +8,7 @@ import Hero, { HeroCtas } from "@/components/Hero";
 import LeadForm from "@/components/LeadForm";
 import Reveal from "@/components/Reveal";
 import BarraCtaMobile from "@/components/BarraCtaMobile";
+import WhatsFlutuante from "@/components/WhatsFlutuante";
 import DepoimentosSection from "@/components/DepoimentosSection";
 import UnidadeCard from "@/components/UnidadeCard";
 import { Diferenciais, Eyebrow } from "@/components/Secoes";
@@ -132,6 +133,14 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
           </div>
         </section>
       </main>
+      <WhatsFlutuante
+        linkDireto={estado.whatsapp.link}
+        regioes={getEstados().map((e) => ({
+          slug: e.slug,
+          nome: e.nome,
+          link: e.whatsapp.link,
+        }))}
+      />
       <BarraCtaMobile />
       <Footer />
     </>

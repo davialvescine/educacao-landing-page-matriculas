@@ -10,6 +10,7 @@ import NiveisSection from "@/components/NiveisSection";
 import UmDiaSection from "@/components/UmDiaSection";
 import DepoimentosSection from "@/components/DepoimentosSection";
 import BarraCtaMobile from "@/components/BarraCtaMobile";
+import WhatsFlutuante from "@/components/WhatsFlutuante";
 import Reveal from "@/components/Reveal";
 import { Diferenciais, IabcDestaque, StatsStrip } from "@/components/Secoes";
 import { getEstados, getFormEstados } from "@/lib/rede";
@@ -121,6 +122,13 @@ export default function Home() {
           </div>
         </section>
       </main>
+      <WhatsFlutuante
+        regioes={estados.map((e) => ({
+          slug: e.slug,
+          nome: e.nome,
+          link: e.whatsapp.link,
+        }))}
+      />
       <BarraCtaMobile />
       <Footer />
     </>
