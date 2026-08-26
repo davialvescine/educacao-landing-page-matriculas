@@ -62,7 +62,7 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
           >
             Educação Adventista
             <br />
-            <span className="text-primary-foreground [text-shadow:0_4px_18px_rgba(18,38,158,0.35)]">
+            <span className="text-white">
               {estado.nome}
             </span>
           </h1>
