@@ -229,15 +229,15 @@ export function IabcDestaque() {
   return (
     <section id="iabc" className="relative scroll-mt-10 overflow-hidden bg-brand-950">
       <Image
-        src="/imagens/campanha/fundo-cerrado.jpg"
+        src="/imagens/campanha/iabc-campus.jpg"
         alt=""
         fill
         sizes="100vw"
-        className="object-cover object-[center_35%] opacity-50"
+        className="object-cover object-[center_58%] opacity-60"
       />
       <div
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-r from-brand-950/95 via-brand-950/60 to-brand-950/95"
+        className="absolute inset-0 bg-gradient-to-r from-brand-950/95 via-brand-950/55 to-brand-950/95"
       />
       <div className="relative mx-auto flex max-w-7xl flex-col items-center gap-10 px-4 py-24 md:flex-row">
         <Reveal>
