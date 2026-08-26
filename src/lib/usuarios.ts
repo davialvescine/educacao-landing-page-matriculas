@@ -33,6 +33,15 @@ export async function registrarAcesso(
     .catch((e) => console.error("[acessos] falha ao registrar:", e));
 }
 
+/**
+ * Registros antigos guardavam o identificador interno do usuário. Ele não
+ * diz nada a quem lê e não deve trafegar até o navegador, então some aqui.
+ * O banco mantém o valor original: histórico de auditoria não se reescreve.
+ */
+function detalheLegivel(detalhe: string): string {
+  return detalhe.replace(/\b[A-Za-z0-9_-]{20,}\b/g, "um usuário");
+}
+
 export interface Acesso {
   id: string;
   usuario_nome: string;
@@ -53,7 +62,7 @@ export async function listarAcessos(limite = 50): Promise<Acesso[]> {
     id: String(r.id),
     usuario_nome: String(r.usuario_nome),
     acao: String(r.acao),
-    detalhe: String(r.detalhe),
+    detalhe: detalheLegivel(String(r.detalhe)),
     criado_em: new Date(r.criado_em).toISOString(),
   }));
 }
