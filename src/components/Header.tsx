@@ -35,15 +35,15 @@ export default function Header() {
             </Link>
           ))}
         </nav>
-        <Link
-          href="/#matricula"
+        <a
+          href="#matricula"
           className={cn(
             buttonVariants(),
             "h-11 rounded-full px-6 text-sm font-bold shadow-cta",
           )}
         >
           Quero matricular
-        </Link>
+        </a>
       </div>
     </header>
   );
