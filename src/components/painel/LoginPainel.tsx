@@ -43,10 +43,10 @@ export default function LoginPainel({ configurado }: { configurado: boolean }) {
         className="w-full max-w-sm rounded-2xl bg-surface p-8 shadow-card"
       >
         <Image
-          src="/imagens/campanha/logo-ea.png"
+          src="/imagens/logos/logo_colegio.png"
           alt="Educação Adventista Centro-Oeste"
-          width={640}
-          height={220}
+          width={502}
+          height={150}
           className="mx-auto h-14 w-auto brightness-0"
         />
         <h1 className="mt-6 text-center text-xl font-extrabold tracking-tight text-brand-950">

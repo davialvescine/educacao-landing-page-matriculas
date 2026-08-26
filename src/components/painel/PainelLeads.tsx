@@ -125,11 +125,11 @@ export default function PainelLeads({
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
           <div className="flex items-center gap-3">
             <Image
-              src="/imagens/campanha/logo-ea.png"
+              src="/imagens/logos/logo_colegio.png"
               alt="Educação Adventista Centro-Oeste"
-              width={640}
-              height={220}
-              className="h-9 w-auto brightness-0 invert"
+              width={502}
+              height={150}
+              className="h-10 w-auto"
             />
             <span className="hidden text-sm font-bold uppercase tracking-widest text-white/70 sm:block">
               Painel de leads
