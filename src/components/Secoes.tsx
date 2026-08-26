@@ -22,16 +22,22 @@ export function Eyebrow({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function StatsTiles() {
+export function StatsTiles({ claro = false }: { claro?: boolean }) {
   const rede = getRede();
   return (
-    <div className="grid grid-cols-2 gap-y-8 text-center sm:grid-cols-3 lg:flex lg:justify-center lg:gap-y-0 lg:divide-x lg:divide-white/10">
+    <div
+      className={`grid grid-cols-2 gap-y-8 text-center sm:grid-cols-3 lg:flex lg:justify-center lg:gap-y-0 lg:divide-x ${claro ? "lg:divide-brand-900/10" : "lg:divide-white/10"}`}
+    >
       {rede.estatisticas.map((s, i) => (
         <Reveal key={s.rotulo} delay={i * 0.07} className="px-4 lg:px-12">
-          <p className="text-4xl font-extrabold tracking-tighter text-gold-400 xl:text-5xl">
+          <p
+            className={`text-4xl font-extrabold tracking-tighter xl:text-5xl ${claro ? "text-brand-800" : "text-gold-400"}`}
+          >
             <CountUp valor={s.valor} />
           </p>
-          <p className="mt-2 text-[11px] font-bold uppercase tracking-widest text-primary-foreground/50">
+          <p
+            className={`mt-2 text-[11px] font-bold uppercase tracking-widest ${claro ? "text-muted-foreground" : "text-primary-foreground/50"}`}
+          >
             {s.rotulo}
           </p>
         </Reveal>
@@ -43,25 +49,25 @@ export function StatsTiles() {
 /** Seção-destaque da rede mundial: a frase como título e os números como prova. */
 export function RedeMundialSection() {
   return (
-    <section className="relative overflow-hidden border-b border-dashed border-white/10 bg-gradient-to-b from-brand-900 via-brand-950 to-brand-950 py-20">
+    <section className="relative overflow-hidden bg-gradient-to-b from-paper via-surface to-gold-100/40 py-20">
       <div
         aria-hidden
-        className="anim-aurora absolute -top-32 left-1/2 h-[22rem] w-[40rem] -translate-x-1/2 rounded-full bg-gold-400/10 blur-[110px]"
+        className="anim-aurora absolute -top-36 left-1/2 h-[22rem] w-[44rem] -translate-x-1/2 rounded-full bg-gold-300/30 blur-[110px]"
       />
       <div className="relative mx-auto max-w-7xl px-4">
         <Reveal>
-          <p className="flex items-center justify-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-gold-400">
+          <p className="flex items-center justify-center gap-2 text-sm font-extrabold uppercase tracking-[0.22em] text-gold-600">
             <span aria-hidden>✦</span> Uma decisão maior do que parece
           </p>
-          <h2 className="mx-auto mt-4 max-w-3xl text-center text-3xl font-extrabold leading-tight tracking-tighter text-white sm:text-4xl">
+          <h2 className="mx-auto mt-4 max-w-3xl text-center text-3xl font-extrabold leading-tight tracking-tighter text-brand-950 sm:text-4xl">
             Você não está matriculando em uma escola.{" "}
-            <span className="bg-gradient-to-r from-gold-300 via-gold-400 to-gold-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-gold-500 via-gold-600 to-gold-500 bg-clip-text text-transparent">
               Está entrando em uma rede mundial.
             </span>
           </h2>
         </Reveal>
         <div className="mt-12">
-          <StatsTiles />
+          <StatsTiles claro />
         </div>
       </div>
     </section>
