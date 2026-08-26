@@ -98,8 +98,17 @@ export default function MapaRegioes() {
         className="absolute inset-0 bg-gradient-to-b from-brand-950/95 via-brand-950/40 to-brand-950/95"
       />
       <div className="relative mx-auto max-w-7xl px-4 py-24">
-        <Reveal className="border-b border-white/10 pb-16">
-          <StatsTiles />
+        <Reveal>
+          <div className="mx-auto max-w-6xl rounded-3xl border border-white/10 bg-white/[0.05] px-6 py-10 backdrop-blur-sm">
+            <p className="flex items-center justify-center gap-2 text-center text-xs font-extrabold uppercase tracking-[0.22em] text-gold-400">
+              <span aria-hidden>✦</span> Você não está matriculando em uma
+              escola, e sim em uma rede mundial
+              <span aria-hidden>✦</span>
+            </p>
+            <div className="mt-8">
+              <StatsTiles />
+            </div>
+          </div>
         </Reveal>
         <div className="mt-20 grid items-center gap-x-16 gap-y-14 lg:grid-cols-12">
           {/* Esquerda: título e lista */}
