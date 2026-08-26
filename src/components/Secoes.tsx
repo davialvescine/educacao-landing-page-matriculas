@@ -115,26 +115,17 @@ export function Diferenciais() {
                 className="absolute inset-0 bg-gradient-to-b from-gold-200/70 via-transparent to-gold-600/40"
               />
               <Image
-                src="/imagens/fotos/alunos2.png"
-                alt="Alunos da Educação Adventista"
-                width={584}
-                height={700}
-                className="absolute bottom-0 left-1/2 z-10 w-[82%] -translate-x-1/2 drop-shadow-foto"
+                src="/imagens/campanha/daniel.webp"
+                alt="Aluno da Educação Adventista"
+                width={1457}
+                height={1600}
+                className="absolute bottom-0 left-1/2 z-10 h-[68%] w-auto -translate-x-1/2"
               />
-              <div className="absolute inset-x-6 top-6 z-20">
-                <p className="text-3xl font-extrabold leading-[1.05] tracking-tighter text-brand-950">
-                  Muito além
-                  <br />
-                  do ensino.
-                </p>
-                <Image
-                  src="/imagens/campanha/muito-alem-do-ensino.png"
-                  alt="#MuitoAlémdoEnsino"
-                  width={1617}
-                  height={122}
-                  className="mt-3 h-3.5 w-auto"
-                />
-              </div>
+              <p className="absolute inset-x-6 top-6 z-20 text-3xl font-extrabold leading-[1.05] tracking-tighter text-brand-950">
+                Muito além
+                <br />
+                do ensino.
+              </p>
             </div>
           </Reveal>
 
