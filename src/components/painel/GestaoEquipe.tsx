@@ -42,6 +42,7 @@ const ROTULO_ACAO: Record<string, string> = {
   login_erro: "erro do servidor na entrada",
   exportou: "exportou leads",
   viu_relatorio: "abriu o relatório",
+  relatorio_enviado: "recebeu o relatório do mês",
   reenviou: "reenviou lead",
   criou_usuario: "criou usuário",
   alterou_usuario: "alterou usuário",

@@ -14,6 +14,7 @@ export type AcaoAcesso =
   | "login_erro"
   | "exportou"
   | "viu_relatorio"
+  | "relatorio_enviado"
   | "reenviou"
   | "criou_usuario"
   | "alterou_usuario"

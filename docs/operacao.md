@@ -69,13 +69,26 @@ aberto não vira PR.
 Container do Next (standalone) e container do tempo real, os dois no
 Coolify, contra o mesmo Postgres. O `docker-compose.yml` tem os dois.
 
-Tarefa agendada a cadastrar no Coolify, a cada 10 minutos:
+Duas tarefas agendadas a cadastrar no Coolify:
 
 ```
+# a cada 10 min — reprocessa lead que falhou ao ir para o Sevenbee
 curl -fsS "https://<dominio>/api/tarefas/reenviar-falhas?segredo=$CRON_SEGREDO"
+
+# todo dia de manhã — relatório do mês que fechou, por e-mail
+curl -fsS "https://<dominio>/api/tarefas/relatorio-mensal?segredo=$CRON_SEGREDO"
 ```
 
-É ela que reprocessa lead que falhou ao ir para o Sevenbee.
+A segunda roda **todo dia** de propósito. Ela mesma confere se hoje é o
+primeiro dia útil e se aquele mês já foi enviado — o registro fica na
+trilha de auditoria. Agendar só para o dia 1 perderia o mês inteiro se o
+servidor estivesse fora naquele dia.
+
+Para conferir o layout antes do primeiro fechamento, sem esperar a data:
+
+```
+curl -fsS "https://<dominio>/api/tarefas/relatorio-mensal?segredo=$CRON_SEGREDO&ano=2026&mes=9"
+```
 
 ---
 
@@ -98,6 +111,11 @@ diferente do domínio real derruba o cookie de sessão.
 `atendente_nome` no lead. Se estiverem vazios com o atendimento já em
 curso, o lead foi trabalhado direto no Sevenbee, sem passar pelo painel —
 o dono só é gravado por quem clica em atender aqui.
+
+**O relatório do mês não chegou.** Rode a tarefa na mão com `&forcar=1` e
+leia a resposta: ela diz quantos foram enviados, quantos foram pulados e
+por quê. Coordenador sem região atribuída é pulado de propósito —
+relatório vazio só ensina a ignorar a mensagem.
 
 **Alguém questiona um consentimento.** A prova está em `consentimentos`,
 por `lead_id`: versão, data, IP e o resumo criptográfico. `intacto`
