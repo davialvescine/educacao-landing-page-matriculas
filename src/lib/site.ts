@@ -8,15 +8,14 @@ export const SITE_URL = (
 ).replace(/\/$/, "");
 
 /**
- * Política de privacidade oficial da rede.
+ * Política de privacidade deste site.
  *
- * É a da Educação Adventista nacional, não uma do Centro-Oeste: é a que
- * existe publicada. Vale conferir com o jurídico da união se ela cobre a
- * captação de leads deste site, porque é para ela que o formulário manda
- * a família quando ela quer ler o texto inteiro.
+ * É nossa, e não a da rede nacional. A da rede fala do portal dela, não
+ * do que este formulário faz com os dados: mandar a família para lá seria
+ * apontar para um texto que não descreve esta coleta. A página em
+ * /politica-de-privacidade descreve o que este sistema faz de fato.
  */
-export const POLITICA_PRIVACIDADE =
-  "https://www.educacaoadventista.org.br/politica-de-privacidade/";
+export const POLITICA_PRIVACIDADE = "/politica-de-privacidade";
 
 /** Instagram oficial da rede (bio confere: DF, GO, MT, MS e TO). */
 export const INSTAGRAM_OFICIAL =

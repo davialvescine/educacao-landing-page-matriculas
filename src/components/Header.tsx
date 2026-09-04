@@ -23,12 +23,16 @@ const NAV = [
  * Quem detecta a rolagem é um sensor de 1px no topo, observado pelo
  * IntersectionObserver. Ouvir o evento de scroll dispararia a cada quadro
  * e travaria a rolagem no celular.
+ *
+ * `solido` é para as páginas que não abrem com foto: sobre fundo claro o
+ * menu branco simplesmente some, então nessas a barra já nasce escura.
  */
-export default function Header() {
+export default function Header({ solido = false }: { solido?: boolean }) {
   const sensor = useRef<HTMLDivElement>(null);
-  const [rolou, setRolou] = useState(false);
+  const [rolou, setRolou] = useState(solido);
 
   useEffect(() => {
+    if (solido) return;
     const alvo = sensor.current;
     if (!alvo) return;
     const obs = new IntersectionObserver(
@@ -37,7 +41,7 @@ export default function Header() {
     );
     obs.observe(alvo);
     return () => obs.disconnect();
-  }, []);
+  }, [solido]);
 
   return (
     <>

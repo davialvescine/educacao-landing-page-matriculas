@@ -54,14 +54,12 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <a
+              <Link
                 href={POLITICA_PRIVACIDADE}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="transition-colors hover:text-primary-foreground"
               >
                 Política de privacidade
-              </a>
+              </Link>
             </li>
             <li>
               {/* Link visível de propósito: o sameAs pesa mais quando o
