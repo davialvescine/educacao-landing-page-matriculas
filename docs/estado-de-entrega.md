@@ -2,12 +2,12 @@
 
 *Apurado no código em 04 de setembro de 2026, contra a proposta comercial enviada em 02/09/2026. Os valores são os da proposta e não foram alterados.*
 
-De **R$ 34.140** de implantação, **R$ 30.100 já estão no ar**: **R$ 24.850** sem ressalva e **R$ 5.250** com um pedaço nomeado faltando. **R$ 4.040** ainda não começaram.
+De **R$ 34.140** de implantação, **R$ 30.100 já estão no ar**: **R$ 25.100** sem ressalva e **R$ 5.000** com um pedaço nomeado faltando. **R$ 4.040** ainda não começaram.
 
 | Estado | Valor | O que significa |
 | --- | --- | --- |
-| ✅ Pronto | R$ 24.850 | Construído, no ar e funcionando como está descrito. |
-| ⚠️ Parcial | R$ 5.250 | Já funciona, mas falta o pedaço nomeado na linha. |
+| ✅ Pronto | R$ 25.100 | Construído, no ar e funcionando como está descrito. |
+| ⚠️ Parcial | R$ 5.000 | Já funciona, mas falta o pedaço nomeado na linha. |
 | ❌ Falta | R$ 4.040 | Não foi construído. |
 
 ## O que ainda não está no ar
@@ -22,7 +22,6 @@ Cada linha aparece detalhada no grupo dela. Aqui estão juntas, com o que trava 
 | § 05 Dica Plus: integração | ❌ Falta | **Esperando a rede.** Falta a documentação da API da plataforma. | R$ 790 |
 | § 06 Search Console e Core Web Vitals | ❌ Falta | **Esperando a publicação.** Só começa com o site no domínio da rede. | R$ 250 |
 | § 04 Trilha de auditoria de acesso | ⚠️ Parcial | **Depende de construir.** Registrar entrada e tentativa de entrada no painel. | R$ 250 |
-| § 07 Consentimento registrado e comprovável | ⚠️ Parcial | **Depende de construir.** Gravar data, hora e versão do texto aceito. | R$ 250 |
 | § 06 Identidade da rede nos buscadores de IA | ⚠️ Parcial | **Esperando a rede.** Faltam o Facebook e o YouTube oficiais. | R$ 550 |
 | § 08 Infraestrutura de produção | ⚠️ Parcial | **Esperando a publicação.** Falta servidor e domínio contratados. | R$ 400 |
 | § 08 Documentação e treinamento | ⚠️ Parcial | **Esperando a rede.** Falta agendar o repasse com as coordenações. | R$ 250 |
@@ -241,13 +240,13 @@ Configuração do `Google Search Console`, envio do sitemap, primeira auditoria 
 
 ## § 07 — LGPD: o que o sistema executa
 
-*⚠️ Parcial R$ 250*
+*✅ Pronto R$ 250*
 
-### ⚠️ Parcial — Consentimento registrado e comprovável · R$ 250
+### ✅ Pronto — Consentimento registrado e comprovável · R$ 250
 
 O aceite no formulário guarda data, hora e a versão exata do texto que a família leu. **O ganho:** se alguém questionar depois, existe prova de que houve consentimento e de **a quê** a pessoa consentiu. Sem esse registro, o aceite não vale como defesa.
 
-> **Estado atual.** O aceite é obrigatório no formulário, mas **não é gravado**: não há data, hora nem versão do texto no banco. Como está, o aceite não serve de prova. É o item mais barato do orçamento e o de maior exposição.
+> **Estado atual.** O aceite é pelo envio, e fica gravado em tabela própria: data, hora, IP, navegador e a versão exata do texto, com a impressão digital do que foi aceito. O texto é versionado em código, então dá para reconstruir anos depois a frase que aquela família leu. O site também ganhou política de privacidade própria, com controlador, CNPJ, endereço, encarregado e prazo de guarda — a redação jurídica final continua sendo da união.
 
 ### · Não contratado — Aviso de cookies que bloqueia antes do aceite · R$ 300
 
