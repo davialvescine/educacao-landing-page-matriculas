@@ -11,6 +11,9 @@ export interface MomentoDia {
   src: string;
   titulo: string;
   texto: string;
+  /** Hora aproximada do dia, ex.: "07h". É o que transforma uma fileira
+   *  de fotos em um DIA: a família consegue imaginar o filho às 14h. */
+  hora: string;
 }
 
 /**
@@ -27,6 +30,7 @@ export interface MomentoDia {
 export default function PainelDia({ momentos }: { momentos: MomentoDia[] }) {
   const secao = useRef<HTMLElement>(null);
   const trilho = useRef<HTMLDivElement>(null);
+  const progresso = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const alvo = secao.current;
@@ -47,6 +51,11 @@ export default function PainelDia({ momentos }: { momentos: MomentoDia[] }) {
           trigger: alvo,
           start: "top top",
           end: () => `+=${distancia()}`,
+          onUpdate: (st) => {
+            if (progresso.current) {
+              progresso.current.style.transform = `scaleX(${st.progress})`;
+            }
+          },
           pin: true,
           scrub: 1,
           invalidateOnRefresh: true,
@@ -81,23 +90,44 @@ export default function PainelDia({ momentos }: { momentos: MomentoDia[] }) {
       ref={secao}
       className="relative overflow-hidden bg-brand-950 py-24 lg:h-[100dvh] lg:py-0"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:pt-20">
-        <h2 className="max-w-2xl text-3xl font-extrabold leading-tight tracking-tighter text-white sm:text-5xl">
-          Um dia dentro do campus
-        </h2>
-        <p className="mt-4 max-w-xl text-lg leading-relaxed text-white/70">
-          Fotos reais das unidades e da rotina, não banco de imagens.
+      {/* Textura de fundo: sem ela o navy chapado virava um bloco morto
+          entre duas seções claras. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_20%_0%,rgba(248,192,56,0.12),transparent_60%)]"
+      />
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:pt-20">
+        <p className="text-xs font-extrabold uppercase tracking-[0.24em] text-gold-300">
+          Das 6h30 às 22h
         </p>
+        <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <h2 className="max-w-2xl text-3xl font-extrabold leading-[1.02] tracking-tighter text-white sm:text-5xl lg:text-6xl">
+            Um dia inteiro
+            <br />
+            dentro do campus
+          </h2>
+          <p className="max-w-md text-lg leading-relaxed text-white/70">
+            Fotos reais do IABC, não banco de imagens. Role para acompanhar o
+            dia, do primeiro sinal ao último.
+          </p>
+        </div>
+
+        {/* Linha do tempo: enche conforme a faixa anda. É o relógio da
+            seção — diz em que ponto do dia a família está. */}
+        <div className="mt-8 hidden h-px w-full bg-white/15 lg:block">
+          <div ref={progresso} className="h-px w-full origin-left scale-x-0 bg-gold-400" />
+        </div>
       </div>
 
       <div
         ref={trilho}
-        className="mt-12 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-6 sm:px-6 lg:mt-14 lg:w-max lg:snap-none lg:overflow-visible lg:pb-0"
+        className="relative mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-6 sm:px-6 lg:mt-12 lg:w-max lg:snap-none lg:overflow-visible lg:pb-0"
       >
-        {momentos.map((m) => (
+        {momentos.map((m, i) => (
           <figure
             key={m.titulo}
-            className="w-[78vw] shrink-0 snap-start sm:w-[42vw] lg:w-[30vw]"
+            className="group w-[78vw] shrink-0 snap-start sm:w-[42vw] lg:w-[30vw]"
           >
             <div className="relative aspect-4/3 overflow-hidden rounded-card">
               <Image
@@ -105,14 +135,26 @@ export default function PainelDia({ momentos }: { momentos: MomentoDia[] }) {
                 alt={m.titulo}
                 fill
                 sizes="(min-width: 1024px) 30vw, (min-width: 640px) 42vw, 78vw"
-                className="object-cover"
+                className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
               />
-            </div>
-            <figcaption className="momento-texto mt-4">
-              <p className="text-lg font-extrabold tracking-tight text-white">
+              {/* Véu só embaixo, para a hora e o título lerem sobre
+                  qualquer foto sem escurecer a imagem inteira. */}
+              <div
+                aria-hidden
+                className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-brand-950/85 to-transparent"
+              />
+              <span className="absolute left-4 top-4 rounded-full bg-gold-400 px-3 py-1 text-xs font-extrabold tabular-nums tracking-wider text-brand-950">
+                {m.hora}
+              </span>
+              <p className="absolute bottom-4 left-4 right-4 text-2xl font-extrabold tracking-tight text-white">
                 {m.titulo}
               </p>
-              <p className="mt-1 max-w-sm text-sm leading-relaxed text-white/65">
+            </div>
+            <figcaption className="momento-texto mt-4 flex gap-3">
+              <span className="text-sm font-extrabold tabular-nums text-gold-300">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <p className="max-w-sm text-sm leading-relaxed text-white/70">
                 {m.texto}
               </p>
             </figcaption>

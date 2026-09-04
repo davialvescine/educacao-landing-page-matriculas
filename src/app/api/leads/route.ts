@@ -11,6 +11,7 @@ import { enviarConfirmacaoLead, type EscolaEmail } from "@/lib/email";
 import { getVersao } from "@/lib/consentimento";
 import { registrarConsentimento } from "@/lib/consentimento-registro";
 import { agenteDaRequisicao, ipDaRequisicao } from "@/lib/requisicao";
+import { permitido, repetido } from "@/lib/limite";
 
 export const runtime = "nodejs";
 
@@ -63,6 +64,15 @@ function escolaDoEmail(
 }
 
 export async function POST(req: Request) {
+  // Trava por IP antes de ler o corpo: rota pública sem trava é um
+  // convite para encher o banco e o CRM com script.
+  if (!permitido(ipDaRequisicao(req))) {
+    return NextResponse.json(
+      { erro: "Muitos envios seguidos. Aguarde um minuto e tente de novo." },
+      { status: 429, headers: { "Retry-After": "60" } },
+    );
+  }
+
   let body: Record<string, unknown>;
   try {
     body = await req.json();
@@ -86,6 +96,13 @@ export async function POST(req: Request) {
       { erro: "Informe nome e WhatsApp." },
       { status: 400 },
     );
+  }
+  // Clique duplo, reenvio do outro portal ou "não sei se foi": o mesmo
+  // telefone em poucos minutos é a mesma família. Responde como sucesso —
+  // para ela, foi — sem criar a segunda linha nem o segundo contato no
+  // CRM, que renderia dois "olá" da mesma escola.
+  if (repetido(lead.whatsapp)) {
+    return NextResponse.json({ ok: true, repetido: true });
   }
   // A escola é o que diz qual equipe atende a família — e, no Mato Grosso,
   // qual das duas associações fica com o lead.

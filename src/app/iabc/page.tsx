@@ -33,13 +33,13 @@ import { linkWhatsapp, SITE_NOME, SITE_URL } from "@/lib/site";
  */
 
 const FOTOS_DIA: MomentoDia[] = [
-  { src: "/imagens/iabc/site/estudo-em-dupla.jpg", titulo: "Estudo", texto: "Aulas e estudo dirigido, com acompanhamento de quem conhece o aluno pelo nome." },
-  { src: "/imagens/iabc/site/laboratorio.jpg", titulo: "Laboratório", texto: "Ciência com a mão na massa, não só no quadro." },
-  { src: "/imagens/iabc/site/natacao.jpg", titulo: "Natação", texto: "Piscina dentro do campus, sem depender de transporte nem de horário de fora." },
-  { src: "/imagens/iabc/site/corrida-na-mata.jpg", titulo: "Esporte", texto: "Treino ao ar livre num campus onde dá para correr sem sair do portão." },
-  { src: "/imagens/iabc/site/piano.jpg", titulo: "Música", texto: "Piano, coral e instrumentos abertos a quem nunca tocou nada antes." },
-  { src: "/imagens/iabc/site/apresentacao.jpg", titulo: "Palco", texto: "Apresentar em público desde cedo, que é o que solta a voz de qualquer um." },
-  { src: "/imagens/iabc/site/convivencia-entardecer.jpg", titulo: "Convivência", texto: "Amizades que nascem de dividir o dia inteiro, e não só a sala de aula." },
+  { src: "/imagens/iabc/site/estudo-em-dupla.jpg", hora: "07h30", titulo: "Estudo", texto: "Aulas e estudo dirigido, com acompanhamento de quem conhece o aluno pelo nome." },
+  { src: "/imagens/iabc/site/laboratorio.jpg", hora: "10h", titulo: "Laboratório", texto: "Ciência com a mão na massa, não só no quadro." },
+  { src: "/imagens/iabc/site/natacao.jpg", hora: "14h", titulo: "Natação", texto: "Piscina dentro do campus, sem depender de transporte nem de horário de fora." },
+  { src: "/imagens/iabc/site/corrida-na-mata.jpg", hora: "16h", titulo: "Esporte", texto: "Treino ao ar livre num campus onde dá para correr sem sair do portão." },
+  { src: "/imagens/iabc/site/piano.jpg", hora: "17h30", titulo: "Música", texto: "Piano, coral e instrumentos abertos a quem nunca tocou nada antes." },
+  { src: "/imagens/iabc/site/apresentacao.jpg", hora: "19h", titulo: "Palco", texto: "Apresentar em público desde cedo, que é o que solta a voz de qualquer um." },
+  { src: "/imagens/iabc/site/convivencia-entardecer.jpg", hora: "21h", titulo: "Convivência", texto: "Amizades que nascem de dividir o dia inteiro, e não só a sala de aula." },
 ];
 
 /** A capa se reveza: nenhuma foto sozinha mostra o que é morar aqui. */

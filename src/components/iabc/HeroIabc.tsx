@@ -211,6 +211,36 @@ export default function HeroIabc({
 
       <div className="mx-auto flex min-h-[100dvh] max-w-7xl flex-col justify-end px-4 pb-16 pt-24 sm:px-6 lg:pb-24">
         {children}
+
+        {/* Rodapé da capa: onde estamos na sequência de fotos, e a pista
+            de que a página continua. Sem o contador, a troca de foto
+            parecia acidente; com ele, parece intenção. */}
+        <div className="hero-entra mt-12 flex items-center justify-between text-white/70">
+          <div className="flex items-center gap-3">
+            {quadros.map((q, i) => (
+              <button
+                key={q.src}
+                type="button"
+                aria-label={`Foto ${i + 1}: ${q.alt}`}
+                aria-current={i === atual}
+                onClick={() => setAtual(i)}
+                className={`h-1 rounded-full transition-all duration-500 ${
+                  i === atual ? "w-10 bg-gold-400" : "w-4 bg-white/35 hover:bg-white/60"
+                }`}
+              />
+            ))}
+            <span className="ml-2 text-xs font-bold tabular-nums tracking-widest">
+              {String(atual + 1).padStart(2, "0")} / {String(quadros.length).padStart(2, "0")}
+            </span>
+          </div>
+          <a
+            href="#o-campus"
+            className="hidden items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] transition-colors hover:text-white sm:inline-flex"
+          >
+            Conhecer
+            <span aria-hidden className="anim-bounce inline-block">↓</span>
+          </a>
+        </div>
       </div>
 
     </section>
