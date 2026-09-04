@@ -88,7 +88,11 @@ export default function PainelDia({ momentos }: { momentos: MomentoDia[] }) {
   return (
     <section
       ref={secao}
-      className="relative overflow-hidden bg-brand-950 py-24 lg:h-[100dvh] lg:py-0"
+      // Presa à rolagem, a seção ocupa a tela inteira; o bloco (título +
+      // faixa + legendas) fica centrado na vertical, senão sobrava um
+      // terço de navy vazio embaixo enquanto a faixa andava lá em cima.
+      // O pt-24 é para o cabeçalho fixo não cobrir o rótulo.
+      className="relative overflow-hidden bg-brand-950 py-24 lg:flex lg:h-[100dvh] lg:flex-col lg:justify-center lg:pb-6 lg:pt-24"
     >
       {/* Textura de fundo: sem ela o navy chapado virava um bloco morto
           entre duas seções claras. */}
@@ -97,7 +101,7 @@ export default function PainelDia({ momentos }: { momentos: MomentoDia[] }) {
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_20%_0%,rgba(248,192,56,0.12),transparent_60%)]"
       />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:pt-20">
+      <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6">
         <p className="text-xs font-extrabold uppercase tracking-[0.24em] text-gold-300">
           Das 6h30 às 22h
         </p>
@@ -122,7 +126,7 @@ export default function PainelDia({ momentos }: { momentos: MomentoDia[] }) {
 
       <div
         ref={trilho}
-        className="relative mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-6 sm:px-6 lg:mt-12 lg:w-max lg:snap-none lg:overflow-visible lg:pb-0"
+        className="relative mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-6 sm:px-6 lg:mt-10 lg:w-max lg:snap-none lg:overflow-visible lg:pb-0"
       >
         {momentos.map((m, i) => (
           <figure
