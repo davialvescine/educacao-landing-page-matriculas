@@ -124,6 +124,31 @@ export function cidadeEscola(escola: Escola): string {
     .trim();
 }
 
+/** "Cidade – UF", "Cidade-UF" ou "Cidade UF" no fim do logradouro. */
+const CIDADE_COM_UF =
+  /([A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][^,–\-]*?)\s*[–\-\s]\s*(?:DF|GO|MS|MT|TO)\b/;
+
+/**
+ * Cidade real da unidade, lida do endereço.
+ * O nome da escola não serve: várias são batizadas pelo bairro
+ * ("Colégio Adventista Setor Pedro Ludovico" fica em Goiânia), e
+ * cidadeEscola() devolveria o bairro. Sem endereço utilizável, null.
+ */
+export function cidadeDaUnidade(escola: Escola): string | null {
+  const endereco = escola.endereco;
+  if (!endereco) return null;
+
+  const comUf = endereco.match(CIDADE_COM_UF);
+  if (comUf) return comUf[1].trim();
+
+  // Endereços sem UF: a cidade é o trecho logo antes do CEP.
+  const partes = endereco.split(",").map((p) => p.trim());
+  const iCep = partes.findIndex((p) => /^CEP\b/i.test(p));
+  if (iCep > 0) return partes[iCep - 1] || null;
+
+  return null;
+}
+
 /** Dados enxutos para o formulário de leads (client component). */
 export function getFormEstados() {
   return [

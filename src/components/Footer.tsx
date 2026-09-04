@@ -3,6 +3,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getRede, getRegioesSite } from "@/lib/rede";
+import { INSTAGRAM_OFICIAL } from "@/lib/site";
 
 export default function Footer() {
   const rede = getRede();
@@ -50,6 +51,31 @@ export default function Footer() {
                 className="transition-colors hover:text-primary-foreground"
               >
                 IABC · Internato
+              </a>
+            </li>
+            <li>
+              {/* Link visível de propósito: o sameAs pesa mais quando o
+                  perfil também é alcançável a partir da página. */}
+              <a
+                href={INSTAGRAM_OFICIAL}
+                target="_blank"
+                rel="me noopener noreferrer"
+                className="inline-flex items-center gap-2 transition-colors hover:text-primary-foreground"
+              >
+                <svg
+                  aria-hidden
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  className="size-4"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" />
+                </svg>
+                Instagram
               </a>
             </li>
           </ul>

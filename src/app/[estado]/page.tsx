@@ -12,16 +12,18 @@ import WhatsFlutuante from "@/components/WhatsFlutuante";
 import DepoimentosSection from "@/components/DepoimentosSection";
 import UnidadeCard from "@/components/UnidadeCard";
 import JsonLd from "@/components/JsonLd";
+import FaqBloco from "@/components/FaqBloco";
 import { Diferenciais, Eyebrow } from "@/components/Secoes";
 import {
-  cidadeEscola,
-  getFormEstados,
+  cidadeDaUnidade,
   construirRegioesSite,
+  getFormEstados,
   getRegiaoSite,
   getRegioesSite,
   nomeEscola,
   slugEscola,
 } from "@/lib/rede";
+import { perguntasRegiao } from "@/lib/faq";
 import { getWhatsappSobrescritos } from "@/lib/regioes";
 import { SITE_URL } from "@/lib/site";
 
@@ -44,7 +46,7 @@ export async function generateMetadata({
   const { estado: slug } = await params;
   const estado = getRegiaoSite(slug);
   if (!estado) return {};
-  const cidades = [...new Set(estado.escolas.map(cidadeEscola))]
+  const cidades = [...new Set(estado.escolas.map(cidadeDaUnidade).filter(Boolean))]
     .slice(0, 6)
     .join(", ");
   return {
@@ -75,6 +77,21 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
             name: nomeEscola(s),
             url: `${SITE_URL}/${estado.slug}/${slugEscola(s)}`,
           })),
+        }}
+      />
+      <JsonLd
+        dados={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Início", item: SITE_URL },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: estado.nome,
+              item: `${SITE_URL}/${estado.slug}`,
+            },
+          ],
         }}
       />
       <Header />
@@ -130,6 +147,13 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
 
         <Diferenciais />
         <DepoimentosSection />
+
+        {/* AEO: as perguntas da região, visíveis e marcadas em FAQPage */}
+        <FaqBloco
+          perguntas={perguntasRegiao(estado)}
+          titulo={`Dúvidas de quem procura escola em ${estado.nome}`}
+          chamada="As perguntas que as famílias da região mais fazem antes de decidir."
+        />
 
         {/* Formulário (finale) */}
         <section
