@@ -10,6 +10,26 @@ De **R$ 34.140** de implantação, **R$ 28.800 já estão no ar**: **R$ 23.550**
 | ⚠️ Parcial | R$ 5.250 | Já funciona, mas falta o pedaço nomeado na linha. |
 | ❌ Falta | R$ 5.340 | Não foi construído. |
 
+## O que ainda não está no ar
+
+Cada linha aparece detalhada no grupo dela. Aqui estão juntas, com o que trava cada uma — porque boa parte do que falta não depende de escrever código.
+
+| Item | Estado | O que trava | Valor |
+| --- | --- | --- | --- |
+| § 02 Página do IABC | ❌ Falta | **Depende de construir.** Rota, conteúdo do internato e agendamento de visita. | R$ 1.300 |
+| § 04 Motor do relatório mensal | ❌ Falta | **Depende de construir.** O cruzamento por região, escola, série e campanha. | R$ 1.100 |
+| § 04 Envio automático por e-mail | ❌ Falta | **Depende de construir.** PDF por região e a tarefa do primeiro dia útil. | R$ 600 |
+| § 02 Página do Dica Plus | ❌ Falta | **Esperando a rede.** Falta o layout que a rede vai desenhar. | R$ 1.300 |
+| § 05 Dica Plus: integração | ❌ Falta | **Esperando a rede.** Falta a documentação da API da plataforma. | R$ 790 |
+| § 06 Search Console e Core Web Vitals | ❌ Falta | **Esperando a publicação.** Só começa com o site no domínio da rede. | R$ 250 |
+| § 04 Trilha de auditoria de acesso | ⚠️ Parcial | **Depende de construir.** Registrar entrada e tentativa de entrada no painel. | R$ 250 |
+| § 07 Consentimento registrado e comprovável | ⚠️ Parcial | **Depende de construir.** Gravar data, hora e versão do texto aceito. | R$ 250 |
+| § 06 Identidade da rede nos buscadores de IA | ⚠️ Parcial | **Esperando a rede.** Faltam o Facebook e o YouTube oficiais. | R$ 550 |
+| § 08 Infraestrutura de produção | ⚠️ Parcial | **Esperando a publicação.** Falta servidor e domínio contratados. | R$ 400 |
+| § 08 Documentação e treinamento | ⚠️ Parcial | **Esperando a rede.** Falta agendar o repasse com as coordenações. | R$ 250 |
+| § 08 QA e homologação | ⚠️ Parcial | **Esperando a publicação.** Falta o ambiente separado, que vem com o servidor. | R$ 250 |
+| § 11 Landing page do projeto | ⚠️ Parcial | **Esperando a rede.** Falta o briefing e a identidade da landing. | R$ 3.300 |
+
 ## § 01 — Página principal e estrutura
 
 *✅ Pronto R$ 6.550*
