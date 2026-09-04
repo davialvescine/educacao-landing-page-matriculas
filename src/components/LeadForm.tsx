@@ -7,7 +7,6 @@ import type { FormEstado } from "@/lib/rede";
 import { eventoLead, lerUtm } from "@/lib/campanha-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -58,7 +57,6 @@ export default function LeadForm({
   const [etapa, setEtapa] = useState<1 | 2>(1);
   const [estado, setEstado] = useState(estadoInicial ?? "");
   const [escola, setEscola] = useState(escolaInicial ?? "");
-  const [cidade, setCidade] = useState("");
   const [nivel, setNivel] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -95,10 +93,6 @@ export default function LeadForm({
       setErro("Selecione a sua região para continuar.");
       return;
     }
-    if (!cidade.trim()) {
-      setErro("Informe a cidade onde vocês moram.");
-      return;
-    }
     // A escola é o que diz qual equipe atende — e, no Mato Grosso, qual das
     // duas associações fica com o lead.
     if (!escola) {
@@ -122,6 +116,8 @@ export default function LeadForm({
     dados.utm = lerUtm();
     // Qual redação a família leu ao aceitar.
     dados.consentimento = VERSAO_ATUAL.versao;
+    // Como o aceite foi obtido, para o registro dizer a verdade.
+    dados.consentimentoMetodo = "envio";
     setEnviando(true);
     setErro("");
     try {
@@ -209,20 +205,6 @@ export default function LeadForm({
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="lead-cidade">Cidade onde vocês moram</Label>
-              <Input
-                id="lead-cidade"
-                name="cidade"
-                value={cidade}
-                onChange={(e) => setCidade(e.target.value)}
-                placeholder="Ex.: Cuiabá"
-                autoComplete="address-level2"
-                maxLength={90}
-                required
-                className="h-12 rounded-xl"
-              />
-            </div>
             <div className={cn("grid gap-2", regiaoFixa && "hidden")}>
               <Label>Escola de interesse</Label>
               <Select
@@ -304,25 +286,21 @@ export default function LeadForm({
                 />
               </div>
             </div>
-            <div className="flex items-start gap-3">
-              <Checkbox id="lead-lgpd" name="lgpd" required className="mt-0.5" />
-              <div className="grid gap-1">
-                <Label
-                  htmlFor="lead-lgpd"
-                  className="text-xs font-normal leading-relaxed text-muted-foreground"
-                >
-                  {VERSAO_ATUAL.resumo}
-                </Label>
-                {/* O texto completo fica a um clique, não escondido atrás
-                    de link para outra página: é ele que vai registrado, e
-                    a lei exige que a pessoa tenha podido lê-lo. */}
-                <details className="text-xs text-muted-foreground">
-                  <summary className="cursor-pointer font-semibold text-primary underline-offset-2 hover:underline">
-                    Ler o texto completo
-                  </summary>
-                  <p className="mt-2 leading-relaxed">{VERSAO_ATUAL.texto}</p>
-                </details>
-              </div>
+            {/* Aceite pelo envio. Como não há caixa para marcar, o texto
+                precisa estar visível ACIMA do botão e não em nota de
+                rodapé: se o consentimento vem do ato de enviar, a pessoa
+                tem de poder ler o que aceita antes de clicar. */}
+            <div className="rounded-xl border border-line bg-paper px-4 py-3">
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                Ao enviar, você declara que é responsável pela criança e
+                autoriza o contato sobre a matrícula.
+              </p>
+              <details className="mt-1 text-xs text-muted-foreground">
+                <summary className="cursor-pointer font-semibold text-primary underline-offset-2 hover:underline">
+                  Ler o texto completo
+                </summary>
+                <p className="mt-2 leading-relaxed">{VERSAO_ATUAL.texto}</p>
+              </details>
             </div>
             {erro && (
               <p className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">

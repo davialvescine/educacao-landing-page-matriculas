@@ -8,7 +8,8 @@ export interface LeadNovo {
   email: string;
   estado: string;
   escola: string;
-  /** Cidade onde a família mora — nem sempre a mesma da escola. */
+  /** Cidade da família. Deixou de ser coletada: a escola escolhida já
+   *  diz qual equipe atende. Fica para os leads gravados antes disso. */
   cidade: string;
   nivel: string;
   /** Origem de campanha: utm_source, utm_medium, utm_campaign, gclid... */

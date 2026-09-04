@@ -89,12 +89,6 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
-  if (!lead.cidade) {
-    return NextResponse.json(
-      { erro: "Informe a sua cidade." },
-      { status: 400 },
-    );
-  }
   // A escola é o que diz qual equipe atende a família — e, no Mato Grosso,
   // qual das duas associações fica com o lead.
   if (!lead.escola) {
@@ -155,6 +149,7 @@ export async function POST(req: Request) {
     versao: versaoConsentimento,
     ip: ipDaRequisicao(req),
     agente: req.headers.get("user-agent") ?? "",
+    metodo: body.consentimentoMetodo === "caixa" ? "caixa" : "envio",
   }).catch((e: unknown) => console.error("[leads] consentimento não registrado:", e));
 
   // Dispara para o sistema externo depois de salvar: lead nunca se perde.

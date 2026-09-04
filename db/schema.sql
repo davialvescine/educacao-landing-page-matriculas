@@ -103,8 +103,12 @@ CREATE TABLE IF NOT EXISTS consentimentos (
   texto_hash  text NOT NULL,          -- sha256 do texto exibido
   aceito_em   timestamptz NOT NULL DEFAULT now(),
   ip          text NOT NULL DEFAULT '',
-  agente      text NOT NULL DEFAULT ''
+  agente      text NOT NULL DEFAULT '',
+  metodo      text NOT NULL DEFAULT 'envio'  -- envio | caixa
 );
+
+-- Como o aceite foi obtido, para bancos criados antes desta versão.
+ALTER TABLE consentimentos ADD COLUMN IF NOT EXISTS metodo text NOT NULL DEFAULT 'envio';
 
 CREATE INDEX IF NOT EXISTS consentimentos_lead_idx ON consentimentos (lead_id);
 CREATE INDEX IF NOT EXISTS consentimentos_versao_idx ON consentimentos (versao);

@@ -28,7 +28,7 @@ interface Props {
   /** Prova de consentimento por lead, quando existir. */
   consentimentos: Record<
     string,
-    { versao: string; texto: string; aceito_em: string; ip: string; intacto: boolean } | null
+    { versao: string; texto: string; aceito_em: string; ip: string; metodo: string; intacto: boolean } | null
   >;
   resumo: ResumoLeads;
   regioes: { slug: string; nome: string }[];
@@ -577,6 +577,10 @@ export default function PainelLeads({
                         <p className="font-medium">
                           Aceito em {formatarData(c.aceito_em)} · versão {c.versao}
                           {c.ip ? ` · ${c.ip}` : ""}
+                          {" · "}
+                          {c.metodo === "caixa"
+                            ? "caixa marcada"
+                            : "pelo envio do formulário"}
                         </p>
                         {!c.intacto && (
                           <p className="mt-1 font-bold text-destructive">
