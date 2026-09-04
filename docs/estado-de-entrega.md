@@ -1,14 +1,14 @@
 # Site de Matrículas 2027: estado de entrega
 
-*Apurado no código em 02 de setembro de 2026. Espelha o orçamento de [`orcamento-matriculas-2027-com-precos.md`](orcamento-matriculas-2027-com-precos.md); os valores são os mesmos e não foram alterados.*
+*Apurado no código em 04 de setembro de 2026, contra a proposta comercial enviada em 02/09/2026. Os valores são os da proposta e não foram alterados.*
 
-De **R$ 30.840** de implantação, **R$ 25.500 já estão no ar**: **R$ 12.900** sem ressalva e **R$ 12.600** com um pedaço nomeado faltando. **R$ 5.340** ainda não começaram.
+De **R$ 34.140** de implantação, **R$ 25.500 já estão no ar**: **R$ 23.550** sem ressalva e **R$ 1.950** com um pedaço nomeado faltando. **R$ 8.640** ainda não começaram.
 
 | Estado | Valor | O que significa |
 | --- | --- | --- |
-| ✅ Pronto | R$ 12.900 | Construído, no ar e funcionando como está descrito. |
-| ⚠️ Parcial | R$ 12.600 | Já funciona, mas falta o pedaço nomeado na linha. |
-| ❌ Falta | R$ 5.340 | Não foi construído. |
+| ✅ Pronto | R$ 23.550 | Construído, no ar e funcionando como está descrito. |
+| ⚠️ Parcial | R$ 1.950 | Já funciona, mas falta o pedaço nomeado na linha. |
+| ❌ Falta | R$ 8.640 | Não foi construído. |
 
 ## § 01 — Página principal e estrutura
 
@@ -41,13 +41,13 @@ Biblioteca de interface reaproveitada em todas as rotas, foco visível, contrast
 
 ## § 02 — Páginas por região, IABC e Dica Plus
 
-*⚠️ Parcial R$ 4.500 · ❌ Falta R$ 2.600*
+*✅ Pronto R$ 4.500 · ❌ Falta R$ 2.600*
 
-### ⚠️ Parcial — Página por região · R$ 900 × 5
+### ✅ Pronto — Página por região · R$ 900 × 5
 
 Um modelo de página de região, alimentado pelos dados de cada estado: DF, GO, MS, Mato Grosso e TO. Cada uma lista as unidades da própria região e atende pelo WhatsApp da associação responsável. No Mato Grosso, o lead vai para a associação certa, Leste ou Oeste, pelo município escolhido, sem que a família precise saber dessa divisão. **SEO incluso:** título e descrição da região, endereço canônico e a lista estruturada `ItemList`. **AEO incluso:** perguntas e respostas da região marcadas em `FAQPage`. **GEO incluso:** a praça acompanhada nos buscadores de IA. **O ganho:** é a porta de entrada da família que ainda está escolhendo a cidade. Região nova entra pelo mesmo modelo, só com os dados dela.
 
-> **Estado atual.** Seis rotas no ar — uma a mais que as cinco orçadas, porque o Mato Grosso virou duas páginas — com `ItemList` das unidades e o WhatsApp da associação. Falta o `FAQPage` de cada região e a triagem do Mato Grosso pelo município: hoje a família escolhe Leste ou Oeste no formulário.
+> **Estado atual.** Cinco rotas no ar, como orçado: o Mato Grosso virou **uma página só**, e a divisão entre ALM e AOM ficou por dentro — o lead nasce na associação certa, decidida pela escola escolhida. SEO: título, descrição, canônico e `ItemList`. AEO: `FAQPage` com cinco perguntas por região. Trilha `BreadcrumbList` incluída.
 
 ### ❌ Falta — Página do IABC · R$ 1.300
 
@@ -187,7 +187,7 @@ Troca de dados com a plataforma de interação. Preço para API documentada com 
 
 ## § 06 — Base técnica de busca
 
-*✅ Pronto R$ 800 · ⚠️ Parcial R$ 800 · ❌ Falta R$ 250*
+*✅ Pronto R$ 1.050 · ⚠️ Parcial R$ 550 · ❌ Falta R$ 250*
 
 ### ✅ Pronto — Base técnica de indexação · R$ 400
 
@@ -195,11 +195,11 @@ Construída uma vez, usada por todas as páginas: `sitemap.xml` e `robots.txt` g
 
 > **Estado atual.** Sitemap e robots gerados, Open Graph, canônico por rota e marcação semântica.
 
-### ⚠️ Parcial — Dados estruturados da instituição · R$ 250
+### ✅ Pronto — Dados estruturados da instituição · R$ 250
 
 Os esquemas que descrevem a rede como um todo, em `JSON-LD`: `EducationalOrganization` para a instituição, o catálogo geral de unidades e o mecanismo de trilha de navegação em `BreadcrumbList`, que todas as páginas usam. **O ganho:** o Google entende que são 46 páginas de uma mesma rede, e não 46 sites soltos, o que concentra autoridade em vez de dispersar.
 
-> **Estado atual.** `EducationalOrganization` e `BreadcrumbList` no ar. Falta o catálogo geral de unidades na home.
+> **Estado atual.** `EducationalOrganization` na home com o catálogo geral das 39 unidades penduradas na instituição, e `BreadcrumbList` nas 46 páginas — antes existia só nas de escola.
 
 ### ✅ Pronto — Respostas em destaque da página principal · R$ 400
 
@@ -211,7 +211,7 @@ As perguntas frequentes da home, marcadas em `FAQPage` com pares `Question` e `A
 
 O trabalho de entidade, feito uma vez para a marca: `sameAs` apontando para os perfis oficiais, nome, endereço e telefone idênticos em todas as fontes que os modelos rastreiam, e a verificação inicial de como **ChatGPT, Gemini e Perplexity** respondem por escola adventista no Centro-Oeste. **O ganho:** boa parte das famílias já pergunta à IA antes de abrir o Google, e a IA responde com quem ela reconhece. Quem não é entidade reconhecível simplesmente não aparece, e não há anúncio que compre esse espaço.
 
-> **Estado atual.** O `sameAs` aponta hoje para um único perfil. Falta o restante das fontes e a verificação inicial no ChatGPT, no Gemini e no Perplexity.
+> **Estado atual.** `sameAs` com o site institucional e o Instagram oficial (perfil conferido), link visível no rodapé de todas as páginas, e cada unidade apontando para o próprio site quando existe. Falta o Facebook e o YouTube, que a rede ainda não informou, e a verificação no ChatGPT, Gemini e Perplexity, que só começa com o site publicado.
 
 ### ❌ Falta — Search Console e Core Web Vitals · R$ 250
 
@@ -268,28 +268,42 @@ Espelho idêntico da produção, com banco e servidor de e-mail próprios, para 
 
 ## § 09 — Mensalidade
 
-### · Começa na publicação — Suporte e manutenção · R$ 980 por mês
+### · Começa na publicação — Suporte e manutenção · R$ 1.280 por mês
 
-**R$ 980 por mês, valor único.** Manutenção de todas as páginas, suporte às landing pages e ao sistema. **Infraestrutura:** servidor dedicado com o banco de leads, certificado de segurança renovado sozinho, backup diário com 30 dias de retenção e monitoramento que avisa se o site cair. **Manutenção do sistema:** atualizações de segurança do framework e das bibliotecas, correção de defeitos e a operação da fila automática de reenvio ao CRM. **Manutenção das páginas:** as 46 páginas no ar e indexadas, com conferência dos dados de cada unidade ao longo do ano e as alterações que a rede pedir: telefone, endereço, WhatsApp, foto, nome de unidade, texto de seção, valores e datas de campanha, perguntas do FAQ. A rede pede, entra no ar, sem contar hora. **Resultado:** relatório mensal gerado e enviado por e-mail a cada coordenação no primeiro dia útil. **Busca:** acompanhamento mensal do Search Console, correção de indexação e acompanhamento de como os buscadores de IA respondem por escola adventista em cada praça. **Dados:** responder as famílias que pedirem para ver, corrigir ou apagar seus dados, e rodar o descarte no prazo. **Suporte:** às landing pages e ao painel, por e-mail e WhatsApp, em até 2 dias úteis.
+**R$ 1.280 por mês, valor único.** Manutenção de todas as páginas, suporte às landing pages e ao sistema. **Infraestrutura:** servidor dedicado com o banco de leads, certificado de segurança renovado sozinho, backup diário com 30 dias de retenção e monitoramento que avisa se o site cair. **Manutenção do sistema:** atualizações de segurança do framework e das bibliotecas, correção de defeitos e a operação da fila automática de reenvio ao CRM. **Manutenção das páginas:** as 46 páginas no ar e indexadas, com conferência dos dados de cada unidade ao longo do ano e as alterações que a rede pedir: telefone, endereço, WhatsApp, foto, nome de unidade, texto de seção, valores e datas de campanha, perguntas do FAQ. A rede pede, entra no ar, sem contar hora. **Resultado:** relatório mensal gerado e enviado por e-mail a cada coordenação no primeiro dia útil. **Busca:** acompanhamento mensal do Search Console, correção de indexação e acompanhamento de como os buscadores de IA respondem por escola adventista em cada praça. **Dados:** responder as famílias que pedirem para ver, corrigir ou apagar seus dados, e rodar o descarte no prazo. **Suporte:** às landing pages e ao painel, por e-mail e WhatsApp, em até 2 dias úteis. **Gestão dos dados:** WhatsApp das associações, dados das unidades e conteúdo das páginas mantidos pela coordenação no painel.
 
 > **Estado atual.** Não é implantação: a mensalidade passa a contar quando o site for publicado.
 
 
 ## § 10 — Páginas por escola
 
-*⚠️ Parcial R$ 5.900*
+*✅ Pronto R$ 5.900*
 
-### ⚠️ Parcial — As 39 páginas de escola · R$ 5.900
+### ✅ Pronto — As 39 páginas de escola · R$ 5.900
 
 Um único modelo de página, alimentado pelos dados de cada unidade: foto, endereço, telefone, WhatsApp da associação e o formulário já apontando para a escola certa. O que muda entre uma e outra é o dado, não o desenho, e por isso o conjunto tem um preço só. Cada uma nasce com título e descrição no nome da cidade, endereço canônico, ficha estruturada `School` com `PostalAddress`, perguntas da unidade em `FAQPage` e a cidade acompanhada nos buscadores de IA. **O ganho:** quando uma família pesquisa por escola cristã com o nome da cidade dela, é esta página que aparece, com a foto da unidade e o botão certo. São 39 endereços disputando, cada um, a busca do próprio município. Escola nova entra pelo mesmo modelo, só com os dados dela.
 
-> **Estado atual.** As 39 páginas no ar, com `School` e `PostalAddress`, canônico e título e descrição no nome da cidade. Falta o `FAQPage` de cada unidade; e o telefone só existe em 4 das 39 fichas, dado que ainda vem da rede.
+> **Estado atual.** As 39 páginas no ar com `School`, `PostalAddress`, trilha, canônico e `FAQPage` próprio. A descrição passou a usar a cidade real do endereço mais o bairro quando diferem — antes dizia a cidade errada em toda unidade batizada pelo bairro. O telefone segue em 4 das 39 fichas, dado que ainda vem da rede.
+
+
+## § 11 — Landing page — projeto Educação dos Sonhos
+
+*❌ Falta R$ 3.300*
+
+### ❌ Falta — Landing page do projeto · R$ 3.300
+
+Implementação da página, coleta de leads e envio ao Sevenbee com webhook de retorno (aguardando, em atendimento, atendido). A fila de resiliência com nova tentativa automática é a mesma do site principal, reaproveitada. Inclui a hospedagem do projeto.
+
+> **Estado atual.** Não iniciada: falta o briefing do projeto. O envio ao CRM e a fila de resiliência já existem no site principal e são reaproveitáveis, mas a página ainda não existe para ligá-los.
 
 
 ## Entregue além do escopo fechado
 
 Não estava no orçamento e não entrou em nenhum subtotal: veio junto porque o resto já estava construído.
 
+- **Mato Grosso como página única.** A família via duas regiões que só fazem sentido para a rede — Leste e Oeste são recorte administrativo. Agora é uma página com as 9 unidades; a divisão continua inteira no painel, e o lead nasce na associação certa pela escola escolhida. As rotas antigas respondem 301.
+- **WhatsApp editável no painel.** Trocar um telefone exigia mexer no código e publicar. Agora o administrador edita e o número entra no ar sozinho, sem deploy: as páginas continuam estáticas e são regeneradas no salvamento. Verificado do banco até o HTML.
+- **Cidade no formulário, e escola obrigatória.** A coordenação não sabia onde a família mora — só a região, que cobre um estado inteiro. A cidade agora viaja com o lead até o CRM e o e-mail. Em troca, quem ainda não escolheu a escola precisa escolher: troca conversão por qualificação.
 - **E-mail de confirmação para a família.** Assim que o cadastro entra, quem informou e-mail recebe uma confirmação na identidade da rede, dizendo qual equipe vai chamar e com o botão do WhatsApp da região. O envio nunca derruba o cadastro: se o servidor de e-mail falhar, o lead já está salvo e segue para o CRM do mesmo jeito. O e-mail é campo opcional no formulário, então a confirmação só alcança quem preencheu.
 
 ## O que trava página já construída
@@ -297,7 +311,7 @@ Não estava no orçamento e não entrou em nenhum subtotal: veio junto porque o 
 Não é desenvolvimento: são dados que só a rede tem. Cada linha é uma página no ar, funcionando, mas incompleta até o dado chegar.
 
 - WhatsApp regional da **ALM (Leste MT)** — sem ele a página da região fica sem botão de WhatsApp; o formulário continua funcionando.
-- Confirmar o dígito dos WhatsApps de **MS** e do **Oeste MT**.
+- Confirmar o dígito dos WhatsApps de **MS** e do **Oeste MT**. O da ALM (Leste MT) deixou de ser bloqueio: dá para cadastrar pelo painel, sem depender de publicação.
 - Telefone próprio de **35 das 39 escolas**, que hoje saem da ficha estruturada sem esse campo.
 - Fotos próprias de **6 unidades**: Rondonópolis, Valparaíso, Porangatu, Goianiense, Sinop e Várzea Grande, que hoje reaproveitam foto de outra escola.
 
