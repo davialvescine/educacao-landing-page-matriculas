@@ -42,3 +42,16 @@ export function slugificar(nome: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
+
+/**
+ * Número de WhatsApp em link clicável.
+ * A base guarda telefone escrito para humano — "(65) 99360-3279" — e isso
+ * não serve de href: vira link relativo e o clique não faz nada.
+ */
+export function linkWhatsapp(numero: string | null | undefined): string | null {
+  if (!numero) return null;
+  if (numero.startsWith("http")) return numero;
+  const digitos = numero.replace(/\D/g, "");
+  if (digitos.length < 10) return null;
+  return `https://wa.me/${digitos.startsWith("55") ? digitos : `55${digitos}`}`;
+}

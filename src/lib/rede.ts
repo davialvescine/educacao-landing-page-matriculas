@@ -1,5 +1,5 @@
 import dados from "@/data/rede.json";
-import { slugificar } from "@/lib/site";
+import { linkWhatsapp, slugificar } from "@/lib/site";
 
 export interface Escola {
   nome: string;
@@ -208,13 +208,18 @@ function montarRegioesSite(
         }
       : bruto;
     const grupo = GRUPOS[estado.slug];
+    // O whatsapp_escola da base vem escrito para humano; sem normalizar,
+    // o href sai como "(65) 99360-3279" e o clique não vai a lugar nenhum.
     const escolas = estado.escolas.map((escola) => ({
       ...escola,
+      whatsapp_escola: linkWhatsapp(escola.whatsapp_escola) ?? undefined,
       ...(grupo
         ? {
             associacao_slug: estado.slug,
             whatsapp_escola:
-              escola.whatsapp_escola ?? estado.whatsapp.link ?? undefined,
+              linkWhatsapp(escola.whatsapp_escola) ??
+              estado.whatsapp.link ??
+              undefined,
           }
         : {}),
     }));

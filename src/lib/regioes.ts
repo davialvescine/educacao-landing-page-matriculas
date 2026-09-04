@@ -1,5 +1,8 @@
 import "server-only";
 import { getPool } from "@/lib/db";
+import { linkWhatsapp } from "@/lib/site";
+
+export { linkWhatsapp };
 
 /**
  * WhatsApp por região, sobrescrito pela coordenação no painel.
@@ -17,14 +20,6 @@ export interface WhatsappRegiao {
   link: string;
 }
 
-/** Só dígitos, com o 55 na frente — formato que o wa.me espera. */
-export function linkWhatsapp(numero: string): string | null {
-  const digitos = numero.replace(/\D/g, "");
-  if (digitos.length < 10) return null;
-  const comDdi = digitos.startsWith("55") ? digitos : `55${digitos}`;
-  return `https://wa.me/${comDdi}`;
-}
-
 /**
  * O que a coordenação sobrescreveu, por slug interno de região.
  * Falha de banco devolve vazio: o site cai no rede.json em vez de quebrar.
@@ -33,7 +28,14 @@ export async function getWhatsappSobrescritos(): Promise<
   Record<string, WhatsappRegiao>
 > {
   const db = getPool();
-  if (!db) return {};
+  if (!db) {
+    // Silêncio aqui esconde configuração errada: sem banco na geração, o
+    // site sai com os números do arquivo e ninguém percebe.
+    console.warn(
+      "[regioes] sem DATABASE_URL: usando os WhatsApp do rede.json.",
+    );
+    return {};
+  }
 
   try {
     const { rows } = await db.query<{ slug: string; whatsapp_numero: string }>(
