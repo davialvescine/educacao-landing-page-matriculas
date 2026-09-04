@@ -9,6 +9,7 @@ import JsonLd from "@/components/JsonLd";
 import FaqBloco from "@/components/FaqBloco";
 import PainelDia, { type MomentoDia } from "@/components/iabc/PainelDia";
 import CasaEscola, { type FotoCampus } from "@/components/iabc/CasaEscola";
+import HeroIabc, { type QuadroHero } from "@/components/iabc/HeroIabc";
 import BarraCtaMobile from "@/components/BarraCtaMobile";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -39,6 +40,14 @@ const FOTOS_DIA: MomentoDia[] = [
   { src: "/imagens/iabc/site/piano.jpg", titulo: "Música", texto: "Piano, coral e instrumentos abertos a quem nunca tocou nada antes." },
   { src: "/imagens/iabc/site/apresentacao.jpg", titulo: "Palco", texto: "Apresentar em público desde cedo, que é o que solta a voz de qualquer um." },
   { src: "/imagens/iabc/site/convivencia-entardecer.jpg", titulo: "Convivência", texto: "Amizades que nascem de dividir o dia inteiro, e não só a sala de aula." },
+];
+
+/** A capa se reveza: nenhuma foto sozinha mostra o que é morar aqui. */
+const QUADROS_HERO: QuadroHero[] = [
+  { src: "/imagens/iabc/site/convivencia-entardecer.jpg", alt: "Fim de tarde no campus" },
+  { src: "/imagens/iabc/site/alunos-no-campus.jpg", alt: "Alunos do Ensino Médio" },
+  { src: "/imagens/iabc/campus-aereo.jpg", alt: "O campus visto de cima" },
+  { src: "/imagens/iabc/site/corrida-na-mata.jpg", alt: "Treino na mata do campus" },
 ];
 
 /** O campus por dentro, no carrossel da seção de abertura. */
@@ -125,62 +134,47 @@ export default function IabcPage() {
 
       <Header />
       <main>
-        {/* Capa: o campus visto de cima é o argumento que nenhuma frase dá */}
-        <section className="relative isolate min-h-[100dvh] overflow-hidden bg-brand-950">
-          <Image
-            src="/imagens/iabc/campus-aereo.jpg"
-            alt="Vista aérea do campus do IABC, em Abadiânia"
-            fill
-            priority
-            sizes="100vw"
-            className="-z-10 object-cover object-[center_62%]"
-          />
-          <div
-            aria-hidden
-            className="absolute inset-0 -z-10 bg-gradient-to-t from-brand-950 via-brand-950/70 to-brand-950/35"
-          />
-          <div className="mx-auto flex min-h-[100dvh] max-w-7xl flex-col justify-end px-4 pb-20 pt-24 sm:px-6">
-            <div className="max-w-3xl">
-              <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-gold-300">
-                Internato · Abadiânia, Goiás
-              </p>
-              <h1 className="mt-5 text-4xl font-extrabold leading-[1.04] tracking-tighter text-white sm:text-6xl lg:text-7xl">
-                Aqui seu filho não
-                <br />
-                vai só estudar. Vai viver.
-              </h1>
-              <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/80">
-                Escola, moradia, esporte e convivência no mesmo campus, com
-                gente cuidando dele o dia inteiro.
-              </p>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <a
-                  href="#visita"
-                  className={cn(
-                    buttonVariants({ size: "lg" }),
-                    "h-14 rounded-full bg-gold-400 px-8 text-base font-bold text-brand-950 shadow-cta transition-transform hover:bg-gold-300 active:translate-y-px",
-                  )}
-                >
-                  Quero conhecer o campus
-                </a>
-                {whatsapp && (
-                  <a
-                    href={whatsapp}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={cn(
-                      buttonVariants({ variant: "outline", size: "lg" }),
-                      "h-14 rounded-full border-2 border-white/35 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-sm hover:bg-white/15 active:translate-y-px",
-                    )}
-                  >
-                    <MessageCircle aria-hidden className="size-5" />
-                    Falar com a equipe
-                  </a>
+        {/* Capa editorial: a foto dá o clima, o texto entrega a frase */}
+        <HeroIabc quadros={QUADROS_HERO}>
+          <p className="hero-entra text-xs font-extrabold uppercase tracking-[0.24em] text-gold-300">
+            Internato · Abadiânia, Goiás
+          </p>
+          <h1 className="hero-titulo mt-6 max-w-4xl text-[2.6rem] font-extrabold leading-[0.98] tracking-tighter text-white sm:text-7xl lg:text-8xl [&_.hero-linha]:overflow-hidden [&_.hero-linha]:pb-[0.08em]">
+            Aqui ele não vai
+            <br />
+            só estudar. Vai{" "}
+            <span className="text-gold-300">viver</span>.
+          </h1>
+          <p className="hero-entra mt-7 max-w-lg text-lg leading-relaxed text-white/80">
+            Escola, moradia e esporte no mesmo campus, com gente cuidando dele o
+            dia inteiro.
+          </p>
+          <div className="hero-entra mt-9 flex flex-col gap-3 sm:flex-row">
+            <a
+              href="#visita"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "h-14 rounded-full bg-gold-400 px-8 text-base font-bold text-brand-950 shadow-cta transition-transform hover:bg-gold-300 active:translate-y-px",
+              )}
+            >
+              Quero conhecer o campus
+            </a>
+            {whatsapp && (
+              <a
+                href={whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "h-14 rounded-full border-2 border-white/35 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-sm hover:bg-white/15 active:translate-y-px",
                 )}
-              </div>
-            </div>
+              >
+                <MessageCircle aria-hidden className="size-5" />
+                Falar com a equipe
+              </a>
+            )}
           </div>
-        </section>
+        </HeroIabc>
 
         <CasaEscola fotos={FOTOS_CAMPUS} />
 

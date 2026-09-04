@@ -192,6 +192,11 @@ body {
 }
 .anim-zoom-lento { animation: zoom-lento 45s ease-in-out infinite alternate; }
 
+/* Respiro da capa: a foto cresce devagar enquanto está no ar, o que tira
+   a sensação de slide parado sem virar movimento chamativo. */
+@keyframes respiro { from { transform: scale(1); } to { transform: scale(1.07); } }
+.anim-respiro { animation: respiro 9s ease-out forwards; }
+
 @keyframes digitando {
   0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
   30%           { opacity: 1; transform: translateY(-3px); }
@@ -287,7 +292,7 @@ a:focus-visible .estado-topo { transform: translateY(-16px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .anim-kenburns, .anim-float, .anim-glow, .anim-bounce, .anim-marquee, .anim-chip, .pin-pulso, .anim-aurora, .anim-esteira, .anim-esteira-rev, .anim-orbita, .anim-orbita-rev, .anim-varredura, .ponto-digitando, .anim-zoom-lento, .anim-flutuar { animation: none; }
+  .anim-kenburns, .anim-float, .anim-glow, .anim-bounce, .anim-marquee, .anim-chip, .pin-pulso, .anim-aurora, .anim-esteira, .anim-esteira-rev, .anim-orbita, .anim-orbita-rev, .anim-varredura, .ponto-digitando, .anim-zoom-lento, .anim-flutuar, .anim-respiro { animation: none; }
   .brilho-letras::after { animation: none; opacity: 0; }
   .tarja::before { transform: scaleX(1); transition: none; }
   .hero-enter, .hero-pop { animation: none; opacity: 1; }
