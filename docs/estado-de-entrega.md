@@ -2,13 +2,32 @@
 
 *Apurado no código em 04 de setembro de 2026, contra a proposta comercial enviada em 02/09/2026. Os valores são os da proposta e não foram alterados.*
 
-De **R$ 34.140** de implantação, **R$ 25.500 já estão no ar**: **R$ 23.550** sem ressalva e **R$ 1.950** com um pedaço nomeado faltando. **R$ 8.640** ainda não começaram.
+De **R$ 34.140** de implantação, **R$ 30.100 já estão no ar**: **R$ 24.850** sem ressalva e **R$ 5.250** com um pedaço nomeado faltando. **R$ 4.040** ainda não começaram.
 
 | Estado | Valor | O que significa |
 | --- | --- | --- |
-| ✅ Pronto | R$ 23.550 | Construído, no ar e funcionando como está descrito. |
-| ⚠️ Parcial | R$ 1.950 | Já funciona, mas falta o pedaço nomeado na linha. |
-| ❌ Falta | R$ 8.640 | Não foi construído. |
+| ✅ Pronto | R$ 24.850 | Construído, no ar e funcionando como está descrito. |
+| ⚠️ Parcial | R$ 5.250 | Já funciona, mas falta o pedaço nomeado na linha. |
+| ❌ Falta | R$ 4.040 | Não foi construído. |
+
+## O que ainda não está no ar
+
+Cada linha aparece detalhada no grupo dela. Aqui estão juntas, com o que trava cada uma — porque boa parte do que falta não depende de escrever código.
+
+| Item | Estado | O que trava | Valor |
+| --- | --- | --- | --- |
+| § 04 Motor do relatório mensal | ❌ Falta | **Depende de construir.** O cruzamento por região, escola, série e campanha. | R$ 1.100 |
+| § 04 Envio automático por e-mail | ❌ Falta | **Depende de construir.** PDF por região e a tarefa do primeiro dia útil. | R$ 600 |
+| § 02 Página do Dica Plus | ❌ Falta | **Esperando a rede.** Falta o layout que a rede vai desenhar. | R$ 1.300 |
+| § 05 Dica Plus: integração | ❌ Falta | **Esperando a rede.** Falta a documentação da API da plataforma. | R$ 790 |
+| § 06 Search Console e Core Web Vitals | ❌ Falta | **Esperando a publicação.** Só começa com o site no domínio da rede. | R$ 250 |
+| § 04 Trilha de auditoria de acesso | ⚠️ Parcial | **Depende de construir.** Registrar entrada e tentativa de entrada no painel. | R$ 250 |
+| § 07 Consentimento registrado e comprovável | ⚠️ Parcial | **Depende de construir.** Gravar data, hora e versão do texto aceito. | R$ 250 |
+| § 06 Identidade da rede nos buscadores de IA | ⚠️ Parcial | **Esperando a rede.** Faltam o Facebook e o YouTube oficiais. | R$ 550 |
+| § 08 Infraestrutura de produção | ⚠️ Parcial | **Esperando a publicação.** Falta servidor e domínio contratados. | R$ 400 |
+| § 08 Documentação e treinamento | ⚠️ Parcial | **Esperando a rede.** Falta agendar o repasse com as coordenações. | R$ 250 |
+| § 08 QA e homologação | ⚠️ Parcial | **Esperando a publicação.** Falta o ambiente separado, que vem com o servidor. | R$ 250 |
+| § 11 Landing page do projeto | ⚠️ Parcial | **Esperando a rede.** Falta o briefing e a identidade da landing. | R$ 3.300 |
 
 ## § 01 — Página principal e estrutura
 
@@ -41,7 +60,7 @@ Biblioteca de interface reaproveitada em todas as rotas, foco visível, contrast
 
 ## § 02 — Páginas por região, IABC e Dica Plus
 
-*✅ Pronto R$ 4.500 · ❌ Falta R$ 2.600*
+*✅ Pronto R$ 5.800 · ❌ Falta R$ 1.300*
 
 ### ✅ Pronto — Página por região · R$ 900 × 5
 
@@ -49,11 +68,11 @@ Um modelo de página de região, alimentado pelos dados de cada estado: DF, GO, 
 
 > **Estado atual.** Cinco rotas no ar, como orçado: o Mato Grosso virou **uma página só**, e a divisão entre ALM e AOM ficou por dentro — o lead nasce na associação certa, decidida pela escola escolhida. SEO: título, descrição, canônico e `ItemList`. AEO: `FAQPage` com cinco perguntas por região. Trilha `BreadcrumbList` incluída.
 
-### ❌ Falta — Página do IABC · R$ 1.300
+### ✅ Pronto — Página do IABC · R$ 1.300
 
 Rota própria para o internato, separada das 39 escolas de bairro: custo total de mensalidade somada a moradia, rotina, segurança, galeria do campus e agendamento de visita. A família do IABC pesquisa de outro estado e quer ver o lugar antes de decidir. É uma jornada de compra distinta, e uma página própria capta quem hoje se perde entre as escolas de bairro. **SEO, AEO e GEO inclusos:** a busca por internato adventista passa a encontrar o campus, e não a home da rede; as perguntas do internato (custo, rotina, idade mínima, como visitar) entram marcadas em `FAQPage`; e o campus passa a ser acompanhado nos buscadores de IA, que é onde a família de outro estado começa a procurar.
 
-> **Estado atual.** Existe a seção do internato na home, com captação própria. A rota separada, com custo total, rotina, galeria e agendamento de visita, não foi construída.
+> **Estado atual.** Rota própria em /iabc, com jornada de compra distinta da escola de bairro: capa editorial com fotos do campus se revezando, o que entra no valor somando mensalidade e moradia, o dia em faixa presa à rolagem, a seção que responde quem cuida do aluno, agendamento de visita e formulário travado no internato. Doze fotos reais vindas do site do próprio IABC. SEO, AEO e GEO no lugar: `School` com endereço, trilha e `FAQPage` com as perguntas do internato. Valor e idade mínima não são publicados porque a rede não os informou; a página manda falar com a equipe.
 
 ### ❌ Falta — Página do Dica Plus · R$ 1.300
 
@@ -288,19 +307,21 @@ Um único modelo de página, alimentado pelos dados de cada unidade: foto, ender
 
 ## § 11 — Landing page — projeto Educação dos Sonhos
 
-*❌ Falta R$ 3.300*
+*⚠️ Parcial R$ 3.300*
 
-### ❌ Falta — Landing page do projeto · R$ 3.300
+### ⚠️ Parcial — Landing page do projeto · R$ 3.300
 
 Implementação da página, coleta de leads e envio ao Sevenbee com webhook de retorno (aguardando, em atendimento, atendido). A fila de resiliência com nova tentativa automática é a mesma do site principal, reaproveitada. Inclui a hospedagem do projeto.
 
-> **Estado atual.** Não iniciada: falta o briefing do projeto. O envio ao CRM e a fila de resiliência já existem no site principal e são reaproveitáveis, mas a página ainda não existe para ligá-los.
+> **Estado atual.** O projeto vai para repositório próprio, porque a identidade visual é outra e o único ponto em comum é o formulário. **O lado deste sistema está pronto:** rota `/api/leads/externo` autenticada por token, servidor-a-servidor, que grava antes de enviar, etiqueta o projeto no CRM e reprocessa pela fila; painel com filtro por site e coluna no CSV; contrato documentado. **Falta a landing em si** — depende do briefing e da identidade visual, e será construída fora deste repositório.
 
 
 ## Entregue além do escopo fechado
 
 Não estava no orçamento e não entrou em nenhum subtotal: veio junto porque o resto já estava construído.
 
+- **Suíte de testes automatizados.** 31 testes cobrindo as regras que quebram em silêncio: para qual associação o lead vai, qual WhatsApp cada unidade mostra, qual cidade a página anuncia, e de qual projeto o lead veio. Nada disso estoura erro ao falhar — só manda a família para a equipe errada.
+- **Migração de banco com ensaio.** Um executor que mostra o que vai mudar antes de mudar, roda dentro de transação e desfaz tudo se algo falhar. Já exercitado num banco com leads dentro.
 - **Mato Grosso como página única.** A família via duas regiões que só fazem sentido para a rede — Leste e Oeste são recorte administrativo. Agora é uma página com as 9 unidades; a divisão continua inteira no painel, e o lead nasce na associação certa pela escola escolhida. As rotas antigas respondem 301.
 - **WhatsApp editável no painel.** Trocar um telefone exigia mexer no código e publicar. Agora o administrador edita e o número entra no ar sozinho, sem deploy: as páginas continuam estáticas e são regeneradas no salvamento. Verificado do banco até o HTML.
 - **Cidade no formulário, e escola obrigatória.** A coordenação não sabia onde a família mora — só a região, que cobre um estado inteiro. A cidade agora viaja com o lead até o CRM e o e-mail. Em troca, quem ainda não escolheu a escola precisa escolher: troca conversão por qualificação.
