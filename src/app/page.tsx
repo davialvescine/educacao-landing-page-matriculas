@@ -92,18 +92,32 @@ export default async function Home() {
             Educando gerações com valores pra vida. Educação Adventista
             Centro-Oeste
           </h1>
+          {/* A luz que passa sobre o lettering é recortada pela PRÓPRIA
+              arte (máscara com a mesma imagem): ela só existe onde há
+              letra, e o varrido termina na borda da letra, não num
+              retângulo. A sombra fica no pai porque a máscara cortaria
+              qualquer sombra desenhada dentro dela. */}
           <div
-            className="hero-pop brilho-letras"
+            className="hero-pop w-full max-w-2xl drop-shadow-[0_10px_24px_rgba(120,60,0,0.18)]"
             style={{ "--delay": "0.18s" } as React.CSSProperties}
           >
-            <Image
-              src="/imagens/campanha/slogan-valores.webp"
-              alt="Educando gerações com valores pra vida"
-              width={2000}
-              height={900}
-              priority
-              className="h-auto w-full max-w-2xl drop-shadow-[0_10px_24px_rgba(120,60,0,0.18)]"
-            />
+            <div
+              className="brilho-letras w-full"
+              style={
+                {
+                  "--mascara": "url(/imagens/campanha/slogan-valores.webp)",
+                } as React.CSSProperties
+              }
+            >
+              <Image
+                src="/imagens/campanha/slogan-valores.webp"
+                alt="Educando gerações com valores pra vida"
+                width={2000}
+                height={900}
+                priority
+                className="h-auto w-full"
+              />
+            </div>
           </div>
           <p
             className="hero-enter max-w-xl text-lg font-medium leading-relaxed text-brand-950/80"

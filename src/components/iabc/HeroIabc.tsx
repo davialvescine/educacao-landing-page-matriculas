@@ -204,7 +204,11 @@ export default function HeroIabc({
               fill
               priority={i === 0}
               sizes="100vw"
-              className={`object-cover object-center ${i === atual ? "anim-respiro" : ""}`}
+              // Todas respiram o tempo todo. Tirar a classe da foto que sai
+              // fazia a escala dela voltar a 1 de uma vez, um "pulo para
+              // trás" visível um instante antes de a próxima cobrir. Quem
+              // está por baixo respirando não aparece; não custa nada.
+              className="anim-respiro object-cover object-center"
             />
           </div>
         ))}

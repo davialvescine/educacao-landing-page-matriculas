@@ -157,7 +157,19 @@ body {
 .anim-glow     { animation: glow-pulse 7s ease-in-out infinite; }
 .anim-bounce   { animation: bounce-soft 2.2s ease-in-out infinite; }
 .anim-marquee  { animation: marquee 42s linear infinite; }
-.brilho-letras { position: relative; overflow: hidden; }
+/* O contêiner é mascarado pela própria arte (--mascara), então a luz do
+   ::after só aparece sobre as letras e termina na borda delas. Sem a
+   variável, cai no comportamento antigo: recorte retangular. */
+.brilho-letras {
+  position: relative;
+  overflow: hidden;
+  -webkit-mask-image: var(--mascara, none);
+  mask-image: var(--mascara, none);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
 .brilho-letras::after {
   content: "";
   position: absolute;
@@ -194,8 +206,12 @@ body {
 
 /* Respiro da capa: a foto cresce devagar enquanto está no ar, o que tira
    a sensação de slide parado sem virar movimento chamativo. */
+/* Vai e volta, sem parar: com `forwards` a foto zumava uma vez e ficava
+   presa em 1.07, e a que saía voltava a 1 num pulo. Alternando, nenhuma
+   foto tem "fim" — em qualquer instante da troca ela está no meio de um
+   movimento suave. */
 @keyframes respiro { from { transform: scale(1); } to { transform: scale(1.07); } }
-.anim-respiro { animation: respiro 9s ease-out forwards; }
+.anim-respiro { animation: respiro 9s ease-in-out infinite alternate; }
 
 @keyframes digitando {
   0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
@@ -286,10 +302,12 @@ a:focus-visible .estado-topo { transform: translateY(-16px); }
     transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--delay, 0s);
 }
-/* `html.js` é posta por um script inline no layout antes de a página
-   pintar. É o sinal de "há JS para mostrar depois" que todo navegador
-   entende — `@media (scripting)` ainda não é reconhecida em vários. */
-html.js .reveal:not(.is-visible) {
+/* `reveal-oculto` é posta pelo próprio componente, num layout effect,
+   e só no que ainda NÃO está na tela. Sem JS a classe nunca existe e
+   tudo aparece; com JS, o que está acima da dobra nunca é escondido, e o
+   que está abaixo é escondido antes de alguém rolar até ele. Nenhum
+   script inline, nenhuma media query que navegador velho não entende. */
+.reveal.reveal-oculto:not(.is-visible) {
   opacity: 0;
   transform: translateY(32px);
 }

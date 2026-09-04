@@ -93,7 +93,11 @@ export default function FotoRotativa({ fotos }: { fotos: FotoAluno[] }) {
   return (
     <div
       ref={caixa}
-      className="relative flex h-[440px] w-full items-end justify-center overflow-hidden sm:h-[520px] lg:h-[620px] xl:h-[680px]"
+      // Sem overflow-hidden: os recortes são mais largos que a coluna e
+      // precisam vazar para os lados — com o corte, o braço e o cabelo
+      // terminavam numa linha reta. A animação usa opacidade e
+      // deslocamento, não máscara, então não depende do recorte.
+      className="relative flex h-[440px] w-full items-end justify-center sm:h-[520px] lg:h-[620px] xl:h-[680px]"
     >
       {fotos.map((f, i) => (
         <div
