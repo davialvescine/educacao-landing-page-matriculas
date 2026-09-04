@@ -1,7 +1,7 @@
 import { listarLeads } from "@/lib/leads";
 import { nomeRegiao } from "@/lib/rede";
 import { regioesPermitidas, usuarioLogado } from "@/lib/painel-auth";
-import { registrarAcesso } from "@/lib/usuarios";
+import { origem, registrarAcesso } from "@/lib/usuarios";
 
 export const runtime = "nodejs";
 
@@ -9,7 +9,7 @@ function celula(v: string): string {
   return `"${v.replaceAll('"', '""')}"`;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   const usuario = await usuarioLogado();
   if (!usuario) {
     return new Response("Não autorizado.", { status: 401 });
@@ -22,6 +22,7 @@ export async function GET() {
     usuarioId: usuario.id,
     usuarioNome: usuario.nome,
     detalhe: `${leads.length} leads`,
+    ...origem(req),
   });
   const linhas = [
     [

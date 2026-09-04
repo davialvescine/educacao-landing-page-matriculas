@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { obterLead } from "@/lib/leads";
 import { enviarLeadWebhook } from "@/lib/webhook";
 import { regioesPermitidas, usuarioLogado } from "@/lib/painel-auth";
-import { registrarAcesso } from "@/lib/usuarios";
+import { origem, registrarAcesso } from "@/lib/usuarios";
 
 export const runtime = "nodejs";
 
@@ -30,6 +30,7 @@ export async function POST(req: Request) {
     usuarioId: usuario.id,
     usuarioNome: usuario.nome,
     detalhe: `${lead.nome} (${lead.estado})`,
+    ...origem(req),
   });
   const resultado = await enviarLeadWebhook(lead.id, {
     nome: lead.nome,

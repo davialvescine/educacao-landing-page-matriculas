@@ -332,8 +332,9 @@ export default function GestaoEquipe({ regioes, acessos, usuarioAtual }: Props) 
           Últimas atividades
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Registro de quem entrou, exportou e alterou dados. Guardado para
-          atender à LGPD.
+          Quem entrou, de onde, e o que fez com os dados das famílias.
+          Tentativa de entrada que falhou aparece em vermelho: várias
+          seguidas no mesmo e-mail é alguém testando senha.
         </p>
         <div className="mt-4 overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
           {acessos.length === 0 ? (
@@ -345,7 +346,9 @@ export default function GestaoEquipe({ regioes, acessos, usuarioAtual }: Props) 
               {acessos.map((a) => (
                 <li
                   key={a.id}
-                  className="flex flex-wrap items-baseline gap-x-2 px-4 py-2.5 text-sm"
+                  className={`flex flex-wrap items-baseline gap-x-2 px-4 py-2.5 text-sm ${
+                    a.acao === "login_falhou" ? "bg-destructive/5" : ""
+                  }`}
                 >
                   <span
                     className="w-28 shrink-0 text-xs text-muted-foreground"
@@ -356,12 +359,23 @@ export default function GestaoEquipe({ regioes, acessos, usuarioAtual }: Props) 
                   <span className="font-bold text-brand-950">
                     {a.usuario_nome || "—"}
                   </span>
-                  <span className="text-muted-foreground">
+                  <span
+                    className={
+                      a.acao === "login_falhou"
+                        ? "font-semibold text-destructive"
+                        : "text-muted-foreground"
+                    }
+                  >
                     {ROTULO_ACAO[a.acao] ?? a.acao}
                   </span>
                   {a.detalhe ? (
                     <span className="text-xs text-muted-foreground">
                       · {a.detalhe}
+                    </span>
+                  ) : null}
+                  {a.ip ? (
+                    <span className="ml-auto font-mono text-xs text-muted-foreground/70">
+                      {a.ip}
                     </span>
                   ) : null}
                 </li>

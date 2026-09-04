@@ -45,8 +45,8 @@ async function retrato() {
      WHERE table_schema = 'public' ORDER BY table_name`,
   );
   const { rows: colunas } = await cliente.query(
-    `SELECT column_name FROM information_schema.columns
-     WHERE table_schema = 'public' AND table_name = 'leads' ORDER BY column_name`,
+    `SELECT table_name, column_name FROM information_schema.columns
+     WHERE table_schema = 'public' ORDER BY table_name, column_name`,
   );
   let leads = null;
   if (tabelas.some((t) => t.table_name === "leads")) {
@@ -55,7 +55,7 @@ async function retrato() {
   }
   return {
     tabelas: tabelas.map((t) => t.table_name),
-    colunasLeads: colunas.map((c) => c.column_name),
+    colunas: new Set(colunas.map((c) => `${c.table_name}.${c.column_name}`)),
     leads,
   };
 }
@@ -64,12 +64,30 @@ const antes = await retrato();
 console.log(`\ntabelas antes: ${antes.tabelas.join(", ") || "(nenhuma)"}`);
 if (antes.leads !== null) console.log(`leads gravados: ${antes.leads}`);
 
-const falta = {
-  "tabela regioes_config": !antes.tabelas.includes("regioes_config"),
-  "coluna leads.cidade":
-    antes.colunasLeads.length > 0 && !antes.colunasLeads.includes("cidade"),
-};
-const pendentes = Object.entries(falta).filter(([, v]) => v).map(([k]) => k);
+// O que o schema atual espera encontrar. Cada linha nova de ALTER TABLE
+// em db/schema.sql entra aqui, senão o ensaio diz "nada pendente" para um
+// banco que na verdade está atrasado — e foi assim que a checagem anterior
+// envelheceu sem ninguém perceber.
+const EXIGE_TABELA = ["leads", "acessos", "regioes_config", "consentimentos"];
+const EXIGE_COLUNA = [
+  "leads.cidade",
+  "leads.utm",
+  "leads.atendimento_status",
+  "acessos.ip",
+  "acessos.agente",
+  "consentimentos.metodo",
+];
+
+const pendentes = [
+  ...EXIGE_TABELA.filter((t) => !antes.tabelas.includes(t)).map(
+    (t) => `tabela ${t}`,
+  ),
+  // Coluna só falta se a tabela existe: tabela ausente já foi contada acima.
+  ...EXIGE_COLUNA.filter((c) => {
+    const tabela = c.split(".")[0];
+    return antes.tabelas.includes(tabela) && !antes.colunas.has(c);
+  }).map((c) => `coluna ${c}`),
+];
 console.log(`\npendente: ${pendentes.length ? pendentes.join(", ") : "nada — banco já está atualizado"}`);
 
 if (!aplicar) {
