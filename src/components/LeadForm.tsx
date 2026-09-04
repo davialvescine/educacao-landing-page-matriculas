@@ -174,7 +174,7 @@ export default function LeadForm({
               </p>
             </div>
             <div className={cn("grid gap-2", regiaoFixa && "hidden")}>
-              <Label className={ROTULO}>Região <span className="text-gold-600">*</span></Label>
+              <Label className={ROTULO}>Região <span className="text-gold-700">*</span></Label>
               <Select
                 key={estado || "sem-regiao"}
                 value={estado || undefined}
@@ -215,7 +215,7 @@ export default function LeadForm({
               </Select>
             </div>
             <div className={cn("grid gap-2", regiaoFixa && "hidden")}>
-              <Label className={ROTULO}>Escola em que deseja matricular <span className="text-gold-600">*</span></Label>
+              <Label className={ROTULO}>Escola em que deseja matricular <span className="text-gold-700">*</span></Label>
               <Select
                 value={escola || undefined}
                 onValueChange={(v) => setEscola(v ?? "")}
@@ -261,7 +261,7 @@ export default function LeadForm({
               </p>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="lead-nome" className={ROTULO}>Nome do responsável <span className="text-gold-600">*</span></Label>
+              <Label htmlFor="lead-nome" className={ROTULO}>Nome do responsável <span className="text-gold-700">*</span></Label>
               <Input
                 id="lead-nome"
                 name="nome"
@@ -273,7 +273,7 @@ export default function LeadForm({
             </div>
             <div className="grid gap-5 sm:grid-cols-2">
               <div className="grid gap-2">
-                <Label htmlFor="lead-whatsapp" className={ROTULO}>WhatsApp <span className="text-gold-600">*</span></Label>
+                <Label htmlFor="lead-whatsapp" className={ROTULO}>WhatsApp <span className="text-gold-700">*</span></Label>
                 <Input
                   id="lead-whatsapp"
                   name="whatsapp"

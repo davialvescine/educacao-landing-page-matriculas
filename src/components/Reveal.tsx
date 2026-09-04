@@ -41,19 +41,22 @@ export default function Reveal({
       mostrar();
       return;
     }
-    let primeira = true;
+    // A decisão de esconder é SÍNCRONA, aqui, antes de pintar: a primeira
+    // callback do observador chega depois do quadro, e conteúdo na borda
+    // de baixo da tela pintaria visível, sumiria e voltaria. Só o que
+    // começa abaixo da dobra é escondido; o observador apenas revela.
+    const topo = el.getBoundingClientRect().top;
+    if (topo > window.innerHeight - 40) el.classList.add("reveal-oculto");
+    else mostrar();
+
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
             mostrar();
             io.unobserve(entry.target);
-          } else if (primeira) {
-            // Primeira leitura, fora da tela: esconde para revelar depois.
-            entry.target.classList.add("reveal-oculto");
           }
         }
-        primeira = false;
       },
       { threshold: 0.15, rootMargin: "0px 0px -40px 0px" },
     );

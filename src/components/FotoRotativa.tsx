@@ -76,8 +76,17 @@ export default function FotoRotativa({ fotos }: { fotos: FotoAluno[] }) {
     if (!raiz) return;
     const entra = raiz.querySelector<HTMLElement>(`[data-foto="${ativa}"]`);
     const sai = raiz.querySelector<HTMLElement>(`[data-foto="${anterior.current}"]`);
-    anterior.current = ativa;
     if (!entra) return;
+    // Foto nova ainda baixando (rede lenta): não troca agora. Trocar
+    // deixaria a anterior sumir e um vazio no lugar até a nova decodificar.
+    // Volta ao índice anterior e a próxima rodada tenta de novo.
+    const img = entra.querySelector("img");
+    if (img && !(img.complete && img.naturalWidth > 0)) {
+      const volta = anterior.current;
+      const t = window.setTimeout(() => setAtiva(volta), 0);
+      return () => window.clearTimeout(t);
+    }
+    anterior.current = ativa;
 
     if (entra === sai || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       gsap.set(entra, { autoAlpha: 1, y: 0, scale: 1 });

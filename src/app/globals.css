@@ -162,7 +162,12 @@ body {
    a posição do gradiente, não a caixa — assim não há borda nenhuma para
    aparecer. Se o navegador não aplicar a máscara, some só a luz; a arte
    embaixo continua intacta. */
+.luz-lettering { display: none; }
+/* Sem suporte a máscara, a faixa branca atravessaria a arte como um
+   retângulo — pior que luz nenhuma. Só existe onde a máscara existe. */
+@supports (mask-image: url("")) or (-webkit-mask-image: url("")) {
 .luz-lettering {
+  display: block;
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -176,6 +181,7 @@ body {
   background-size: 300% 100%;
   background-repeat: no-repeat;
   animation: luz-lettering 7s ease-in-out infinite;
+}
 }
 @keyframes luz-lettering {
   0%        { background-position: 150% 0; }
