@@ -1,103 +1,27 @@
-import { describe, expect, it, vi } from "vitest";
-import {
-  ehSlugDeProjeto,
-  normalizarHost,
-  projetoPorHost,
-  projetoPorRota,
-  PROJETO_PADRAO,
-  urlDoProjeto,
-} from "@/lib/projetos";
+import { describe, expect, it } from "vitest";
+import { ehSlugDeProjeto, getProjeto, PROJETOS, PROJETO_PADRAO } from "@/lib/projetos";
 
 /**
- * Duas marcas, dois domínios, uma aplicação. Errar aqui significa servir
- * o site errado num domínio — ou pior, oferecer o mesmo conteúdo nos dois
- * endereços, que é o que faz o buscador rebaixar os dois.
+ * O painel recebe lead de dois projetos. Confundir a origem faz o lead
+ * aparecer na tela errada e contar na estatística errada.
  */
-
-describe("qual site cada domínio serve", () => {
-  it("reconhece os dois domínios", () => {
-    expect(projetoPorHost("educaadventistacentrooeste.com.br")?.slug).toBe("matriculas");
-    expect(projetoPorHost("educacaodossonhos.com.br")?.slug).toBe("educacao-dos-sonhos");
+describe("registro de projetos", () => {
+  it("o site de matrículas é o projeto padrão e não é externo", () => {
+    expect(PROJETO_PADRAO.slug).toBe("matriculas");
+    expect(PROJETO_PADRAO.externo).toBe(false);
   });
 
-  it("ignora www e porta", () => {
-    expect(projetoPorHost("www.educacaodossonhos.com.br")?.slug).toBe("educacao-dos-sonhos");
-    expect(projetoPorHost("educacaodossonhos.com.br:3000")?.slug).toBe("educacao-dos-sonhos");
-    expect(projetoPorHost("WWW.EducacaoDosSonhos.com.BR")?.slug).toBe("educacao-dos-sonhos");
+  it("o Educação dos Sonhos é externo: vive em outro repositório", () => {
+    const eds = getProjeto("educacao-dos-sonhos");
+    expect(eds?.externo).toBe(true);
+    expect(eds?.dominio).toBe("educacaodossonhos.com.br");
   });
 
-  it("fora de produção, qualquer host serve o site principal", () => {
-    // localhost, IP direto, túnel de teste: nada disso pode travar o dev.
-    expect(projetoPorHost("localhost:3000")?.slug).toBe(PROJETO_PADRAO.slug);
-    expect(projetoPorHost(null)?.slug).toBe(PROJETO_PADRAO.slug);
+  it("não há slug repetido", () => {
+    const slugs = PROJETOS.map((p) => p.slug);
+    expect(new Set(slugs).size).toBe(slugs.length);
   });
 
-  it("host desconhecido não recebe site nenhum", () => {
-    // Devolver o site principal aqui deixaria ele acessível por qualquer
-    // domínio apontado para a origem — conteúdo duplicado aos olhos do
-    // buscador, e lead entrando classificado como se fosse de lá.
-    const antes = process.env.NODE_ENV;
-    vi.stubEnv("NODE_ENV", "production");
-    vi.resetModules();
-    return import("@/lib/projetos").then((m) => {
-      expect(m.projetoPorHost("dominio-invasor.com")).toBeNull();
-      expect(m.projetoPorHost("educacaodossonhos.com.br")?.slug).toBe(
-        "educacao-dos-sonhos",
-      );
-      // E quem precisa seguir mesmo assim tem a versão tolerante.
-      expect(m.projetoPorHostOuPadrao("dominio-invasor.com").slug).toBe(
-        "matriculas",
-      );
-      vi.stubEnv("NODE_ENV", antes ?? "test");
-    });
-  });
-
-  it("só o site principal expõe o painel", () => {
-    expect(projetoPorHost("educaadventistacentrooeste.com.br")?.temPainel).toBe(true);
-    expect(projetoPorHost("educacaodossonhos.com.br")?.temPainel).toBe(false);
-  });
-});
-
-describe("qual site cada rota pertence", () => {
-  it("as rotas da landing vivem sob o prefixo dela", () => {
-    expect(projetoPorRota("/sonhos").slug).toBe("educacao-dos-sonhos");
-    expect(projetoPorRota("/sonhos/obrigado").slug).toBe("educacao-dos-sonhos");
-  });
-
-  it("o resto pertence ao site de matrículas", () => {
-    expect(projetoPorRota("/").slug).toBe("matriculas");
-    expect(projetoPorRota("/goias").slug).toBe("matriculas");
-    expect(projetoPorRota("/painel").slug).toBe("matriculas");
-  });
-
-  it("não confunde rota que apenas começa parecido", () => {
-    expect(projetoPorRota("/sonhosdealguem").slug).toBe("matriculas");
-  });
-});
-
-describe("endereço canônico por site", () => {
-  it("cada projeto anuncia o próprio domínio", () => {
-    const urls = new Set(
-      ["educaadventistacentrooeste.com.br", "educacaodossonhos.com.br"].map((h) =>
-        urlDoProjeto(projetoPorHost(h)!),
-      ),
-    );
-    expect(urls).toEqual(
-      new Set([
-        "https://educaadventistacentrooeste.com.br",
-        "https://educacaodossonhos.com.br",
-      ]),
-    );
-  });
-});
-
-describe("normalizarHost", () => {
-  it("devolve vazio para entrada ausente", () => {
-    expect(normalizarHost(undefined)).toBe("");
-  });
-});
-
-describe("ehSlugDeProjeto", () => {
   it("aceita só os slugs conhecidos", () => {
     expect(ehSlugDeProjeto("matriculas")).toBe(true);
     expect(ehSlugDeProjeto("educacao-dos-sonhos")).toBe(true);

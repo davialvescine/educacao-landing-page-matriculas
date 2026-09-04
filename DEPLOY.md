@@ -27,9 +27,7 @@ Stack: Next.js 16 (App Router, páginas estáticas + `/api/leads` dinâmica), Po
    | `NEXT_PUBLIC_GA_ID` | não | ID do GA4 (padrão embutido: `G-8ZSKJGD105`). |
    | `NEXT_PUBLIC_META_PIXEL_ID` | quando houver ads | Meta Pixel para campanhas de Facebook/Instagram; dispara `PageView`, `Lead` e `Contact`. |
    | `NEXT_PUBLIC_SITE_URL` | não | URL canônica (padrão embutido: `https://educaadventistacentrooeste.com.br`). |
-   | `HOSTS_AUTORIZADOS` | recomendada | Hosts extras aceitos além dos dois domínios dos projetos, separados por vírgula — preview do Coolify, staging, health check interno. **Em produção, host fora dessa lista recebe 404**: sem isso, qualquer domínio apontado para o IP da origem passaria a servir o site num endereço não autorizado, o que o buscador lê como conteúdo duplicado. |
-   | `NEXT_PUBLIC_DOMINIO_MATRICULAS` | não | Domínio do site de matrículas (padrão: `educaadventistacentrooeste.com.br`). |
-   | `NEXT_PUBLIC_DOMINIO_SONHOS` | não | Domínio da landing do Educação dos Sonhos (padrão: `educacaodossonhos.com.br`). |
+   | `LEAD_API_TOKEN` | quando houver projeto externo | Token que autoriza `POST /api/leads/externo`. Gere com `openssl rand -base64 32` e guarde a mesma string no projeto que vai enviar. Sem ela, a rota responde 503. |
    | `SMTP_HOST`, `SMTP_PORTA`, `SMTP_USUARIO`, `SMTP_SENHA`, `SMTP_REMETENTE` | recomendada | Envio do "esqueci minha senha" do painel. Com Google Workspace: `smtp.gmail.com`, porta 587, usuário = e-mail da conta e senha = **senha de app** gerada na conta Google. Sem isso, o link some e o administrador cadastra a senha manualmente. |
    | `SEVENBEE_WEBHOOK_SEGREDO` | recomendada | Segredo do webhook de retorno do Sevenbee (status de atendimento). Cadastre no Sevenbee (Ajustes > Integrações > Webhooks) a URL `https://<dominio>/api/sevenbee/webhook?segredo=<valor>` assinando os eventos `SESSION_CREATED`, `SESSION_UPDATED` e `SESSION_ENDED`. |
 
@@ -99,3 +97,44 @@ Resposta esperada: qualquer 2xx. Timeout de 8 s; falhas ficam com
 
 - Painel de leads (rota protegida lendo a tabela `leads`).
 - Job de reenvio de webhooks com `webhook_status <> 'enviado'`.
+
+## Recebendo lead de outro projeto
+
+O painel também recebe leads de projetos que vivem fora deste
+repositório — hoje, a landing do **Educação dos Sonhos**, que tem
+identidade visual, repositório e domínio próprios.
+
+A entrega é **servidor-a-servidor**, não do navegador: o outro projeto
+recebe o formulário no próprio backend e repassa para cá com o token no
+cabeçalho. Assim o token nunca chega ao cliente, e não é preciso abrir
+CORS — API pública com CORS deixaria qualquer um despejar lead no
+painel.
+
+```
+POST https://educaadventistacentrooeste.com.br/api/leads/externo
+Authorization: Bearer <LEAD_API_TOKEN>
+Content-Type: application/json
+
+{
+  "projeto":  "educacao-dos-sonhos",   // obrigatório, precisa ser externo
+  "nome":     "Joana da Silva",        // obrigatório
+  "whatsapp": "(62) 98888-7777",       // obrigatório, com DDD
+  "email":    "joana@exemplo.com",     // opcional
+  "cidade":   "Goiânia",               // opcional
+  "estado":   "",                      // opcional; vazio = sem associação
+  "nivel":    ""                       // opcional
+}
+```
+
+Respostas: `200 {ok, id}` · `400` dado inválido · `401` token errado ·
+`503` token não configurado neste servidor.
+
+O que este sistema faz com o lead recebido, sem o outro projeto precisar
+implementar nada disso: grava antes de enviar, manda ao CRM com a
+etiqueta do projeto, reprocessa pela fila automática se o CRM estiver
+fora, e mostra no painel com filtro por site de origem.
+
+Lead de projeto externo entra **sem associação**: aparece para o
+administrador e fica fora do recorte dos coordenadores, que é por região.
+Se um dia a rede quiser encaminhar por região, basta o outro projeto
+mandar o slug em `estado`.

@@ -422,7 +422,8 @@ export default function PainelLeads({
                       </a>
                     </td>
                     <td className="whitespace-nowrap px-4 py-3">
-                      {nomeRegiao.get(l.estado) ?? l.estado}
+                      {nomeRegiao.get(l.estado) ?? l.estado ?? ""}
+                      {!l.estado && "—"}
                       {l.cidade ? (
                         <span className="block text-xs text-muted-foreground">
                           {l.cidade}

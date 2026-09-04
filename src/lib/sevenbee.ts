@@ -1,5 +1,6 @@
 import type { LeadNovo } from "@/lib/leads";
 import { getRegiaoLead } from "@/lib/rede";
+import { getProjeto, PROJETO_PADRAO } from "@/lib/projetos";
 
 /**
  * Integração com o Sevenbee (https://sevenbee.readme.io).
@@ -42,8 +43,9 @@ export async function enviarLeadSevenbee(
         .filter(Boolean)
         .join(" / ")
     : "";
+  const projeto = getProjeto(lead.projeto) ?? PROJETO_PADRAO;
   const anotacao = [
-    `Lead da landing de matrículas (${new Date().toLocaleDateString("pt-BR")}).`,
+    `Lead de ${projeto.nome} (${new Date().toLocaleDateString("pt-BR")}).`,
     estado ? `Região: ${estado.nome} (${estado.associacao})` : null,
     lead.cidade ? `Cidade da família: ${lead.cidade}` : null,
     lead.escola ? `Escola de interesse: ${lead.escola}` : null,
@@ -65,9 +67,10 @@ export async function enviarLeadSevenbee(
         phoneNumber: telefoneInternacional(lead.whatsapp),
         email: lead.email || null,
         annotation: anotacao,
-        tagNames: [tagBase, estado?.nome ?? lead.estado].filter(Boolean),
+        // A etiqueta do projeto separa os funis dentro do próprio CRM.
+        tagNames: [tagBase, projeto.nome, estado?.nome ?? lead.estado].filter(Boolean),
         metadata: {
-          origem: "landing-matriculas",
+          origem: projeto.slug,
           lead_id: id,
           regiao: lead.estado,
           regiao_nome: estado?.nome ?? lead.estado,
