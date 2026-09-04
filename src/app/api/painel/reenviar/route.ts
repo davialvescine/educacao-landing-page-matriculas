@@ -37,6 +37,7 @@ export async function POST(req: Request) {
     email: lead.email,
     estado: lead.estado,
     escola: lead.escola,
+    cidade: lead.cidade,
     nivel: lead.nivel,
   });
   if (!resultado.configurado) {

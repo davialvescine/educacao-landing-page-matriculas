@@ -52,6 +52,7 @@ export default function LeadForm({
   const [etapa, setEtapa] = useState<1 | 2>(1);
   const [estado, setEstado] = useState(estadoInicial ?? "");
   const [escola, setEscola] = useState(escolaInicial ?? "");
+  const [cidade, setCidade] = useState("");
   const [nivel, setNivel] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -83,17 +84,19 @@ export default function LeadForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // O Mato Grosso é uma página só, mas por trás são duas associações: é a
-  // escola que diz qual delas atende a família. Sem ela o lead não tem dono.
-  const exigeEscola = estado === "mato-grosso";
-
   function avancar() {
     if (!estado) {
       setErro("Selecione a sua região para continuar.");
       return;
     }
-    if (exigeEscola && !escola) {
-      setErro("Escolha a unidade de Mato Grosso para continuar.");
+    if (!cidade.trim()) {
+      setErro("Informe a cidade onde vocês moram.");
+      return;
+    }
+    // A escola é o que diz qual equipe atende — e, no Mato Grosso, qual das
+    // duas associações fica com o lead.
+    if (!escola) {
+      setErro("Escolha a escola de interesse para continuar.");
       return;
     }
     setErro("");
@@ -199,23 +202,28 @@ export default function LeadForm({
               </Select>
             </div>
             <div className="grid gap-2">
-              <Label>
-                Escola de interesse
-                {exigeEscola && <span aria-hidden className="text-destructive"> *</span>}
-              </Label>
+              <Label htmlFor="lead-cidade">Cidade onde vocês moram</Label>
+              <Input
+                id="lead-cidade"
+                name="cidade"
+                value={cidade}
+                onChange={(e) => setCidade(e.target.value)}
+                placeholder="Ex.: Cuiabá"
+                autoComplete="address-level2"
+                maxLength={90}
+                required
+                className="h-12 rounded-xl"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label>Escola de interesse</Label>
               <Select
                 value={escola || undefined}
                 onValueChange={(v) => setEscola(v ?? "")}
                 disabled={escolas.length === 0}
               >
                 <SelectTrigger className="h-12 w-full rounded-xl">
-                  <SelectValue
-                    placeholder={
-                      exigeEscola
-                        ? "Escolha a unidade"
-                        : "Ainda não sei / qualquer unidade"
-                    }
-                  />
+                  <SelectValue placeholder="Escolha a unidade" />
                 </SelectTrigger>
                 <SelectContent>
                   {escolas.map((s) => (

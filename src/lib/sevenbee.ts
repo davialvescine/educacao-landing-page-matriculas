@@ -45,6 +45,7 @@ export async function enviarLeadSevenbee(
   const anotacao = [
     `Lead da landing de matrículas (${new Date().toLocaleDateString("pt-BR")}).`,
     estado ? `Região: ${estado.nome} (${estado.associacao})` : null,
+    lead.cidade ? `Cidade da família: ${lead.cidade}` : null,
     lead.escola ? `Escola de interesse: ${lead.escola}` : null,
     lead.nivel ? `Série / nível: ${lead.nivel}` : null,
     origem ? `Campanha: ${origem}` : null,
@@ -71,6 +72,7 @@ export async function enviarLeadSevenbee(
           regiao: lead.estado,
           regiao_nome: estado?.nome ?? lead.estado,
           associacao: estado?.associacao ?? "",
+          cidade: lead.cidade,
           escola: lead.escola,
           nivel: lead.nivel,
           ...(lead.utm ?? {}),

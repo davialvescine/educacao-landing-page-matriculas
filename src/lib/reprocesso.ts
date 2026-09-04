@@ -34,6 +34,7 @@ export async function reenviarFalhas(limite = 100): Promise<ResultadoReprocesso>
       email: lead.email,
       estado: lead.estado,
       escola: lead.escola,
+      cidade: lead.cidade,
       nivel: lead.nivel,
       utm: lead.utm ?? null,
     });

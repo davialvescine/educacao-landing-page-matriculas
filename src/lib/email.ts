@@ -208,6 +208,8 @@ export async function enviarConfirmacaoLead(dados: {
   whatsapp: string | null;
   /** Telefone que a família digitou, devolvido para conferência. */
   telefone: string;
+  /** Cidade onde a família mora. */
+  cidade?: string;
   nivel?: string;
   escola?: EscolaEmail;
 }): Promise<boolean> {
@@ -235,6 +237,7 @@ export async function enviarConfirmacaoLead(dados: {
     `Nome: ${dados.nome}`,
     `WhatsApp: ${dados.telefone}`,
     `E-mail: ${dados.para}`,
+    ...(dados.cidade ? [`Cidade: ${dados.cidade}`] : []),
     ...(dados.escola ? [`Escola: ${dados.escola.nome}`] : []),
     `Região: ${dados.regiao}`,
     ...(dados.nivel ? [`Nível: ${dados.nivel}`] : []),
@@ -404,6 +407,7 @@ export async function enviarConfirmacaoLead(dados: {
           ${linhaRecibo("Nome", dados.nome)}
           ${linhaRecibo("WhatsApp", dados.telefone)}
           ${linhaRecibo("E-mail", dados.para)}
+          ${dados.cidade ? linhaRecibo("Cidade", dados.cidade) : ""}
           ${linhaRecibo("Região", dados.regiao, !dados.nivel)}
           ${dados.nivel ? linhaRecibo("Nível", dados.nivel, true) : ""}
         </table>
