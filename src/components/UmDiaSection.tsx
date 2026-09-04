@@ -3,10 +3,10 @@ import Reveal from "@/components/Reveal";
 import { Eyebrow } from "@/components/Secoes";
 
 const CENAS = [
-  { src: "/imagens/campanha/escola-robotica.jpg", legenda: "Robótica e cultura maker" },
-  { src: "/imagens/campanha/escola-ciencias.jpg", legenda: "Ciência na prática" },
-  { src: "/imagens/campanha/escola-esporte.jpg", legenda: "Esporte e amizade" },
-  { src: "/imagens/campanha/escola-musica.jpg", legenda: "Música e artes" },
+  { src: "/imagens/iabc/vida-estudo.jpg", legenda: "Estudo com propósito" },
+  { src: "/imagens/iabc/vida-musica.jpg", legenda: "Música e artes" },
+  { src: "/imagens/iabc/vida-esporte.jpg", legenda: "Esporte e conquistas" },
+  { src: "/imagens/iabc/vida-amizade.jpg", legenda: "Amizades para a vida" },
 ];
 
 /** Um dia na escola: galeria de experiências. */

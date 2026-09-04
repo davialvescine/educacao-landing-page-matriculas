@@ -7,9 +7,11 @@ import type { FormEstado } from "@/lib/rede";
 import { eventoLead, lerUtm } from "@/lib/campanha-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import { VERSAO_ATUAL } from "@/lib/consentimento";
+import { POLITICA_PRIVACIDADE } from "@/lib/site";
 import {
   Select,
   SelectContent,
@@ -22,6 +24,9 @@ interface Props {
   estados: FormEstado[];
   /** Slug do estado pré-selecionado (páginas de região). */
   estadoInicial?: string;
+  /** Trava a região e esconde os seletores: usada na página do IABC, onde
+   *  a única unidade possível já é a da própria página. */
+  regiaoFixa?: boolean;
   /** Nome da escola pré-selecionada (páginas de unidade). */
   escolaInicial?: string;
 }
@@ -47,12 +52,12 @@ export default function LeadForm({
   estados,
   estadoInicial,
   escolaInicial,
+  regiaoFixa = false,
 }: Props) {
   const router = useRouter();
   const [etapa, setEtapa] = useState<1 | 2>(1);
   const [estado, setEstado] = useState(estadoInicial ?? "");
   const [escola, setEscola] = useState(escolaInicial ?? "");
-  const [cidade, setCidade] = useState("");
   const [nivel, setNivel] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -89,10 +94,6 @@ export default function LeadForm({
       setErro("Selecione a sua região para continuar.");
       return;
     }
-    if (!cidade.trim()) {
-      setErro("Informe a cidade onde vocês moram.");
-      return;
-    }
     // A escola é o que diz qual equipe atende — e, no Mato Grosso, qual das
     // duas associações fica com o lead.
     if (!escola) {
@@ -114,6 +115,10 @@ export default function LeadForm({
     dados.nivel = nivel;
     dados.whatsapp = whatsapp;
     dados.utm = lerUtm();
+    // Qual redação a família leu ao aceitar.
+    dados.consentimento = VERSAO_ATUAL.versao;
+    // Como o aceite foi obtido, para o registro dizer a verdade.
+    dados.consentimentoMetodo = "envio";
     setEnviando(true);
     setErro("");
     try {
@@ -154,13 +159,13 @@ export default function LeadForm({
           <div className="grid gap-5">
             <div>
               <h3 className="text-xl font-extrabold tracking-tight text-brand-900">
-                Onde você quer estudar?
+                {regiaoFixa ? "Vamos começar" : "Onde você quer estudar?"}
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Leva menos de um minuto.
               </p>
             </div>
-            <div className="grid gap-2">
+            <div className={cn("grid gap-2", regiaoFixa && "hidden")}>
               <Label>Região*</Label>
               <Select
                 key={estado || "sem-regiao"}
@@ -201,21 +206,7 @@ export default function LeadForm({
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="lead-cidade">Cidade onde vocês moram</Label>
-              <Input
-                id="lead-cidade"
-                name="cidade"
-                value={cidade}
-                onChange={(e) => setCidade(e.target.value)}
-                placeholder="Ex.: Cuiabá"
-                autoComplete="address-level2"
-                maxLength={90}
-                required
-                className="h-12 rounded-xl"
-              />
-            </div>
-            <div className="grid gap-2">
+            <div className={cn("grid gap-2", regiaoFixa && "hidden")}>
               <Label>Escola de interesse</Label>
               <Select
                 value={escola || undefined}
@@ -296,15 +287,23 @@ export default function LeadForm({
                 />
               </div>
             </div>
-            <div className="flex items-start gap-3">
-              <Checkbox id="lead-lgpd" name="lgpd" required className="mt-0.5" />
-              <Label
-                htmlFor="lead-lgpd"
-                className="text-xs font-normal leading-relaxed text-muted-foreground"
+            {/* Aceite pelo envio, acima do botão. O botão é o fim do
+                caminho visual do formulário: o que precisa ser lido vem
+                antes dele. Depois do botão, a pessoa só encontraria o
+                texto depois de já ter consentido. */}
+            <div className="rounded-xl border border-line bg-paper px-4 py-3">
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                Ao enviar, você autoriza o contato da Educação Adventista
+                sobre a matrícula, com os dados que informou.
+              </p>
+              <a
+                href={POLITICA_PRIVACIDADE}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 inline-block text-xs font-semibold text-primary underline-offset-2 hover:underline"
               >
-                Autorizo o contato da Educação Adventista pelos dados informados,
-                conforme a Lei Geral de Proteção de Dados (LGPD).
-              </Label>
+                Política de privacidade
+              </a>
             </div>
             {erro && (
               <p className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">

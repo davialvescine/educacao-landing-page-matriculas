@@ -3,7 +3,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getRede, getRegioesSite } from "@/lib/rede";
-import { INSTAGRAM_OFICIAL } from "@/lib/site";
+import { INSTAGRAM_OFICIAL, POLITICA_PRIVACIDADE } from "@/lib/site";
 
 export default function Footer() {
   const rede = getRede();
@@ -52,6 +52,14 @@ export default function Footer() {
               >
                 IABC · Internato
               </a>
+            </li>
+            <li>
+              <Link
+                href={POLITICA_PRIVACIDADE}
+                className="transition-colors hover:text-primary-foreground"
+              >
+                Política de privacidade
+              </Link>
             </li>
             <li>
               {/* Link visível de propósito: o sameAs pesa mais quando o

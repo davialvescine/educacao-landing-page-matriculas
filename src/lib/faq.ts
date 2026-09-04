@@ -106,3 +106,47 @@ export function perguntasEscola(escola: Escola, estado: Estado): Pergunta[] {
     },
   ];
 }
+
+/**
+ * Perguntas do internato. A família do IABC pesquisa de outro estado e
+ * decide por coisas que a de escola de bairro nem cogita: quanto custa
+ * morar, como é a rotina, com que idade dá para entrar, se dá para
+ * visitar antes.
+ *
+ * Valor, idade mínima e regra de saída não estão na nossa base e mudam
+ * por ano letivo — nenhuma resposta inventa número.
+ */
+export function perguntasIabc(iabc: {
+  nome: string;
+  endereco?: string;
+  telefone?: string;
+}): Pergunta[] {
+  return [
+    {
+      p: "Quanto custa estudar no IABC como interno?",
+      r: "O valor do internato soma a mensalidade escolar e a moradia, que inclui dormitório e alimentação. A tabela muda por série e por ano letivo, então peça contato nesta página: a equipe envia os valores vigentes, as formas de pagamento e as condições de matrícula, sem compromisso.",
+    },
+    {
+      p: "Como é a rotina de um aluno interno?",
+      r: "O aluno vive no campus: estuda, pratica esporte, participa da música e da vida espiritual no mesmo lugar, com horários definidos e acompanhamento de monitores. A rotina detalhada e o calendário de saídas são explicados pela equipe do internato antes da matrícula.",
+    },
+    {
+      p: "Qual a idade mínima para o internato?",
+      r: "O IABC atende da Educação Infantil ao Ensino Médio, mas o regime de internato tem critérios próprios de idade e série. Fale com a equipe para confirmar se a série do seu filho é atendida no internato neste ano letivo.",
+    },
+    {
+      p: "Dá para conhecer o campus antes de decidir?",
+      r: `Sim, e é o que recomendamos. Preencha o formulário desta página para agendar uma visita${iabc.telefone ? ` ou ligue para ${iabc.telefone}` : ""}. A família conhece os dormitórios, as salas, a estrutura de esporte e conversa com quem cuida dos alunos no dia a dia.`,
+    },
+    {
+      p: "Precisa ser adventista para estudar no IABC?",
+      r: "Não. O internato recebe alunos de todas as crenças, com respeito à fé de cada família. A vida espiritual faz parte da rotina do campus, e a proposta é a mesma da rede: ensino de qualidade com valores cristãos.",
+    },
+    {
+      p: "Onde fica o IABC?",
+      r: iabc.endereco
+        ? `${iabc.nome} fica em ${iabc.endereco}. É a razão de muitas famílias de outros estados escolherem o internato: o campus reúne escola e moradia no mesmo lugar.`
+        : `${iabc.nome} fica em Abadiânia, no interior de Goiás, com escola e moradia no mesmo campus.`,
+    },
+  ];
+}

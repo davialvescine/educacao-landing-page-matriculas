@@ -162,7 +162,7 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
         >
           <div className="absolute inset-0">
             <Image
-              src="/imagens/campanha/escola-ciencias.jpg"
+              src="/imagens/iabc/vida-amizade.jpg"
               alt=""
               fill
               sizes="100vw"

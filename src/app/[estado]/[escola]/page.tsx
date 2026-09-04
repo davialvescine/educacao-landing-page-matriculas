@@ -320,7 +320,7 @@ export default async function EscolaPage({
         >
           <div className="absolute inset-0">
             <Image
-              src="/imagens/campanha/escola-ciencias.jpg"
+              src="/imagens/iabc/vida-estudo.jpg"
               alt=""
               fill
               sizes="100vw"

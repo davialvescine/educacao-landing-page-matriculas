@@ -8,6 +8,11 @@ import { slugificar } from "@/lib/site";
 import { salvarLead, type LeadNovo } from "@/lib/leads";
 import { enviarLeadWebhook } from "@/lib/webhook";
 import { enviarConfirmacaoLead, type EscolaEmail } from "@/lib/email";
+import { getVersao } from "@/lib/consentimento";
+import {
+  ipDaRequisicao,
+  registrarConsentimento,
+} from "@/lib/consentimento-registro";
 
 export const runtime = "nodejs";
 
@@ -84,17 +89,20 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
-  if (!lead.cidade) {
-    return NextResponse.json(
-      { erro: "Informe a sua cidade." },
-      { status: 400 },
-    );
-  }
   // A escola é o que diz qual equipe atende a família — e, no Mato Grosso,
   // qual das duas associações fica com o lead.
   if (!lead.escola) {
     return NextResponse.json(
       { erro: "Escolha a escola de interesse." },
+      { status: 400 },
+    );
+  }
+  // Sem consentimento válido não há base legal para tratar o dado: o
+  // pedido para na porta, em vez de gravar um lead que não pode ser usado.
+  const versaoConsentimento = limpar(body.consentimento, 20);
+  if (!getVersao(versaoConsentimento)) {
+    return NextResponse.json(
+      { erro: "É preciso aceitar o uso dos dados para continuar." },
       { status: 400 },
     );
   }
@@ -133,6 +141,16 @@ export async function POST(req: Request) {
       { status: 500 },
     );
   }
+
+  // A prova do aceite é gravada junto do lead, não depois do envio: se o
+  // CRM cair, o consentimento continua registrado.
+  await registrarConsentimento({
+    leadId: id,
+    versao: versaoConsentimento,
+    ip: ipDaRequisicao(req),
+    agente: req.headers.get("user-agent") ?? "",
+    metodo: body.consentimentoMetodo === "caixa" ? "caixa" : "envio",
+  }).catch((e: unknown) => console.error("[leads] consentimento não registrado:", e));
 
   // Dispara para o sistema externo depois de salvar: lead nunca se perde.
   await enviarLeadWebhook(id, lead);

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { listarLeads, resumoLeads } from "@/lib/leads";
+import { getConsentimento } from "@/lib/consentimento-registro";
 import { getEstados } from "@/lib/rede";
 import {
   autenticacaoConfigurada,
@@ -66,9 +67,20 @@ export default async function PainelPage({ searchParams }: Props) {
     resumoLeads(permitidas),
   ]);
 
+  // A prova de consentimento de cada lead na tela, para a coordenação
+  // conseguir responder na hora se alguém questionar.
+  const consentimentos = Object.fromEntries(
+    (
+      await Promise.all(
+        leads.slice(0, 200).map(async (l) => [l.id, await getConsentimento(l.id)] as const),
+      )
+    ).filter(([, c]) => c),
+  );
+
   return (
     <PainelLeads
       leads={leads}
+      consentimentos={consentimentos}
       resumo={resumo}
       regioes={regioesVisiveis}
       filtroRegiao={regiao ?? ""}
