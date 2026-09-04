@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { VERSAO_ATUAL } from "@/lib/consentimento";
 import {
   Select,
   SelectContent,
@@ -119,6 +120,8 @@ export default function LeadForm({
     dados.nivel = nivel;
     dados.whatsapp = whatsapp;
     dados.utm = lerUtm();
+    // Qual redação a família leu ao aceitar.
+    dados.consentimento = VERSAO_ATUAL.versao;
     setEnviando(true);
     setErro("");
     try {
@@ -303,13 +306,23 @@ export default function LeadForm({
             </div>
             <div className="flex items-start gap-3">
               <Checkbox id="lead-lgpd" name="lgpd" required className="mt-0.5" />
-              <Label
-                htmlFor="lead-lgpd"
-                className="text-xs font-normal leading-relaxed text-muted-foreground"
-              >
-                Autorizo o contato da Educação Adventista pelos dados informados,
-                conforme a Lei Geral de Proteção de Dados (LGPD).
-              </Label>
+              <div className="grid gap-1">
+                <Label
+                  htmlFor="lead-lgpd"
+                  className="text-xs font-normal leading-relaxed text-muted-foreground"
+                >
+                  {VERSAO_ATUAL.resumo}
+                </Label>
+                {/* O texto completo fica a um clique, não escondido atrás
+                    de link para outra página: é ele que vai registrado, e
+                    a lei exige que a pessoa tenha podido lê-lo. */}
+                <details className="text-xs text-muted-foreground">
+                  <summary className="cursor-pointer font-semibold text-primary underline-offset-2 hover:underline">
+                    Ler o texto completo
+                  </summary>
+                  <p className="mt-2 leading-relaxed">{VERSAO_ATUAL.texto}</p>
+                </details>
+              </div>
             </div>
             {erro && (
               <p className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">

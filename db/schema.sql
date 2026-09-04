@@ -83,3 +83,28 @@ CREATE TABLE IF NOT EXISTS regioes_config (
   atualizado_em   timestamptz NOT NULL DEFAULT now(),
   atualizado_por  text NOT NULL DEFAULT ''
 );
+
+-- ============================================================
+-- Prova de consentimento (LGPD art. 8º §2º: o ônus é do controlador).
+--
+-- Tabela própria, e não colunas em leads, por dois motivos: a prova
+-- precisa sobreviver à anonimização do lead quando o ciclo encerrar, e
+-- registro de consentimento não se atualiza — cada aceite é uma linha
+-- nova, imutável.
+--
+-- Guarda a VERSÃO do texto e o resumo criptográfico dele: a versão diz
+-- qual redação a família leu, o resumo prova que aquela redação não foi
+-- alterada depois.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS consentimentos (
+  id          bigserial PRIMARY KEY,
+  lead_id     uuid NOT NULL,
+  versao      text NOT NULL,          -- ex.: 2026-09-1
+  texto_hash  text NOT NULL,          -- sha256 do texto exibido
+  aceito_em   timestamptz NOT NULL DEFAULT now(),
+  ip          text NOT NULL DEFAULT '',
+  agente      text NOT NULL DEFAULT ''
+);
+
+CREATE INDEX IF NOT EXISTS consentimentos_lead_idx ON consentimentos (lead_id);
+CREATE INDEX IF NOT EXISTS consentimentos_versao_idx ON consentimentos (versao);

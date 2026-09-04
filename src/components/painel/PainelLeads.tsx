@@ -25,6 +25,11 @@ import type { LeadRegistro, ResumoLeads } from "@/lib/leads";
 
 interface Props {
   leads: LeadRegistro[];
+  /** Prova de consentimento por lead, quando existir. */
+  consentimentos: Record<
+    string,
+    { versao: string; texto: string; aceito_em: string; ip: string; intacto: boolean } | null
+  >;
   resumo: ResumoLeads;
   regioes: { slug: string; nome: string }[];
   filtroRegiao: string;
@@ -110,6 +115,7 @@ function BadgeAtendimento({ status }: { status: string }) {
 
 export default function PainelLeads({
   leads,
+  consentimentos,
   resumo,
   regioes,
   filtroRegiao,
@@ -551,6 +557,39 @@ export default function PainelLeads({
                 </dt>
                 <dd className="mt-1 font-medium text-brand-950">
                   {selecionado.escola || "—"}
+                </dd>
+              </div>
+              <div className="sm:col-span-2">
+                <dt className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  Consentimento
+                </dt>
+                <dd className="mt-1 text-sm text-brand-950">
+                  {(() => {
+                    const c = consentimentos[selecionado.id];
+                    if (!c)
+                      return (
+                        <span className="text-muted-foreground">
+                          Sem registro. Lead anterior ao registro de aceite.
+                        </span>
+                      );
+                    return (
+                      <div className="rounded-xl border border-line bg-paper p-3">
+                        <p className="font-medium">
+                          Aceito em {formatarData(c.aceito_em)} · versão {c.versao}
+                          {c.ip ? ` · ${c.ip}` : ""}
+                        </p>
+                        {!c.intacto && (
+                          <p className="mt-1 font-bold text-destructive">
+                            O texto desta versão mudou depois do aceite: a prova
+                            não confere.
+                          </p>
+                        )}
+                        <p className="mt-2 leading-relaxed text-muted-foreground">
+                          {c.texto}
+                        </p>
+                      </div>
+                    );
+                  })()}
                 </dd>
               </div>
               <div>
