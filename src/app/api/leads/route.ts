@@ -11,7 +11,7 @@ import { enviarConfirmacaoLead, type EscolaEmail } from "@/lib/email";
 import { getVersao } from "@/lib/consentimento";
 import { registrarConsentimento } from "@/lib/consentimento-registro";
 import { agenteDaRequisicao, ipDaRequisicao } from "@/lib/requisicao";
-import { permitido, repetido } from "@/lib/limite";
+import { chaveDoPedido, lembrar, permitido, repetido } from "@/lib/limite";
 
 export const runtime = "nodejs";
 
@@ -97,13 +97,7 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
-  // Clique duplo, reenvio do outro portal ou "não sei se foi": o mesmo
-  // telefone em poucos minutos é a mesma família. Responde como sucesso —
-  // para ela, foi — sem criar a segunda linha nem o segundo contato no
-  // CRM, que renderia dois "olá" da mesma escola.
-  if (repetido(lead.whatsapp)) {
-    return NextResponse.json({ ok: true, repetido: true });
-  }
+
   // A escola é o que diz qual equipe atende a família — e, no Mato Grosso,
   // qual das duas associações fica com o lead.
   if (!lead.escola) {
@@ -146,9 +140,22 @@ export async function POST(req: Request) {
     );
   }
 
+  // Deduplicação SÓ aqui, com tudo validado: clique duplo, reenvio do
+  // outro portal ou "não sei se foi" é o mesmo pedido duas vezes em
+  // poucos minutos. Responde como sucesso — para a família, foi — sem
+  // criar a segunda linha nem o segundo contato no CRM. A chave inclui
+  // nome e série: dois filhos no mesmo telefone são dois pedidos.
+  const chave = chaveDoPedido(lead);
+  if (repetido(chave)) {
+    return NextResponse.json({ ok: true, repetido: true });
+  }
+
   let id: string;
   try {
     id = await salvarLead(lead);
+    // Marcar só depois de gravar: marcar antes fazia um reenvio depois
+    // de falha ganhar "sucesso" falso, e o lead sumia.
+    lembrar(chave);
   } catch (e) {
     console.error("[leads] falha ao salvar:", e);
     return NextResponse.json(

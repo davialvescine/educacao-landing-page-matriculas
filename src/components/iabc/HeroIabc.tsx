@@ -42,16 +42,24 @@ export default function HeroIabc({
   const fundo = useRef<HTMLDivElement>(null);
   const [atual, setAtual] = useState(0);
   const anterior = useRef(0);
+  /** O quadro que estava no ar antes deste, para ficar por baixo durante
+   *  o deslize. Estado (e não ref) porque o render precisa dele. */
+  const [porBaixo, setPorBaixo] = useState(0);
 
+  const [pausado, setPausado] = useState(false);
+
+  // Depende de `atual` de propósito: cada troca — automática ou por
+  // clique — reinicia a contagem. Sem isso, um clique aos 5,1 segundos
+  // era desfeito pela troca automática 0,1 segundo depois.
   useEffect(() => {
-    if (quadros.length < 2) return;
+    if (quadros.length < 2 || pausado) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const t = setInterval(
       () => setAtual((i) => (i + 1) % quadros.length),
       TROCA,
     );
     return () => clearInterval(t);
-  }, [quadros.length]);
+  }, [quadros.length, atual, pausado]);
 
   // A foto anda para o lado, não pisca.
   //
@@ -70,6 +78,11 @@ export default function HeroIabc({
     const sai = caixa.querySelector<HTMLElement>(
       `[data-quadro="${anterior.current}"]`,
     );
+    // Atualiza AGORA, antes de qualquer saída: a primeira versão nunca
+    // atualizava, e a animação tratava o quadro 0 como "anterior" para
+    // sempre — na volta a ele, entra === sai e a transição nem rodava.
+    setPorBaixo(anterior.current);
+    anterior.current = atual;
     if (!entra || entra === sai) return;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -182,7 +195,7 @@ export default function HeroIabc({
               // Ninguém some: a foto que sai continua no ar por baixo da
               // cortina. Apagar a de baixo é o que deixava o fundo da
               // seção aparecer por um instante, e era isso que piscava.
-              zIndex: i === atual ? 3 : i === anterior.current ? 2 : 1,
+              zIndex: i === atual ? 3 : i === porBaixo ? 2 : 1,
             }}
           >
             <Image
@@ -215,8 +228,17 @@ export default function HeroIabc({
         {/* Rodapé da capa: onde estamos na sequência de fotos, e a pista
             de que a página continua. Sem o contador, a troca de foto
             parecia acidente; com ele, parece intenção. */}
-        <div className="hero-entra mt-12 flex items-center justify-between text-white/70">
-          <div className="flex items-center gap-3">
+        <div
+          className="hero-entra mt-12 flex items-center justify-between text-white/70"
+          // Parar de trocar enquanto a pessoa está nos controles: conteúdo
+          // que gira sozinho precisa de um jeito de parar, e este é o
+          // menos intrusivo — passou o mouse, parou.
+          onMouseEnter={() => setPausado(true)}
+          onMouseLeave={() => setPausado(false)}
+          onFocus={() => setPausado(true)}
+          onBlur={() => setPausado(false)}
+        >
+          <div className="flex items-center gap-1">
             {quadros.map((q, i) => (
               <button
                 key={q.src}
@@ -224,10 +246,15 @@ export default function HeroIabc({
                 aria-label={`Foto ${i + 1}: ${q.alt}`}
                 aria-current={i === atual}
                 onClick={() => setAtual(i)}
-                className={`h-1 rounded-full transition-all duration-500 ${
-                  i === atual ? "w-10 bg-gold-400" : "w-4 bg-white/35 hover:bg-white/60"
-                }`}
-              />
+                // Alvo de toque de 44px; a barrinha de 4px é só o desenho.
+                className="group flex h-11 items-center px-1"
+              >
+                <span
+                  className={`block h-1 rounded-full transition-all duration-500 ${
+                    i === atual ? "w-10 bg-gold-400" : "w-4 bg-white/35 group-hover:bg-white/60"
+                  }`}
+                />
+              </button>
             ))}
             <span className="ml-2 text-xs font-bold tabular-nums tracking-widest">
               {String(atual + 1).padStart(2, "0")} / {String(quadros.length).padStart(2, "0")}

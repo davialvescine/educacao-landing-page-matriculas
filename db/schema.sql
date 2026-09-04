@@ -212,13 +212,22 @@ CREATE INDEX IF NOT EXISTS consentimentos_versao_idx ON consentimentos (versao);
 -- tem tipo próprio, para não ser confundido com o oficial do fechamento.
 -- ============================================================
 CREATE TABLE IF NOT EXISTS relatorios_enviados (
-  ano         int  NOT NULL,
-  mes         int  NOT NULL,
-  usuario_id  text NOT NULL,
-  tipo        text NOT NULL DEFAULT 'oficial',  -- oficial | teste
-  enviado_em  timestamptz NOT NULL DEFAULT now(),
+  ano             int  NOT NULL,
+  mes             int  NOT NULL,
+  usuario_id      text NOT NULL,
+  tipo            text NOT NULL DEFAULT 'oficial',  -- oficial | teste
+  -- Duas fases. A reivindicação entra com enviado_em NULO; o envio bem
+  -- sucedido preenche. Linha reivindicada há mais de 15 minutos e ainda
+  -- sem envio é um processo que caiu no meio — pode ser retomada. Sem
+  -- isso, a queda deixava o destinatário marcado como "enviado" para
+  -- sempre.
+  reivindicado_em timestamptz NOT NULL DEFAULT now(),
+  enviado_em      timestamptz,
   PRIMARY KEY (ano, mes, usuario_id, tipo)
 );
+ALTER TABLE relatorios_enviados ADD COLUMN IF NOT EXISTS reivindicado_em timestamptz NOT NULL DEFAULT now();
+ALTER TABLE relatorios_enviados ALTER COLUMN enviado_em DROP NOT NULL;
+ALTER TABLE relatorios_enviados ALTER COLUMN enviado_em DROP DEFAULT;
 
 -- Dono do lead saiu do sistema (o atendimento é conduzido no Sevenbee).
 -- Banco que chegou a receber as colunas fica limpo também.

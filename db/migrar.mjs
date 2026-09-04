@@ -113,6 +113,7 @@ const EXIGE_COLUNA = [
   "acessos.ip",
   "acessos.agente",
   "consentimentos.metodo",
+  "relatorios_enviados.reivindicado_em",
 ];
 
 // Índice, gatilho e função também envelhecem: a checagem só de tabela e

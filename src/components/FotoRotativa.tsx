@@ -38,11 +38,20 @@ export default function FotoRotativa({ fotos }: { fotos: FotoAluno[] }) {
 
   useEffect(() => {
     if (fotos.length < 2) return;
-    const inicial = Math.floor(Date.now() / 60_000) % fotos.length;
-    anterior.current = inicial;
-    setAtiva(inicial);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = setInterval(() => setAtiva((a) => (a + 1) % fotos.length), TROCA);
+    // Começa sempre na foto 0, que é a que veio no HTML com prioridade:
+    // trocar logo na hidratação jogava fora o candidato a LCP e fazia a
+    // capa piscar na entrada. A variedade fica para a PRÓXIMA troca, que
+    // parte de um ponto diferente a cada visita.
+    const salto = 1 + (Math.floor(Date.now() / 60_000) % (fotos.length - 1));
+    let primeira = true;
+    const id = setInterval(() => {
+      setAtiva((a) => {
+        const proxima = primeira ? salto : (a + 1) % fotos.length;
+        primeira = false;
+        return proxima;
+      });
+    }, TROCA);
     return () => clearInterval(id);
   }, [fotos.length]);
 

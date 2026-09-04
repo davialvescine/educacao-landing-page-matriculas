@@ -64,6 +64,15 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR" className={cn("h-full antialiased font-sans", jakarta.variable)}>
+      {/* Marca "há JS" antes da primeira pintura, para o CSS poder esconder
+          o que a revelação por rolagem vai mostrar. Sem JS a classe não
+          existe e tudo aparece. Inline e minúsculo de propósito: se fosse
+          um módulo, a página pintaria antes dele rodar. */}
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }}
+        />
+      </head>
       <body className="min-h-full flex flex-col font-sans">
         {children}
         <CapturaUtm />

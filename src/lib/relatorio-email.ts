@@ -135,20 +135,29 @@ export function montarCorpo(dados: Relatorio, nome: string, painelUrl: string): 
         <td style="padding:18px 32px 0">
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
             <tr>
-              <td width="50%" valign="top" style="padding-right:6px">
+              <td width="33%" valign="top" style="padding-right:6px">
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
                        style="border:1px solid ${FIO};border-radius:12px">
-                  <tr><td style="padding:14px 16px">
-                    <p style="margin:0;font:800 10.5px/1.4 ${FONTE};letter-spacing:.15em;text-transform:uppercase;color:${OURO_TEXTO}">Atendidas</p>
+                  <tr><td style="padding:14px 12px">
+                    <p style="margin:0;font:800 10px/1.4 ${FONTE};letter-spacing:.12em;text-transform:uppercase;color:${OURO_TEXTO}">Atendidas</p>
                     <p style="margin:2px 0 0;font:800 26px/1.1 ${FONTE};color:${NAVY}">${dados.atendidos}</p>
                   </td></tr>
                 </table>
               </td>
-              <td width="50%" valign="top" style="padding-left:6px">
+              <td width="34%" valign="top" style="padding:0 3px">
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
                        style="border:1px solid ${FIO};border-radius:12px">
-                  <tr><td style="padding:14px 16px">
-                    <p style="margin:0;font:800 10.5px/1.4 ${FONTE};letter-spacing:.15em;text-transform:uppercase;color:${OURO_TEXTO}">Aguardando</p>
+                  <tr><td style="padding:14px 12px">
+                    <p style="margin:0;font:800 10px/1.4 ${FONTE};letter-spacing:.12em;text-transform:uppercase;color:${OURO_TEXTO}">Em atendimento</p>
+                    <p style="margin:2px 0 0;font:800 26px/1.1 ${FONTE};color:${NAVY}">${dados.emAtendimento}</p>
+                  </td></tr>
+                </table>
+              </td>
+              <td width="33%" valign="top" style="padding-left:6px">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+                       style="border:1px solid ${FIO};border-radius:12px">
+                  <tr><td style="padding:14px 12px">
+                    <p style="margin:0;font:800 10px/1.4 ${FONTE};letter-spacing:.12em;text-transform:uppercase;color:${OURO_TEXTO}">Aguardando</p>
                     <p style="margin:2px 0 0;font:800 26px/1.1 ${FONTE};color:${NAVY}">${dados.aguardando}</p>
                   </td></tr>
                 </table>
@@ -201,13 +210,36 @@ function montarTexto(dados: Relatorio, nome: string, painelUrl: string): string 
     "",
     `Matrículas em ${dados.rotulo}`,
     `Famílias que pediram contato: ${dados.total}`,
-    `Atendidas: ${dados.atendidos} · Aguardando: ${dados.aguardando}`,
+    `Atendidas: ${dados.atendidos} · Em atendimento: ${dados.emAtendimento} · Aguardando: ${dados.aguardando}`,
     "",
     "Por região:",
     linhas,
     "",
     `A lista de famílias está no painel: ${painelUrl}`,
   ].join("\n");
+}
+
+/**
+ * Há alguém que ainda não recebeu o oficial deste mês? É o que o cron
+ * diário consulta: enquanto houver, ele tenta; quando zerar, para. Assim
+ * uma falha parcial no dia 1 é retomada no dia 2 sem ninguém intervir.
+ */
+export async function haPendentes(ano: number, mes: number): Promise<boolean> {
+  const db = getPool();
+  if (!db) return false;
+  const { rows } = await db.query(
+    `SELECT 1
+       FROM "user" u
+      WHERE u.banned IS NOT TRUE AND u.email <> ''
+        AND (u.role = 'admin' OR jsonb_array_length(coalesce(u.regioes, '[]'::jsonb)) > 0)
+        AND NOT EXISTS (
+          SELECT 1 FROM relatorios_enviados r
+           WHERE r.ano = $1 AND r.mes = $2 AND r.usuario_id = u.id
+             AND r.tipo = 'oficial' AND r.enviado_em IS NOT NULL)
+      LIMIT 1`,
+    [ano, mes],
+  );
+  return rows.length > 0;
 }
 
 export interface ResultadoEnvio {
@@ -270,25 +302,33 @@ export async function enviarRelatorioMensal(opcoes: {
       continue;
     }
 
-    // Reivindica antes de montar qualquer coisa: quem perder esta
-    // inserção (outra execução chegou primeiro, ou já foi enviado) pula.
+    // Reivindica antes de montar qualquer coisa. A linha entra SEM
+    // enviado_em; só o envio bem-sucedido preenche. Quem perder a
+    // inserção pula — a não ser que a linha seja uma reivindicação
+    // velha sem envio (processo que caiu no meio), que é retomada.
     const { rowCount } = await db.query(
       `INSERT INTO relatorios_enviados (ano, mes, usuario_id, tipo)
        VALUES ($1, $2, $3, $4)
-       ON CONFLICT DO NOTHING`,
+       ON CONFLICT (ano, mes, usuario_id, tipo) DO UPDATE
+         SET reivindicado_em = now()
+       WHERE relatorios_enviados.enviado_em IS NULL
+         AND relatorios_enviados.reivindicado_em < now() - interval '15 minutes'`,
       [opcoes.ano, opcoes.mes, p.id, tipo],
     );
     if (!rowCount) {
       resultado.pulados += 1;
-      resultado.detalhes.push(`${p.email}: já enviado`);
+      resultado.detalhes.push(`${p.email}: já enviado ou em andamento`);
       continue;
     }
 
+    // Falha solta a vez na hora. Se este DELETE falhar, a linha fica sem
+    // enviado_em e vence em 15 minutos — a próxima rodada retoma.
     const desfazer = () =>
       db
         .query(
           `DELETE FROM relatorios_enviados
-            WHERE ano = $1 AND mes = $2 AND usuario_id = $3 AND tipo = $4`,
+            WHERE ano = $1 AND mes = $2 AND usuario_id = $3 AND tipo = $4
+              AND enviado_em IS NULL`,
           [opcoes.ano, opcoes.mes, p.id, tipo],
         )
         .catch(() => {});
@@ -316,6 +356,11 @@ export async function enviarRelatorioMensal(opcoes: {
     }).catch(() => false);
 
     if (ok) {
+      await db.query(
+        `UPDATE relatorios_enviados SET enviado_em = now()
+          WHERE ano = $1 AND mes = $2 AND usuario_id = $3 AND tipo = $4`,
+        [opcoes.ano, opcoes.mes, p.id, tipo],
+      );
       resultado.enviados += 1;
       await registrarAcesso("relatorio_enviado", {
         usuarioId: p.id,

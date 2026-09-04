@@ -80,14 +80,15 @@ curl -fsS -X POST -H "Authorization: Bearer $CRON_SEGREDO" \
      "https://<dominio>/api/tarefas/relatorio-mensal"
 ```
 
-O segredo vai no cabeçalho, não na URL: URL fica em histórico de shell e
-em log de acesso. `-f` importa — a rota devolve 500 quando nenhum envio
-sai e 207 quando parte falha, e é isso que o monitor do Coolify enxerga.
+O segredo vai **só** no cabeçalho: URL fica em histórico de shell e em
+log de acesso.
 
-A segunda roda **todo dia** de propósito. Ela mesma confere se hoje é o
-primeiro dia útil e se aquele mês já foi enviado — o registro fica na
-trilha de auditoria. Agendar só para o dia 1 perderia o mês inteiro se o
-servidor estivesse fora naquele dia.
+A segunda roda **todo dia** de propósito. A regra dela não é "hoje é o
+dia X": é "há alguém sem o oficial deste mês, e estamos entre o primeiro
+dia útil e o dia 7". Servidor fora no dia 1, sai no dia 2; dez de vinte
+falharam, os dez saem no dia seguinte; todo mundo recebeu, ela não faz
+nada até o mês que vem. Qualquer falha responde **500** — é o que o
+`-f` do curl e o monitor do Coolify enxergam.
 
 Para conferir o layout antes do primeiro fechamento, sem esperar a data
 e **sem consumir a vez oficial** de ninguém:
