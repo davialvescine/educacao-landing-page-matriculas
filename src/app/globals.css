@@ -157,33 +157,29 @@ body {
 .anim-glow     { animation: glow-pulse 7s ease-in-out infinite; }
 .anim-bounce   { animation: bounce-soft 2.2s ease-in-out infinite; }
 .anim-marquee  { animation: marquee 42s linear infinite; }
-/* O contêiner é mascarado pela própria arte (--mascara), então a luz do
-   ::after só aparece sobre as letras e termina na borda delas. Sem a
-   variável, cai no comportamento antigo: recorte retangular. */
-.brilho-letras {
-  position: relative;
-  overflow: hidden;
+/* Luz que varre o lettering da capa. Camada por cima da arte, com a
+   própria arte como máscara: a luz só existe onde há letra. O que anda é
+   a posição do gradiente, não a caixa — assim não há borda nenhuma para
+   aparecer. Se o navegador não aplicar a máscara, some só a luz; a arte
+   embaixo continua intacta. */
+.luz-lettering {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
   -webkit-mask-image: var(--mascara, none);
   mask-image: var(--mascara, none);
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
+  background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, 0.5) 50%, transparent 65%);
+  background-size: 300% 100%;
+  background-repeat: no-repeat;
+  animation: luz-lettering 7s ease-in-out infinite;
 }
-.brilho-letras::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 32%;
-  transform: translateX(-260%) skewX(-18deg);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.38), transparent);
-  animation: brilho-letras 7s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes brilho-letras {
-  0%        { transform: translateX(-260%) skewX(-18deg); }
-  45%, 100% { transform: translateX(460%) skewX(-18deg); }
+@keyframes luz-lettering {
+  0%        { background-position: 150% 0; }
+  45%, 100% { background-position: -150% 0; }
 }
 
 @keyframes varredura {
@@ -318,7 +314,7 @@ a:focus-visible .estado-topo { transform: translateY(-16px); }
 
 @media (prefers-reduced-motion: reduce) {
   .anim-kenburns, .anim-float, .anim-glow, .anim-bounce, .anim-marquee, .anim-chip, .pin-pulso, .anim-aurora, .anim-esteira, .anim-esteira-rev, .anim-orbita, .anim-orbita-rev, .anim-varredura, .ponto-digitando, .anim-zoom-lento, .anim-flutuar, .anim-respiro { animation: none; }
-  .brilho-letras::after { animation: none; opacity: 0; }
+  .luz-lettering { animation: none; opacity: 0; }
   .tarja::before { transform: scaleX(1); transition: none; }
   .hero-enter, .hero-pop { animation: none; opacity: 1; }
   .reveal { opacity: 1; transform: none; transition: none; }

@@ -45,23 +45,15 @@ export default function Hero({
           className="object-cover"
         />
       </div>
-      {/* Brilho pulsante.
-          A imagem é um retângulo, e sobre o amarelo a borda dela aparecia
-          como um quadrado mais claro atrás do título. A máscara radial
-          apaga as bordas antes de a luz chegar nelas, e o blend em screen
-          faz o brilho somar à cor de fundo em vez de cobri-la. */}
+      {/* Brilho pulsante, em CSS.
+          Era uma imagem de 495 KB cuja borda aparecia como um quadrado
+          mais claro sobre o amarelo. Um gradiente radial não tem borda,
+          não pesa nada e o blend em screen faz a luz somar à cor de
+          fundo em vez de cobri-la. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-32 top-1/4 -z-10 opacity-70 mix-blend-screen [mask-image:radial-gradient(closest-side,#000_35%,transparent_100%)]"
-      >
-        <Image
-          src="/imagens/campanha/brilho.webp"
-          alt=""
-          width={900}
-          height={790}
-          className="w-[42rem] max-w-none"
-        />
-      </div>
+        className="anim-glow pointer-events-none absolute -left-32 top-1/4 -z-10 size-[42rem] rounded-full opacity-80 mix-blend-screen [background:radial-gradient(closest-side,rgba(255,255,255,0.7),rgba(255,240,200,0.25)_45%,transparent_72%)]"
+      />
 
       <div className="mx-auto max-w-7xl px-4 pt-20">
         <div className="grid items-end gap-x-8 lg:min-h-[600px] lg:grid-cols-12 xl:min-h-[660px]">

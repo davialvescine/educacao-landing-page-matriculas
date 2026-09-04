@@ -35,6 +35,15 @@ export default function FotoRotativa({ fotos }: { fotos: FotoAluno[] }) {
   const caixa = useRef<HTMLDivElement>(null);
   const [ativa, setAtiva] = useState(0);
   const anterior = useRef(0);
+  // As outras fotos só entram no DOM depois da primeira pintura. São
+  // seis recortes de 300 a 700 KB cada; no HTML inicial, todos disputavam
+  // a banda com a foto que a pessoa realmente vê. Como ficam por baixo,
+  // ninguém nota que chegaram um segundo depois.
+  const [demais, setDemais] = useState(false);
+  useEffect(() => {
+    const t = window.setTimeout(() => setDemais(true), 1500);
+    return () => window.clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     if (fotos.length < 2) return;
@@ -99,7 +108,7 @@ export default function FotoRotativa({ fotos }: { fotos: FotoAluno[] }) {
       // deslocamento, não máscara, então não depende do recorte.
       className="relative flex h-[440px] w-full items-end justify-center sm:h-[520px] lg:h-[620px] xl:h-[680px]"
     >
-      {fotos.map((f, i) => (
+      {fotos.map((f, i) => (i === 0 || demais) && (
         <div
           key={f.src}
           data-foto={i}

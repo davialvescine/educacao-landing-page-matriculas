@@ -92,32 +92,33 @@ export default async function Home() {
             Educando gerações com valores pra vida. Educação Adventista
             Centro-Oeste
           </h1>
-          {/* A luz que passa sobre o lettering é recortada pela PRÓPRIA
-              arte (máscara com a mesma imagem): ela só existe onde há
-              letra, e o varrido termina na borda da letra, não num
-              retângulo. A sombra fica no pai porque a máscara cortaria
-              qualquer sombra desenhada dentro dela. */}
+          {/* A luz que passa sobre o lettering é uma camada à parte,
+              por cima da arte e recortada pela PRÓPRIA arte (máscara com
+              a mesma imagem): só existe onde há letra, e termina na borda
+              da letra, não num retângulo. A arte em si nunca é mascarada —
+              a versão que mascarava o contêiner apagava o lettering
+              inteiro no Chrome. Se a máscara falhar, some só a luz. */}
           <div
-            className="hero-pop w-full max-w-2xl drop-shadow-[0_10px_24px_rgba(120,60,0,0.18)]"
+            className="hero-pop relative w-full max-w-2xl drop-shadow-[0_10px_24px_rgba(120,60,0,0.18)]"
             style={{ "--delay": "0.18s" } as React.CSSProperties}
           >
-            <div
-              className="brilho-letras w-full"
+            <Image
+              src="/imagens/campanha/slogan-valores.webp"
+              alt="Educando gerações com valores pra vida"
+              width={2000}
+              height={900}
+              priority
+              className="h-auto w-full"
+            />
+            <span
+              aria-hidden
+              className="luz-lettering"
               style={
                 {
                   "--mascara": "url(/imagens/campanha/slogan-valores.webp)",
                 } as React.CSSProperties
               }
-            >
-              <Image
-                src="/imagens/campanha/slogan-valores.webp"
-                alt="Educando gerações com valores pra vida"
-                width={2000}
-                height={900}
-                priority
-                className="h-auto w-full"
-              />
-            </div>
+            />
           </div>
           <p
             className="hero-enter max-w-xl text-lg font-medium leading-relaxed text-brand-950/80"

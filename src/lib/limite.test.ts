@@ -37,14 +37,20 @@ describe("permitido", () => {
 
 describe("chaveDoPedido", () => {
   it("normaliza o telefone: formatação e DDI 55 não mudam a chave", () => {
-    const a = chaveDoPedido({ whatsapp: "(62) 99999-0000", nome: "Ana", nivel: "Ensino Médio" });
-    const b = chaveDoPedido({ whatsapp: "+55 62 99999 0000", nome: "ana ", nivel: "ensino médio" });
+    const a = chaveDoPedido({ whatsapp: "(62) 99999-0000", nome: "Ana", nivel: "Ensino Médio", escola: "X" });
+    const b = chaveDoPedido({ whatsapp: "+55 62 99999 0000", nome: "ana ", nivel: "ensino médio", escola: "x" });
     expect(a).toBe(b);
   });
 
   it("dois filhos com o mesmo telefone são dois pedidos", () => {
-    const a = chaveDoPedido({ whatsapp: "62999990000", nome: "Ana", nivel: "Ensino Médio" });
-    const b = chaveDoPedido({ whatsapp: "62999990000", nome: "Ana", nivel: "Educação Infantil" });
+    const a = chaveDoPedido({ whatsapp: "62999990000", nome: "Ana", nivel: "Ensino Médio", escola: "X" });
+    const b = chaveDoPedido({ whatsapp: "62999990000", nome: "Ana", nivel: "Educação Infantil", escola: "X" });
+    expect(a).not.toBe(b);
+  });
+
+  it("o mesmo filho pedido para duas escolas são dois pedidos", () => {
+    const a = chaveDoPedido({ whatsapp: "62999990000", nome: "Ana", nivel: "EM", escola: "Águas Claras" });
+    const b = chaveDoPedido({ whatsapp: "62999990000", nome: "Ana", nivel: "EM", escola: "Taguatinga" });
     expect(a).not.toBe(b);
   });
 });
@@ -52,7 +58,7 @@ describe("chaveDoPedido", () => {
 describe("repetido / lembrar", () => {
   it("só é repetido depois de LEMBRADO — validar e falhar não conta", () => {
     const t = 1_000_000;
-    const chave = chaveDoPedido({ whatsapp: "62999990000", nome: "Ana", nivel: "EM" });
+    const chave = chaveDoPedido({ whatsapp: "62999990000", nome: "Ana", nivel: "EM", escola: "X" });
     expect(repetido(chave, t)).toBe(false);
     expect(repetido(chave, t + 1000)).toBe(false); // ainda não gravou
     lembrar(chave, t + 1000);
@@ -61,13 +67,13 @@ describe("repetido / lembrar", () => {
 
   it("depois da janela, pode de novo", () => {
     const t = 1_000_000;
-    const chave = chaveDoPedido({ whatsapp: "62999990000", nome: "Ana", nivel: "EM" });
+    const chave = chaveDoPedido({ whatsapp: "62999990000", nome: "Ana", nivel: "EM", escola: "X" });
     lembrar(chave, t);
     expect(repetido(chave, t + 3 * 60_000)).toBe(false);
   });
 
   it("telefone vazio nunca é repetido: a validação de campo cuida disso", () => {
-    const chave = chaveDoPedido({ whatsapp: "", nome: "x", nivel: "y" });
+    const chave = chaveDoPedido({ whatsapp: "", nome: "x", nivel: "y", escola: "z" });
     lembrar(chave, 1);
     expect(repetido(chave, 2)).toBe(false);
   });

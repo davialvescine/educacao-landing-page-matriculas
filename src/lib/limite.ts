@@ -86,11 +86,18 @@ export function permitido(ip: string, agora = Date.now()): boolean {
 
 /** Chave de deduplicação: telefone só dígitos (sem o 55), nome e série
  *  normalizados. Exportada para o teste conferir a normalização. */
-export function chaveDoPedido(p: { whatsapp: string; nome: string; nivel: string }): string {
+export function chaveDoPedido(p: {
+  whatsapp: string;
+  nome: string;
+  nivel: string;
+  escola: string;
+}): string {
   let tel = p.whatsapp.replace(/\D/g, "");
   if (tel.startsWith("55") && tel.length >= 12) tel = tel.slice(2);
   const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, " ");
-  return `${tel}|${norm(p.nome)}|${norm(p.nivel)}`;
+  // A escola entra na chave: mesmo filho pedido para duas escolas em
+  // dois minutos é a família comparando, e são dois pedidos legítimos.
+  return `${tel}|${norm(p.nome)}|${norm(p.nivel)}|${norm(p.escola)}`;
 }
 
 /** Verdadeiro se este mesmo pedido acabou de ser GRAVADO. Só consulta. */
@@ -107,6 +114,9 @@ export function repetido(chave: string, agora = Date.now()): boolean {
  */
 export function lembrar(chave: string, agora = Date.now()) {
   if (!chave.split("|")[0]) return;
+  // Tira e põe de novo: renovar no lugar deixaria a chave na posição
+  // antiga do Map, e a poda por teto a tomaria por velha.
+  ENVIOS.delete(chave);
   ENVIOS.set(chave, agora);
   if (ENVIOS.size > TETO) podar(ENVIOS, (t) => agora - t <= DEDUP_MS);
 }

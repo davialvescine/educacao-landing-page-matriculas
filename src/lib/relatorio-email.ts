@@ -224,9 +224,11 @@ function montarTexto(dados: Relatorio, nome: string, painelUrl: string): string 
  * diário consulta: enquanto houver, ele tenta; quando zerar, para. Assim
  * uma falha parcial no dia 1 é retomada no dia 2 sem ninguém intervir.
  */
-export async function haPendentes(ano: number, mes: number): Promise<boolean> {
+export async function haPendentes(ano: number, mes: number): Promise<boolean | null> {
   const db = getPool();
-  if (!db) return false;
+  // null, e não false: sem banco não dá para dizer "todo mundo recebeu",
+  // e a rota tem de responder erro, não "nada a fazer".
+  if (!db) return null;
   const { rows } = await db.query(
     `SELECT 1
        FROM "user" u

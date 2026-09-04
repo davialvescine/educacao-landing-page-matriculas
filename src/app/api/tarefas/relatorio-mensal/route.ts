@@ -41,8 +41,10 @@ function autorizado(req: Request): boolean {
 }
 
 const ANO_MIN = 2025;
-/** Último dia do mês em que o oficial ainda sai automaticamente. */
-const ULTIMO_DIA_JANELA = 7;
+/** Último dia do mês em que o oficial ainda sai automaticamente. Dez
+ *  dias, e não sete: falha no último dia da janela precisa de pelo menos
+ *  mais uma rodada para ser retomada. */
+const ULTIMO_DIA_JANELA = 10;
 
 export async function POST(req: Request) {
   if (!process.env.CRON_SEGREDO) {
@@ -98,7 +100,11 @@ export async function POST(req: Request) {
         motivo: `fora da janela (dia ${diaUtil} a ${ULTIMO_DIA_JANELA})`,
       });
     }
-    if (!(await haPendentes(alvo.ano, alvo.mes))) {
+    const pendentes = await haPendentes(alvo.ano, alvo.mes);
+    if (pendentes === null) {
+      return NextResponse.json({ ok: false, erro: "Sem banco." }, { status: 500 });
+    }
+    if (!pendentes) {
       return NextResponse.json({
         ok: true,
         enviado: false,
