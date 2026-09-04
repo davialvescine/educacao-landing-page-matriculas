@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { VERSAO_ATUAL } from "@/lib/consentimento";
+import { POLITICA_PRIVACIDADE } from "@/lib/site";
 import {
   Select,
   SelectContent,
@@ -286,21 +287,23 @@ export default function LeadForm({
                 />
               </div>
             </div>
-            {/* Aceite pelo envio. Como não há caixa para marcar, o texto
-                precisa estar visível ACIMA do botão e não em nota de
-                rodapé: se o consentimento vem do ato de enviar, a pessoa
-                tem de poder ler o que aceita antes de clicar. */}
+            {/* Aceite pelo envio, acima do botão. O botão é o fim do
+                caminho visual do formulário: o que precisa ser lido vem
+                antes dele. Depois do botão, a pessoa só encontraria o
+                texto depois de já ter consentido. */}
             <div className="rounded-xl border border-line bg-paper px-4 py-3">
               <p className="text-xs leading-relaxed text-muted-foreground">
-                Ao enviar, você declara que é responsável pela criança e
-                autoriza o contato sobre a matrícula.
+                Ao enviar, você autoriza o contato da Educação Adventista
+                sobre a matrícula, com os dados que informou.
               </p>
-              <details className="mt-1 text-xs text-muted-foreground">
-                <summary className="cursor-pointer font-semibold text-primary underline-offset-2 hover:underline">
-                  Ler o texto completo
-                </summary>
-                <p className="mt-2 leading-relaxed">{VERSAO_ATUAL.texto}</p>
-              </details>
+              <a
+                href={POLITICA_PRIVACIDADE}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 inline-block text-xs font-semibold text-primary underline-offset-2 hover:underline"
+              >
+                Política de privacidade
+              </a>
             </div>
             {erro && (
               <p className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">

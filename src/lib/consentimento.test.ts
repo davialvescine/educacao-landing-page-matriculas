@@ -33,13 +33,22 @@ describe("versões do consentimento", () => {
 
   it("o texto atende ao que a lei exige dizer", () => {
     const t = VERSAO_ATUAL.texto.toLowerCase();
-    // art. 14 §1º: dado de criança, consentimento do responsável
-    expect(t).toMatch(/respons[áa]vel/);
     // art. 8º §4º: finalidade específica, não autorização genérica
     expect(t).toMatch(/matr[íi]cula/);
-    // art. 9º: com quem os dados são compartilhados
+    // art. 9º: quem é o controlador e com quem os dados são compartilhados
+    expect(t).toMatch(/educa[çc][ãa]o adventista/);
     expect(t).toMatch(/compartilh/);
-    // art. 8º §5º: revogação a qualquer momento
+    // art. 8º §5º: revogação a qualquer momento e sem custo
     expect(t).toMatch(/qualquer momento/);
+    expect(t).toMatch(/sem custo/);
+  });
+
+  it("fala dos dados de quem preenche, não de dados da criança", () => {
+    // O formulário coleta nome, WhatsApp e e-mail do adulto. Prometer no
+    // texto um tratamento de dado de criança que não acontece cria
+    // obrigação inexistente e confunde quem for auditar.
+    const t = VERSAO_ATUAL.texto.toLowerCase();
+    expect(t).toMatch(/o meu nome/);
+    expect(t).not.toMatch(/da crian[çc]a/);
   });
 });

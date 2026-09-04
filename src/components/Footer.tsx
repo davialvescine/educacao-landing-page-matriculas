@@ -3,7 +3,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getRede, getRegioesSite } from "@/lib/rede";
-import { INSTAGRAM_OFICIAL } from "@/lib/site";
+import { INSTAGRAM_OFICIAL, POLITICA_PRIVACIDADE } from "@/lib/site";
 
 export default function Footer() {
   const rede = getRede();
@@ -51,6 +51,16 @@ export default function Footer() {
                 className="transition-colors hover:text-primary-foreground"
               >
                 IABC · Internato
+              </a>
+            </li>
+            <li>
+              <a
+                href={POLITICA_PRIVACIDADE}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-primary-foreground"
+              >
+                Política de privacidade
               </a>
             </li>
             <li>

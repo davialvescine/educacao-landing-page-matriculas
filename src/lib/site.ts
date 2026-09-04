@@ -7,6 +7,17 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://educaadventistacentrooeste.com.br"
 ).replace(/\/$/, "");
 
+/**
+ * Política de privacidade oficial da rede.
+ *
+ * É a da Educação Adventista nacional, não uma do Centro-Oeste: é a que
+ * existe publicada. Vale conferir com o jurídico da união se ela cobre a
+ * captação de leads deste site, porque é para ela que o formulário manda
+ * a família quando ela quer ler o texto inteiro.
+ */
+export const POLITICA_PRIVACIDADE =
+  "https://www.educacaoadventista.org.br/politica-de-privacidade/";
+
 /** Instagram oficial da rede (bio confere: DF, GO, MT, MS e TO). */
 export const INSTAGRAM_OFICIAL =
   "https://www.instagram.com/educacaoadventistacentrooeste/";
