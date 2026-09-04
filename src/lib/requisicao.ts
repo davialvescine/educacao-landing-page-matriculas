@@ -10,7 +10,16 @@
  * para poderem ser testadas sem subir nada.
  */
 
-/** Primeiro IP da cadeia de proxies, que é o do visitante. */
+/**
+ * Primeiro IP da cadeia de proxies, que é o do visitante.
+ *
+ * ATENÇÃO: isto vale exatamente o quanto o proxy da frente valer. O
+ * cabeçalho é do cliente, e quem alcançar a origem direto pode escrever
+ * o que quiser nele. O proxy (Cloudflare/Coolify) precisa SOBRESCREVER
+ * x-forwarded-for, não acrescentar — e a origem não pode ficar exposta
+ * fora dele. Sem isso, o IP do consentimento e o da trilha de auditoria
+ * são sugestões, não prova.
+ */
 export function ipDaRequisicao(req: Request): string {
   const encaminhado = req.headers.get("x-forwarded-for");
   if (encaminhado) return encaminhado.split(",")[0].trim().slice(0, 45);

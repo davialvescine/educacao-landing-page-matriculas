@@ -9,6 +9,10 @@ import { agenteDaRequisicao, ipDaRequisicao } from "@/lib/requisicao";
 export type AcaoAcesso =
   | "login"
   | "login_falhou"
+  /** Erro do servidor na entrada. Separado de propósito de
+   *  "login_falhou": indisponibilidade não é tentativa de invasão. */
+  | "login_erro"
+  | "pegou_lead"
   | "exportou"
   | "reenviou"
   | "criou_usuario"

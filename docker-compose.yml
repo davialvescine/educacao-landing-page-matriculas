@@ -54,3 +54,19 @@ services:
 
 volumes:
   dados-db:
+
+  # Só este serviço ganhou processo próprio, e por dois motivos: Route
+  # Handler não segura WebSocket, e output "standalone" do Next não
+  # convive com servidor customizado. Se ele cair, o painel continua de
+  # pé — perde só a atualização automática.
+  tempo-real:
+    build: ./tempo-real
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://matriculas:matriculas-local@db:5432/matriculas
+      ORIGEM: http://localhost:3300
+      PORTA: "3801"
+    ports:
+      - "3801:3801"

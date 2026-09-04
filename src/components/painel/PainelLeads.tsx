@@ -14,6 +14,8 @@ import {
   RefreshCw,
   Send,
   Users,
+  Eye,
+  Hand,
   TriangleAlert,
   X,
 } from "lucide-react";
@@ -22,6 +24,7 @@ import { signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { LeadRegistro, ResumoLeads } from "@/lib/leads";
+import { useTempoReal } from "@/lib/tempo-real";
 
 interface Props {
   leads: LeadRegistro[];
@@ -36,6 +39,9 @@ interface Props {
   filtroStatus: string;
   integracaoConfigurada: boolean;
   usuario: { nome: string; papel: "admin" | "coordenador" };
+  /** Endereço do serviço de tempo real. Vem do servidor, e não de
+   *  NEXT_PUBLIC_*, que seria resolvido no build. Vazio = desligado. */
+  tempoRealUrl: string;
 }
 
 const STATUS_FILTROS = [
@@ -114,7 +120,7 @@ function BadgeAtendimento({ status }: { status: string }) {
 }
 
 export default function PainelLeads({
-  leads,
+  leads: leadsDoServidor,
   consentimentos,
   resumo,
   regioes,
@@ -122,12 +128,52 @@ export default function PainelLeads({
   filtroStatus,
   integracaoConfigurada,
   usuario,
+  tempoRealUrl,
 }: Props) {
   const router = useRouter();
   const [reenviando, setReenviando] = useState<string | null>(null);
   const [aviso, setAviso] = useState("");
   const [selecionado, setSelecionado] = useState<LeadRegistro | null>(null);
   const nomeRegiao = new Map(regioes.map((r) => [r.slug, r.nome]));
+
+  // A lista renderizada no servidor entra aqui e passa a se manter
+  // sozinha. Sem o serviço de tempo real no ar, `ligado` fica falso e a
+  // tela volta a depender do botão Atualizar — nada quebra.
+  const {
+    leads,
+    ligado,
+    presenca,
+    olhares,
+    novos,
+    olhar,
+    largar,
+    pegar,
+    marcarVisto,
+  } = useTempoReal(leadsDoServidor, tempoRealUrl);
+
+  // Enquanto o modal de um lead está aberto, os colegas veem que alguém
+  // está nele. É o que evita a mensagem dobrada — antes de qualquer
+  // clique em atender.
+  useEffect(() => {
+    if (!selecionado) {
+      largar();
+      return;
+    }
+    olhar(selecionado.id);
+    marcarVisto(selecionado.id);
+    return () => largar();
+  }, [selecionado, olhar, largar, marcarVisto]);
+
+  async function atender(lead: LeadRegistro) {
+    const r = await pegar(lead.id);
+    if (r.pego) {
+      setAviso(`Você está atendendo ${lead.nome}.`);
+    } else if (r.erro) {
+      setAviso("Não consegui reservar agora. Tente de novo.");
+    } else {
+      setAviso(`${r.de || "Outra pessoa"} pegou este atendimento primeiro.`);
+    }
+  }
 
   // Fecha o modal com Esc e trava o scroll da página enquanto ele está aberto.
   useEffect(() => {
@@ -237,6 +283,23 @@ export default function PainelLeads({
             </span>
           </div>
           <div className="flex items-center gap-2">
+            {/* Estado da conexão ao vivo. Aparece só quando ligado: selo
+                apagado permanente vira ruído para quem nunca teve o
+                serviço no ar. */}
+            {ligado ? (
+              <span
+                title={
+                  presenca.length > 1
+                    ? `Também no painel agora: ${presenca.map((p) => p.nome).join(", ")}`
+                    : "Atualizando sozinho"
+                }
+                className="inline-flex h-9 items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-400/10 px-3 text-xs font-bold text-emerald-200"
+              >
+                <span className="size-2 animate-pulse rounded-full bg-emerald-400" />
+                Ao vivo
+                {presenca.length > 1 ? ` · ${presenca.length}` : ""}
+              </span>
+            ) : null}
             <a
               href="/api/painel/exportar"
               className="inline-flex h-9 items-center gap-2 rounded-full border border-white/25 px-4 text-sm font-bold text-white transition-colors hover:bg-white/10"
@@ -378,7 +441,10 @@ export default function PainelLeads({
                   <tr
                     key={l.id}
                     onClick={() => setSelecionado(l)}
-                    className="cursor-pointer border-b border-line/60 transition-colors last:border-0 hover:bg-brand-50/60"
+                    className={cn(
+                      "cursor-pointer border-b border-line/60 transition-colors last:border-0 hover:bg-brand-50/60",
+                      novos.has(l.id) && "animate-pulse bg-gold-100/60",
+                    )}
                   >
                     <td
                       className="whitespace-nowrap px-4 py-3 text-muted-foreground"
@@ -391,6 +457,14 @@ export default function PainelLeads({
                       {l.email ? (
                         <span className="block text-xs font-normal text-muted-foreground">
                           {l.email}
+                        </span>
+                      ) : null}
+                      {/* Quem está neste lead AGORA. É o aviso que chega
+                          antes do dano, e não depois dele. */}
+                      {olhares[l.id]?.length ? (
+                        <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-800">
+                          <Eye aria-hidden className="size-3" />
+                          {olhares[l.id].map((p) => p.nome).join(", ")} está aqui
                         </span>
                       ) : null}
                     </td>
@@ -433,8 +507,30 @@ export default function PainelLeads({
                     </td>
                     <td className="whitespace-nowrap px-4 py-3">
                       <BadgeAtendimento status={l.atendimento_status} />
+                      {l.atendente_nome ? (
+                        <span className="mt-1 block text-xs text-muted-foreground">
+                          com {l.atendente_nome}
+                        </span>
+                      ) : null}
                     </td>
                     <td className="whitespace-nowrap px-4 py-3 text-right">
+                      {/* Reservar o atendimento. Quem decide é o banco:
+                          o segundo clique volta com o nome de quem
+                          chegou primeiro, e ninguém manda mensagem
+                          dobrada para a família. */}
+                      {ligado && !l.atendente_id ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            atender(l);
+                          }}
+                          className="mr-2 h-8 rounded-full text-xs font-bold"
+                        >
+                          <Hand aria-hidden className="size-3" /> Atender
+                        </Button>
+                      ) : null}
                       {integracaoConfigurada &&
                       l.webhook_status !== "enviado" ? (
                         <Button

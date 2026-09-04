@@ -39,6 +39,8 @@ interface Props {
 const ROTULO_ACAO: Record<string, string> = {
   login: "entrou no painel",
   login_falhou: "tentativa de login",
+  login_erro: "erro do servidor na entrada",
+  pegou_lead: "pegou o atendimento",
   exportou: "exportou leads",
   reenviou: "reenviou lead",
   criou_usuario: "criou usuário",

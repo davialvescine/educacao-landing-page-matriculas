@@ -1,6 +1,6 @@
 import { toNextJsHandler } from "better-auth/next-js";
 import { auth } from "@/lib/auth";
-import { origem, registrarAcesso } from "@/lib/usuarios";
+import { origem, registrarAcesso, type AcaoAcesso } from "@/lib/usuarios";
 
 export const runtime = "nodejs";
 
@@ -51,16 +51,23 @@ async function entrar(req: Request): Promise<Response> {
       .json()
       .catch(() => null);
     const usuario = (dados as { user?: { id?: string; name?: string } } | null)?.user;
-    await registrarAcesso("login", {
+    anotar("login", {
       usuarioId: usuario?.id,
       usuarioNome: usuario?.name ?? tentado,
       ...de,
     });
+  } else if (resposta.status >= 500) {
+    // Banco fora do ar não é tentativa de invasão. Marcar 500 como senha
+    // errada faria uma indisponibilidade parecer ataque de força bruta,
+    // exatamente quando alguém está olhando a trilha para entender o que
+    // está acontecendo.
+    anotar("login_erro", {
+      usuarioNome: tentado,
+      detalhe: `falha do servidor (${resposta.status})`,
+      ...de,
+    });
   } else {
-    // O e-mail digitado é o que identifica a tentativa. A senha não entra
-    // aqui de forma alguma: quem erra o campo digita a senha no lugar do
-    // e-mail com frequência suficiente para isso virar vazamento.
-    await registrarAcesso("login_falhou", {
+    anotar("login_falhou", {
       usuarioNome: tentado,
       detalhe: `e-mail ou senha inválidos (${resposta.status})`,
       ...de,
@@ -70,12 +77,35 @@ async function entrar(req: Request): Promise<Response> {
   return resposta;
 }
 
-/** E-mail digitado na tentativa, ou vazio se o corpo não vier legível. */
+/**
+ * Registra sem segurar a resposta.
+ *
+ * O `await` aqui punha a auditoria no caminho crítico do login: pool
+ * saturado ou lock deixavam a tela girando com a sessão já criada. A
+ * gravação não pode custar a entrada de ninguém, então ela solta e o
+ * erro fica no log do servidor.
+ */
+function anotar(acao: AcaoAcesso, opcoes: Parameters<typeof registrarAcesso>[1]) {
+  void registrarAcesso(acao, opcoes).catch(() => {});
+}
+
+/**
+ * E-mail digitado na tentativa — e só se for mesmo um e-mail.
+ *
+ * Quem troca os campos digita a SENHA aqui. Gravar o conteúdo cru
+ * colocaria a senha em texto claro na trilha de auditoria, visível para
+ * qualquer administrador. O que não parece e-mail vira uma marca sem
+ * conteúdo: ainda dá para contar as tentativas, sem guardar o segredo.
+ */
+const PARECE_EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,}$/i;
+
 async function emailTentado(req: Request): Promise<string> {
   try {
     const corpo = await req.json();
     const email = (corpo as { email?: unknown })?.email;
-    return typeof email === "string" ? email.trim().slice(0, 120) : "";
+    if (typeof email !== "string") return "";
+    const limpo = email.trim().slice(0, 120);
+    return PARECE_EMAIL.test(limpo) ? limpo : "(não é um e-mail)";
   } catch {
     return "";
   }
