@@ -51,14 +51,29 @@ rota e ponha em `src/lib/`.
 
     npx vitest run
 
-## Antes de dar por pronto
+## Antes de subir — portão obrigatório, nesta ordem
 
-    npx tsc --noEmit
-    npx vitest run
-    npm run build
+**1. CI local.** Não é sugestão. Nada é empurrado sem passar.
 
-Build é obrigatório: as páginas de escola são geradas no build, e erro de
-dados só aparece lá.
+    npm run ci
+
+Roda tipos, testes, build e a sintaxe do serviço de tempo real, e não
+para no primeiro erro — devolve a lista inteira. O build é obrigatório
+porque as páginas de escola são geradas nele: dado ruim não aparece em
+`npm run dev`, só estoura lá.
+
+**2. Revisão com o Codex.** Todo trabalho passa por revisão antes do
+push. Segunda leitura pega o que quem escreveu não enxerga: já achou
+fail-open em resolução de host neste projeto, e falha silenciosa é
+exatamente o que não aparece nos testes.
+
+Mande o diff e peça revisão adversarial — não "está bom?", e sim "onde
+isto quebra". Se apontar algo real, conserte e rode o CI de novo.
+
+**3. Só então** `git push` e PR.
+
+Um passo que falha invalida os seguintes. CI vermelho não vai para
+revisão; revisão com apontamento aberto não vira PR.
 
 ## Banco
 
@@ -72,10 +87,14 @@ senão o ensaio diz "nada pendente" para banco atrasado — já aconteceu.
 
 ## Git
 
-Uma branch por assunto, cortada de `main`. Mensagem de commit em
-português, explicando a decisão e não o diff: o que estava errado, por
-que a solução é essa, o que foi descartado. Não empurre nem abra PR sem
-o cliente pedir.
+Uma branch por assunto, cortada de `main` — não de outra branch de
+trabalho, senão elas empilham e uma não pode ser mesclada sem a outra
+(já aconteceu). Mensagem de commit em português, explicando a decisão e
+não o diff: o que estava errado, por que a solução é essa, o que foi
+descartado.
+
+Não empurre nem abra PR sem o cliente pedir, e nunca antes do portão
+acima.
 
 ## O que é responsabilidade da união, não nossa
 

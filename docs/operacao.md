@@ -51,6 +51,19 @@ errado.
 
 ---
 
+## Antes de subir qualquer coisa
+
+```bash
+npm run ci      # tipos, testes, build e sintaxe do tempo real
+```
+
+Depois do CI verde, **revisão com o Codex** sobre o diff, pedindo leitura
+adversarial. Só então `git push` e PR. Um passo que falha invalida os
+seguintes: CI vermelho não vai para revisão, e revisão com apontamento
+aberto não vira PR.
+
+---
+
 ## Publicar
 
 Container do Next (standalone) e container do tempo real, os dois no
