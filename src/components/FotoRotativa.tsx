@@ -10,8 +10,12 @@ export interface FotoAluno {
   h: number;
 }
 
-/** De quanto em quanto tempo o aluno da capa muda. */
-const TROCA = 6000;
+/** A primeira troca vem cedo e vai para um aluno sorteado — é o que faz
+ *  cada visita ter um rosto diferente. As seguintes são raras: a capa é
+ *  um retrato, não um carrossel, e trocar toda hora tira o olho do
+ *  título. */
+const PRIMEIRA_TROCA = 7000;
+const TROCA = 25000;
 
 /**
  * Os alunos da campanha se revezando na capa.
@@ -53,15 +57,18 @@ export default function FotoRotativa({ fotos }: { fotos: FotoAluno[] }) {
     // capa piscar na entrada. A variedade fica para a PRÓXIMA troca, que
     // parte de um ponto diferente a cada visita.
     const salto = 1 + (Math.floor(Date.now() / 60_000) % (fotos.length - 1));
-    let primeira = true;
-    const id = setInterval(() => {
-      setAtiva((a) => {
-        const proxima = primeira ? salto : (a + 1) % fotos.length;
-        primeira = false;
-        return proxima;
-      });
-    }, TROCA);
-    return () => clearInterval(id);
+    let intervalo: number | undefined;
+    const primeira = window.setTimeout(() => {
+      setAtiva(salto);
+      intervalo = window.setInterval(
+        () => setAtiva((a) => (a + 1) % fotos.length),
+        TROCA,
+      );
+    }, PRIMEIRA_TROCA);
+    return () => {
+      window.clearTimeout(primeira);
+      if (intervalo) window.clearInterval(intervalo);
+    };
   }, [fotos.length]);
 
   useEffect(() => {

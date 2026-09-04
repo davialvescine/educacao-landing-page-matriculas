@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import type { FormEstado } from "@/lib/rede";
 import { eventoLead, lerUtm } from "@/lib/campanha-client";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,13 @@ interface Props {
   /** Nome da escola pré-selecionada (páginas de unidade). */
   escolaInicial?: string;
 }
+
+/** Rótulo em negrito, como a família lê num formulário de papel: o nome
+ *  do campo é a pergunta, e a pergunta não é letra miúda. */
+const ROTULO = "text-base font-extrabold tracking-tight text-brand-950";
+/** Campo alto, cantos macios, fundo levemente fora do branco para o
+ *  cartão não virar uma parede de caixas brancas sobre branco. */
+const CAMPO = "h-14 w-full rounded-2xl border-line bg-paper px-4 text-base";
 
 const NIVEIS = [
   "Educação Infantil",
@@ -140,17 +147,17 @@ export default function LeadForm({
   }
 
   return (
-    <Card className="rounded-2xl border-brand-100 shadow-card">
-      <CardContent className="p-6 sm:p-8">
+    <Card className="rounded-3xl border-brand-100 shadow-card">
+      <CardContent className="p-6 sm:p-10">
         {/* Progresso */}
-        <div className="mb-6 flex items-center gap-3">
-          <div className="h-2 flex-grow overflow-hidden rounded-full bg-brand-100">
+        <div className="mb-8 flex items-center gap-4">
+          <div className="h-1.5 flex-grow overflow-hidden rounded-full bg-brand-100">
             <div
               className="h-full rounded-full bg-gold-400 transition-all duration-500"
               style={{ width: etapa === 1 ? "50%" : "100%" }}
             />
           </div>
-          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+          <span className="text-xs font-extrabold uppercase tracking-[0.2em] text-brand-900/70">
             Etapa {etapa} de 2
           </span>
         </div>
@@ -158,15 +165,16 @@ export default function LeadForm({
         {etapa === 1 ? (
           <div className="grid gap-5">
             <div>
-              <h3 className="text-xl font-extrabold tracking-tight text-brand-900">
-                {regiaoFixa ? "Vamos começar" : "Onde você quer estudar?"}
+              <h3 className="text-2xl font-extrabold leading-tight tracking-tighter text-brand-950 sm:text-3xl">
+                {regiaoFixa ? "Vamos começar" : "Onde ele vai estudar?"}
               </h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Leva menos de um minuto.
+              <p className="mt-2 text-base leading-relaxed text-muted-foreground">
+                Leva menos de um minuto. Não pedimos dados bancários e não há
+                nenhum compromisso.
               </p>
             </div>
             <div className={cn("grid gap-2", regiaoFixa && "hidden")}>
-              <Label>Região*</Label>
+              <Label className={ROTULO}>Região <span className="text-gold-600">*</span></Label>
               <Select
                 key={estado || "sem-regiao"}
                 value={estado || undefined}
@@ -179,7 +187,7 @@ export default function LeadForm({
                   setErro("");
                 }}
               >
-                <SelectTrigger className="h-12 w-full rounded-xl">
+                <SelectTrigger className={CAMPO}>
                   <SelectValue placeholder="Selecione a região" />
                 </SelectTrigger>
                 <SelectContent>
@@ -192,9 +200,9 @@ export default function LeadForm({
               </Select>
             </div>
             <div className="grid gap-2">
-              <Label>Série / nível do aluno</Label>
+              <Label className={ROTULO}>Série em que o aluno vai estudar em 2027</Label>
               <Select value={nivel || undefined} onValueChange={(v) => setNivel(v ?? "")}>
-                <SelectTrigger className="h-12 w-full rounded-xl">
+                <SelectTrigger className={CAMPO}>
                   <SelectValue placeholder="Selecione" />
                 </SelectTrigger>
                 <SelectContent>
@@ -207,13 +215,13 @@ export default function LeadForm({
               </Select>
             </div>
             <div className={cn("grid gap-2", regiaoFixa && "hidden")}>
-              <Label>Escola de interesse</Label>
+              <Label className={ROTULO}>Escola em que deseja matricular <span className="text-gold-600">*</span></Label>
               <Select
                 value={escola || undefined}
                 onValueChange={(v) => setEscola(v ?? "")}
                 disabled={escolas.length === 0}
               >
-                <SelectTrigger className="h-12 w-full rounded-xl">
+                <SelectTrigger className={CAMPO}>
                   <SelectValue placeholder="Escolha a unidade" />
                 </SelectTrigger>
                 <SelectContent>
@@ -234,36 +242,38 @@ export default function LeadForm({
               type="button"
               size="lg"
               onClick={avancar}
-              className="mt-1 h-14 rounded-full text-base font-bold shadow-cta"
+              className="group mt-2 h-16 rounded-full bg-brand-950 text-base font-bold text-white shadow-cta hover:bg-brand-900"
             >
               Continuar
-              <ArrowRight aria-hidden className="size-4" />
+              <span className="ml-1 flex size-9 items-center justify-center rounded-full bg-white/12 transition-transform group-hover:translate-x-0.5">
+                <ArrowUpRight aria-hidden className="size-4" />
+              </span>
             </Button>
           </div>
         ) : (
           <form onSubmit={onSubmit} className="grid gap-5">
             <div>
-              <h3 className="text-xl font-extrabold tracking-tight text-brand-900">
-                Quase lá! Para onde enviamos as informações?
+              <h3 className="text-2xl font-extrabold leading-tight tracking-tighter text-brand-950 sm:text-3xl">
+                Quase lá. Para quem a escola liga?
               </h3>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-2 text-base leading-relaxed text-muted-foreground">
                 A equipe da unidade fala com você pelo WhatsApp.
               </p>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="lead-nome">Nome do responsável*</Label>
+              <Label htmlFor="lead-nome" className={ROTULO}>Nome do responsável <span className="text-gold-600">*</span></Label>
               <Input
                 id="lead-nome"
                 name="nome"
                 required
                 maxLength={120}
                 placeholder="Seu nome completo"
-                className="h-12 rounded-xl"
+                className={cn(CAMPO, "h-12 rounded-xl")}
               />
             </div>
             <div className="grid gap-5 sm:grid-cols-2">
               <div className="grid gap-2">
-                <Label htmlFor="lead-whatsapp">WhatsApp*</Label>
+                <Label htmlFor="lead-whatsapp" className={ROTULO}>WhatsApp <span className="text-gold-600">*</span></Label>
                 <Input
                   id="lead-whatsapp"
                   name="whatsapp"
@@ -272,18 +282,18 @@ export default function LeadForm({
                   placeholder="(61) 99999-9999"
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(mascaraWhatsApp(e.target.value))}
-                  className="h-12 rounded-xl"
+                  className={cn(CAMPO, "h-12 rounded-xl")}
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="lead-email">E-mail (opcional)</Label>
+                <Label htmlFor="lead-email" className={ROTULO}>E-mail <span className="font-medium text-muted-foreground">(opcional)</span></Label>
                 <Input
                   id="lead-email"
                   name="email"
                   type="email"
                   maxLength={160}
                   placeholder="voce@email.com"
-                  className="h-12 rounded-xl"
+                  className={cn(CAMPO, "h-12 rounded-xl")}
                 />
               </div>
             </div>
@@ -315,7 +325,7 @@ export default function LeadForm({
                 type="button"
                 variant="ghost"
                 onClick={() => setEtapa(1)}
-                className="h-14 shrink-0 rounded-full px-5 font-bold text-brand-700"
+                className="h-16 shrink-0 rounded-full px-5 font-bold text-brand-700"
               >
                 <ArrowLeft aria-hidden className="size-4" />
                 Voltar
@@ -324,9 +334,14 @@ export default function LeadForm({
                 type="submit"
                 size="lg"
                 disabled={enviando}
-                className="h-14 flex-grow rounded-full text-base font-bold shadow-cta"
+                className="group h-16 flex-grow rounded-full bg-brand-950 text-base font-bold text-white shadow-cta hover:bg-brand-900"
               >
                 {enviando ? "Enviando..." : "Quero garantir minha vaga"}
+                {!enviando && (
+                  <span className="ml-1 flex size-9 items-center justify-center rounded-full bg-white/12 transition-transform group-hover:translate-x-0.5">
+                    <ArrowUpRight aria-hidden className="size-4" />
+                  </span>
+                )}
               </Button>
             </div>
           </form>
