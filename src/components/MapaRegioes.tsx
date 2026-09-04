@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import MapaInterativo from "@/components/MapaInterativo";
+import Constelacao from "@/components/Constelacao";
 import Reveal from "@/components/Reveal";
 import { MAPA_PATHS, MAPA_VIEWBOX } from "@/data/mapa-paths";
 import { getRegioesSite } from "@/lib/rede";
@@ -19,7 +19,10 @@ const PINS: {
   { slug: "mato-grosso", rotulo: "Mato Grosso", x: 720, y: 800, delay: "0s" },
   { slug: "tocantins", rotulo: "Tocantins", x: 1390, y: 380, delay: "0.8s" },
   { slug: "goias", rotulo: "Goiás", x: 1250, y: 1260, delay: "1.2s" },
-  { slug: "distrito-federal", rotulo: "DF", x: 1620, y: 990, delay: "1.6s" },
+  // Em cima do quadrado do DF (caixa do path: x 1418–1559, y 1062–1154),
+  // e não ao lado dele — o pino fora do território dizia que Brasília
+  // ficava em Goiás.
+  { slug: "distrito-federal", rotulo: "DF", x: 1488, y: 1100, delay: "1.6s" },
   { slug: "mato-grosso-do-sul", rotulo: "MS", x: 750, y: 1660, delay: "2s" },
 ];
 
@@ -83,17 +86,23 @@ export default function MapaRegioes() {
       id="regioes"
       className="relative scroll-mt-10 overflow-hidden bg-brand-950"
     >
-      {/* Cerrado ao fundo (ipê-amarelo, chapadas) com véu azul */}
-      <Image
-        src="/imagens/campanha/fundo-cerrado-2.jpg"
-        alt=""
-        fill
-        sizes="100vw"
-        className="object-cover object-center opacity-70"
+      {/* Fundo: navy limpo, uma luz dourada atrás do mapa e o céu de
+          pontos que a seção do mundo já usa. A foto do cerrado por baixo
+          de um véu azul virava um borrão marrom que sujava o mapa em vez
+          de emoldurá-lo. */}
+      <Constelacao />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_60%_at_72%_50%,rgba(248,192,56,0.16),transparent_70%)]"
       />
       <div
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-b from-brand-950/95 via-brand-950/40 to-brand-950/95"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(40%_45%_at_18%_30%,rgba(18,38,158,0.35),transparent_70%)]"
+      />
+      {/* Grade finíssima: dá chão ao mapa sem competir com ele. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:linear-gradient(rgba(255,255,255,.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.6)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(70%_70%_at_50%_50%,#000,transparent)]"
       />
       <div className="relative mx-auto max-w-7xl px-4 py-24">
         <div className="grid items-center gap-x-16 gap-y-14 lg:grid-cols-12">
