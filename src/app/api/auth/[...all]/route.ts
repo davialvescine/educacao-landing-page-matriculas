@@ -1,6 +1,7 @@
 import { toNextJsHandler } from "better-auth/next-js";
 import { auth } from "@/lib/auth";
 import { origem, registrarAcesso, type AcaoAcesso } from "@/lib/usuarios";
+import { getPool } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -51,9 +52,12 @@ async function entrar(req: Request): Promise<Response> {
       .json()
       .catch(() => null);
     const usuario = (dados as { user?: { id?: string; name?: string } } | null)?.user;
+    // Só a identidade que o Better Auth devolveu. Cair para o que foi
+    // digitado deixaria entrada não confiável no caminho, sem ganho:
+    // numa entrada bem-sucedida o nome sempre vem.
     anotar("login", {
       usuarioId: usuario?.id,
-      usuarioNome: usuario?.name ?? tentado,
+      usuarioNome: usuario?.name ?? "(sem nome)",
       ...de,
     });
   } else if (resposta.status >= 500) {
@@ -90,23 +94,41 @@ function anotar(acao: AcaoAcesso, opcoes: Parameters<typeof registrarAcesso>[1])
 }
 
 /**
- * E-mail digitado na tentativa — e só se for mesmo um e-mail.
+ * E-mail digitado na tentativa — e só se ele existir como conta.
  *
- * Quem troca os campos digita a SENHA aqui. Gravar o conteúdo cru
- * colocaria a senha em texto claro na trilha de auditoria, visível para
- * qualquer administrador. O que não parece e-mail vira uma marca sem
- * conteúdo: ainda dá para contar as tentativas, sem guardar o segredo.
+ * Testar o formato não bastava: quem troca os campos digita a SENHA
+ * aqui, e senha como "MinhaSenha@empresa.com" passa por qualquer regex
+ * de e-mail e ia inteira para a trilha de auditoria, legível para
+ * qualquer administrador.
+ *
+ * Conferir contra a tabela resolve pelos dois lados: e-mail de conta que
+ * existe não é segredo, e o que não existe — senha, lixo, tentativa de
+ * enumerar — nunca é gravado. Continua dando para contar as tentativas
+ * por conta, que é para o que a trilha serve.
  */
-const PARECE_EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,}$/i;
-
 async function emailTentado(req: Request): Promise<string> {
+  let digitado = "";
   try {
     const corpo = await req.json();
     const email = (corpo as { email?: unknown })?.email;
     if (typeof email !== "string") return "";
-    const limpo = email.trim().slice(0, 120);
-    return PARECE_EMAIL.test(limpo) ? limpo : "(não é um e-mail)";
+    digitado = email.trim().slice(0, 120);
   } catch {
     return "";
+  }
+  if (!digitado) return "";
+
+  const db = getPool();
+  if (!db) return "(conta desconhecida)";
+  try {
+    const { rows } = await db.query(
+      `SELECT 1 FROM "user" WHERE lower(email) = lower($1) LIMIT 1`,
+      [digitado],
+    );
+    return rows.length ? digitado : "(conta desconhecida)";
+  } catch {
+    // Na dúvida, não grava. Auditoria incompleta é problema; senha
+    // gravada em texto claro é incidente.
+    return "(conta desconhecida)";
   }
 }

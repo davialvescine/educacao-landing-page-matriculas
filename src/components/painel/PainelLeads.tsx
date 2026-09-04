@@ -153,6 +153,16 @@ export default function PainelLeads({
   // Enquanto o modal de um lead está aberto, os colegas veem que alguém
   // está nele. É o que evita a mensagem dobrada — antes de qualquer
   // clique em atender.
+  // O lead aberto no modal sumiu da lista — foi apagado ou mudou de
+  // região e deixou de ser meu. A lista filtra, mas o modal guarda uma
+  // cópia própria e continuaria exibindo nome, telefone e e-mail de
+  // alguém que não é mais desta coordenação.
+  useEffect(() => {
+    if (selecionado && !leads.some((l) => l.id === selecionado.id)) {
+      setSelecionado(null);
+    }
+  }, [leads, selecionado]);
+
   useEffect(() => {
     if (!selecionado) {
       largar();

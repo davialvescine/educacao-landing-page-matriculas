@@ -79,6 +79,7 @@ io.use(async (socket, next) => {
     if (!usuario) return next(new Error("sem sessão"));
     socket.data.usuario = usuario;
     socket.data.token = token;
+    socket.data.vez = 0;
     next();
   } catch (e) {
     console.error("[tempo-real] falha ao conferir sessão:", e);
@@ -103,7 +104,17 @@ io.on("connection", (socket) => {
         socket.emit("sessao:encerrada");
         return socket.disconnect(true);
       }
+      // Região tirada de alguém muda quem pode vê-lo na lista de
+      // presença dos outros. Sem recalcular, a lista fica obsoleta até
+      // a próxima conexão ou desconexão de qualquer pessoa.
+      const mudou =
+        atual.admin !== socket.data.usuario.admin ||
+        atual.regioes.join("|") !== socket.data.usuario.regioes.join("|");
       socket.data.usuario = atual;
+      if (mudou) {
+        sairDeTudo(socket);
+        anunciarPresenca();
+      }
     } catch (e) {
       // Banco fora do ar não derruba quem já está conectado: a próxima
       // volta reconfere. Derrubar aqui transformaria instabilidade de
@@ -114,7 +125,13 @@ io.on("connection", (socket) => {
 
   // ---- volta: quem está olhando o quê -------------------------------
   socket.on("lead:olhando", async (leadId) => {
+    // A consulta de região é assíncrona, e nesse meio-tempo a pessoa
+    // pode fechar o modal, abrir outro lead ou cair. Sem esta marca, a
+    // resposta atrasada inseria alguém que já tinha saído — presença
+    // fantasma, que ninguém consegue limpar depois.
+    const marca = ++socket.data.vez;
     const estado = await regiaoDoLead(pool, leadId).catch(() => null);
+    if (marca !== socket.data.vez) return;
     if (!estado || !podeVer(socket.data.usuario, estado)) return;
     sairDeTudo(socket);
     if (!olhando.has(leadId)) olhando.set(leadId, { estado, pessoas: new Map() });
@@ -127,9 +144,13 @@ io.on("connection", (socket) => {
     anunciarOlhares(leadId);
   });
 
-  socket.on("lead:largou", () => sairDeTudo(socket));
+  socket.on("lead:largou", () => {
+    socket.data.vez += 1; // invalida consulta ainda em voo
+    sairDeTudo(socket);
+  });
 
   socket.on("disconnect", () => {
+    socket.data.vez += 1;
     clearInterval(conferir);
     sairDeTudo(socket);
     anunciarPresenca();
@@ -145,6 +166,19 @@ function sairDeTudo(socket) {
       continue;
     }
     anunciarOlhares(leadId);
+  }
+}
+
+/** Zera quem está olhando um lead e avisa todas as regiões envolvidas. */
+function esquecerOlhares(leadId, ...estados) {
+  const alvo = olhando.get(leadId);
+  if (!alvo) return;
+  olhando.delete(leadId);
+  for (const s of io.sockets.sockets.values()) {
+    if (alvo.pessoas.has(s.id)) s.data.vez += 1;
+  }
+  for (const e of new Set([alvo.estado, ...estados].filter(Boolean))) {
+    espalhar(e, "lead:olhares", { leadId, pessoas: [] });
   }
 }
 
@@ -199,7 +233,13 @@ async function escutarBanco() {
   if (escuta.religando) return;
   escuta.religando = true;
 
-  const cliente = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  const cliente = new pg.Client({
+    connectionString: process.env.DATABASE_URL,
+    // Sem prazo, uma conexão que nunca resolve prende a trava
+    // `religando` e o serviço fica sem escuta para sempre — de pé,
+    // respondendo, e sem fazer nada.
+    connectionTimeoutMillis: 10_000,
+  });
   const cair = (motivo) => {
     if (escuta.cliente !== cliente) return;
     escuta.ligada = false;
@@ -243,7 +283,13 @@ async function escutarBanco() {
       espalharSó(carga.estado_anterior, lead.estado, "leads:sumiu", {
         id: lead.id,
       });
+      // E a presença ACOMPANHA o lead se não for zerada aqui: quem
+      // estava olhando pela região antiga continuaria no mapa, e o
+      // próximo aviso levaria o nome dessa pessoa para a região nova.
+      // Foi assim que a correção anterior reabriu o vazamento.
+      esquecerOlhares(lead.id, carga.estado_anterior, lead.estado);
     }
+    if (carga.acao === "delete") esquecerOlhares(lead.id, lead.estado);
     espalhar(lead.estado, "leads:mudou", carga);
   });
 }

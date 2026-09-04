@@ -68,6 +68,20 @@ export function useTempoReal(iniciais: LeadRegistro[], url: string) {
   const [olhares, setOlhares] = useState<Record<string, Olhar[]>>({});
   const [novos, setNovos] = useState<Set<string>>(new Set());
   const socket = useRef<Socket | null>(null);
+  const recarga = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /** Recarrega uma vez só, com atraso sorteado, mesmo que o pedido
+   *  chegue várias vezes seguidas. */
+  const agendarRecarga = useCallback(() => {
+    if (recarga.current) return;
+    recarga.current = setTimeout(
+      () => {
+        recarga.current = null;
+        router.refresh();
+      },
+      Math.random() * 4000,
+    );
+  }, [router]);
 
   // Nova renderização do servidor (filtro trocado, botão Atualizar):
   // manda na lista. O que veio por socket já está gravado no banco, então
@@ -103,7 +117,7 @@ export function useTempoReal(iniciais: LeadRegistro[], url: string) {
       // o que chegou, então busca de novo. Ignorar deixaria a tela
       // mostrando um passado com cara de presente.
       if (aviso.acao === "recarregar") {
-        router.refresh();
+        agendarRecarga();
         return;
       }
       if (aviso.acao === "delete") {
@@ -125,7 +139,18 @@ export function useTempoReal(iniciais: LeadRegistro[], url: string) {
     // A escuta do banco caiu e voltou. O que aconteceu no intervalo não
     // volta — o Postgres não guarda notificação — então a lista inteira
     // é buscada de novo.
-    s.on("recarregar", () => router.refresh());
+    //
+    // Com atraso sorteado: o aviso chega a todas as abas no mesmo
+    // instante, e vinte recarregando juntas viram uma rajada de
+    // consultas em cima do banco que acabou de voltar. Espalhar em
+    // alguns segundos custa nada a quem olha e evita derrubar de novo o
+    // que estava se recuperando.
+    s.on("recarregar", () => agendarRecarga());
+
+    // Reconexão da PRÓPRIA aba: o serviço pode ter reiniciado, ou a
+    // rede caiu. De um jeito ou de outro, o que aconteceu enquanto ela
+    // esteve fora não chega — então ela também precisa buscar de novo.
+    s.io.on("reconnect", () => agendarRecarga());
 
     s.on("presenca", (pessoas: Presente[]) => setPresenca(pessoas ?? []));
 
@@ -141,8 +166,9 @@ export function useTempoReal(iniciais: LeadRegistro[], url: string) {
     return () => {
       s.close();
       socket.current = null;
+      if (recarga.current) clearTimeout(recarga.current);
     };
-  }, [url, router]);
+  }, [url, router, agendarRecarga]);
 
   /** Avisa que estou neste lead. É o que aparece para os outros antes de
    *  qualquer clique — e é o que de fato evita duas mensagens à família. */

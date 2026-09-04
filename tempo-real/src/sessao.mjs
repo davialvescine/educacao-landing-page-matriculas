@@ -70,9 +70,16 @@ export function podeVer(usuario, estado) {
   return usuario.regioes.includes(estado);
 }
 
+const UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 /** A região de um lead, para autorizar antes de qualquer coisa. */
 export async function regiaoDoLead(pool, leadId) {
-  if (typeof leadId !== "string" || !/^[0-9a-f-]{36}$/i.test(leadId)) return null;
+  // UUID de verdade, e não "36 caracteres hexadecimais ou hífen": a
+  // versão frouxa deixava passar 36 hífens, que chegavam ao Postgres e
+  // viravam erro 22P02 — carga inútil que qualquer usuário autenticado
+  // podia disparar em série.
+  if (typeof leadId !== "string" || !UUID.test(leadId)) return null;
   const { rows } = await pool.query(`SELECT estado FROM leads WHERE id = $1`, [
     leadId,
   ]);
