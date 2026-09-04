@@ -32,21 +32,22 @@ import { linkWhatsapp, SITE_NOME, SITE_URL } from "@/lib/site";
  */
 
 const FOTOS_DIA: MomentoDia[] = [
-  { src: "/imagens/iabc/vida-estudo.jpg", titulo: "Estudo", texto: "Aulas e tempo de estudo dirigido, com acompanhamento de quem conhece o aluno pelo nome." },
-  { src: "/imagens/iabc/vida-esporte.jpg", titulo: "Esporte", texto: "Quadras, campo e treinos que ocupam a tarde e ensinam a jogar junto." },
-  { src: "/imagens/iabc/vida-natacao.jpg", titulo: "Natação", texto: "Piscina dentro do campus, sem depender de transporte nem de horário de fora." },
-  { src: "/imagens/iabc/vida-musica.jpg", titulo: "Música", texto: "Coral e instrumentos abertos a quem nunca tocou nada antes." },
-  { src: "/imagens/iabc/vida-amizade.jpg", titulo: "Convivência", texto: "Amizades que nascem de dividir o dia inteiro, e não só a sala de aula." },
-  { src: "/imagens/iabc/vida-missao.jpg", titulo: "Missão", texto: "Projetos de serviço que tiram o aluno do campus e colocam o mundo na conta." },
+  { src: "/imagens/iabc/site/estudo-em-dupla.jpg", titulo: "Estudo", texto: "Aulas e estudo dirigido, com acompanhamento de quem conhece o aluno pelo nome." },
+  { src: "/imagens/iabc/site/laboratorio.jpg", titulo: "Laboratório", texto: "Ciência com a mão na massa, não só no quadro." },
+  { src: "/imagens/iabc/site/natacao.jpg", titulo: "Natação", texto: "Piscina dentro do campus, sem depender de transporte nem de horário de fora." },
+  { src: "/imagens/iabc/site/corrida-na-mata.jpg", titulo: "Esporte", texto: "Treino ao ar livre num campus onde dá para correr sem sair do portão." },
+  { src: "/imagens/iabc/site/piano.jpg", titulo: "Música", texto: "Piano, coral e instrumentos abertos a quem nunca tocou nada antes." },
+  { src: "/imagens/iabc/site/apresentacao.jpg", titulo: "Palco", texto: "Apresentar em público desde cedo, que é o que solta a voz de qualquer um." },
+  { src: "/imagens/iabc/site/convivencia-entardecer.jpg", titulo: "Convivência", texto: "Amizades que nascem de dividir o dia inteiro, e não só a sala de aula." },
 ];
 
 /** O campus por dentro, no carrossel da seção de abertura. */
 const FOTOS_CAMPUS: FotoCampus[] = [
   { src: "/imagens/iabc/campus-dormitorio.jpg", alt: "Dormitório" },
-  { src: "/imagens/iabc/vida-estudo.jpg", alt: "Sala de estudo" },
-  { src: "/imagens/iabc/vida-natacao.jpg", alt: "Piscina" },
-  { src: "/imagens/iabc/vida-esporte.jpg", alt: "Quadra" },
-  { src: "/imagens/iabc/campus-aereo.jpg", alt: "Campus" },
+  { src: "/imagens/iabc/site/alunos-no-campus.jpg", alt: "Alunos no campus" },
+  { src: "/imagens/iabc/site/academia.jpg", alt: "Academia" },
+  { src: "/imagens/iabc/site/grupo-ao-ar-livre.jpg", alt: "Área externa" },
+  { src: "/imagens/iabc/campus-aereo.jpg", alt: "Vista do campus" },
 ];
 
 export const metadata: Metadata = {
@@ -198,7 +199,7 @@ export default function IabcPage() {
             </Reveal>
             <div className="mt-12 grid gap-6 sm:grid-cols-2">
               <Reveal>
-                <div className="h-full rounded-card bg-brand-50 p-8">
+                <div className="h-full rounded-card border border-gold-200 bg-gold-100/50 p-8">
                   <p className="text-lg font-extrabold tracking-tight text-brand-950">
                     Mensalidade escolar
                   </p>
@@ -209,11 +210,11 @@ export default function IabcPage() {
                 </div>
               </Reveal>
               <Reveal delay={0.1}>
-                <div className="h-full rounded-card bg-gold-100 p-8">
+                <div className="h-full rounded-card bg-gold-400 p-8">
                   <p className="text-lg font-extrabold tracking-tight text-brand-950">
                     Moradia no campus
                   </p>
-                  <p className="mt-3 leading-relaxed text-brand-950/70">
+                  <p className="mt-3 leading-relaxed text-brand-950/80">
                     Dormitório, alimentação e o acompanhamento de quem fica com
                     os alunos fora do horário de aula.
                   </p>
@@ -232,19 +233,41 @@ export default function IabcPage() {
         </section>
 
         {/* O medo real do pai, dito com todas as letras */}
-        <section className="bg-brand-900">
-          <div className="mx-auto max-w-4xl px-4 py-24 text-center sm:px-6 lg:py-28">
+        <section className="relative isolate overflow-hidden bg-gold-400">
+          <Image
+            src="/imagens/iabc/site/acolhimento-em-sala.jpg"
+            alt=""
+            fill
+            sizes="100vw"
+            className="-z-10 object-cover object-center opacity-25"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 -z-10 bg-gradient-to-r from-gold-400 via-gold-400/85 to-gold-400/55"
+          />
+          <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-24 sm:px-6 lg:grid-cols-[1.15fr_1fr] lg:gap-16 lg:py-28">
             <Reveal>
-              <p className="text-2xl font-extrabold leading-snug tracking-tight text-white sm:text-4xl">
+              <p className="text-2xl font-extrabold leading-snug tracking-tighter text-brand-950 sm:text-4xl">
                 A pergunta que ninguém faz em voz alta é quem cuida do meu filho
                 quando eu não estou.
               </p>
-              <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-white/70">
+              <p className="mt-7 max-w-xl text-lg leading-relaxed text-brand-950/75">
                 No internato existe uma equipe responsável pelos alunos fora da
                 sala de aula, com rotina definida, horários e acompanhamento
                 diário. Antes de matricular, a família conhece essas pessoas
                 pessoalmente. É o que a visita serve para responder.
               </p>
+            </Reveal>
+            <Reveal delay={0.12}>
+              <div className="relative aspect-4/5 overflow-hidden rounded-card shadow-foto lg:aspect-3/4">
+                <Image
+                  src="/imagens/iabc/site/acolhimento-em-sala.jpg"
+                  alt="Professora acolhendo um aluno em sala"
+                  fill
+                  sizes="(min-width: 1024px) 40vw, 100vw"
+                  className="object-cover"
+                />
+              </div>
             </Reveal>
           </div>
         </section>
@@ -255,7 +278,7 @@ export default function IabcPage() {
             <Reveal>
               <div className="relative aspect-4/3 overflow-hidden rounded-card shadow-foto">
                 <Image
-                  src="/imagens/iabc/vida-amizade.jpg"
+                  src="/imagens/iabc/site/amizade.jpg"
                   alt="Alunos do IABC no campus"
                   fill
                   sizes="(min-width: 1024px) 48vw, 100vw"
