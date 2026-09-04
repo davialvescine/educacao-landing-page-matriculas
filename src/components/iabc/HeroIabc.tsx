@@ -54,35 +54,48 @@ export default function HeroIabc({
     return () => clearInterval(t);
   }, [quadros.length]);
 
-  // A foto nova entra por cortina, não por fade. O fade é a transição que
-  // todo carrossel faz; a cortina dá direção ao movimento e faz a troca
-  // parecer decisão, não desbotamento.
+  // A foto anda para o lado, não pisca.
+  //
+  // A que entra vem da direita e empurra a cena; a que sai desliza um
+  // pouco para a esquerda, mais devagar, e fica atrás. Esse
+  // descompasso entre as duas é o que dá profundidade: sem ele, duas
+  // imagens andando na mesma velocidade parecem um slide de PowerPoint.
+  //
+  // Como a nova sempre vem da direita, voltar da última para a primeira
+  // não rebobina a tela.
   useEffect(() => {
-    const quadro = fundo.current?.querySelector<HTMLElement>(
-      `[data-quadro="${atual}"]`,
+    const caixa = fundo.current;
+    if (!caixa) return;
+
+    const entra = caixa.querySelector<HTMLElement>(`[data-quadro="${atual}"]`);
+    const sai = caixa.querySelector<HTMLElement>(
+      `[data-quadro="${anterior.current}"]`,
     );
-    if (!quadro) return;
+    if (!entra || entra === sai) return;
+
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      gsap.set(quadro, { clipPath: "inset(0% 0% 0% 0%)", opacity: 1 });
+      gsap.set(entra, { xPercent: 0 });
       return;
     }
-    gsap.fromTo(
-      quadro,
-      { clipPath: "inset(0% 0% 0% 100%)" },
-      {
-        clipPath: "inset(0% 0% 0% 0%)",
-        duration: 1.15,
-        ease: "power3.inOut",
-      },
-    );
-  }, [atual]);
 
-  // Guarda quem estava no ar: é ela que fica embaixo durante a cortina.
-  useEffect(() => {
-    const t = window.setTimeout(() => {
-      anterior.current = atual;
-    }, 1200);
-    return () => window.clearTimeout(t);
+    const tl = gsap.timeline();
+    tl.fromTo(
+      entra,
+      { xPercent: 100 },
+      { xPercent: 0, duration: 1.25, ease: "power3.inOut" },
+      0,
+    );
+    if (sai) {
+      tl.fromTo(
+        sai,
+        { xPercent: 0 },
+        { xPercent: -22, duration: 1.25, ease: "power3.inOut" },
+        0,
+      );
+    }
+    return () => {
+      tl.kill();
+    };
   }, [atual]);
 
   useEffect(() => {
@@ -159,7 +172,6 @@ export default function HeroIabc({
               // cortina. Apagar a de baixo é o que deixava o fundo da
               // seção aparecer por um instante, e era isso que piscava.
               zIndex: i === atual ? 3 : i === anterior.current ? 2 : 1,
-              clipPath: i === atual ? undefined : "inset(0% 0% 0% 0%)",
             }}
           >
             <Image
