@@ -44,6 +44,7 @@ export interface Rede {
     site: string;
     endereco?: string;
     telefone?: string;
+    whatsapp?: string;
   };
 }
 

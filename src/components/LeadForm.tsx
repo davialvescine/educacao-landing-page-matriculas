@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -22,6 +23,9 @@ interface Props {
   estados: FormEstado[];
   /** Slug do estado pré-selecionado (páginas de região). */
   estadoInicial?: string;
+  /** Trava a região e esconde os seletores: usada na página do IABC, onde
+   *  a única unidade possível já é a da própria página. */
+  regiaoFixa?: boolean;
   /** Nome da escola pré-selecionada (páginas de unidade). */
   escolaInicial?: string;
 }
@@ -47,6 +51,7 @@ export default function LeadForm({
   estados,
   estadoInicial,
   escolaInicial,
+  regiaoFixa = false,
 }: Props) {
   const router = useRouter();
   const [etapa, setEtapa] = useState<1 | 2>(1);
@@ -154,13 +159,13 @@ export default function LeadForm({
           <div className="grid gap-5">
             <div>
               <h3 className="text-xl font-extrabold tracking-tight text-brand-900">
-                Onde você quer estudar?
+                {regiaoFixa ? "Vamos começar" : "Onde você quer estudar?"}
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Leva menos de um minuto.
               </p>
             </div>
-            <div className="grid gap-2">
+            <div className={cn("grid gap-2", regiaoFixa && "hidden")}>
               <Label>Região*</Label>
               <Select
                 key={estado || "sem-regiao"}
@@ -215,7 +220,7 @@ export default function LeadForm({
                 className="h-12 rounded-xl"
               />
             </div>
-            <div className="grid gap-2">
+            <div className={cn("grid gap-2", regiaoFixa && "hidden")}>
               <Label>Escola de interesse</Label>
               <Select
                 value={escola || undefined}
