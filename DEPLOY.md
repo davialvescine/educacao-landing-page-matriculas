@@ -27,6 +27,9 @@ Stack: Next.js 16 (App Router, páginas estáticas + `/api/leads` dinâmica), Po
    | `NEXT_PUBLIC_GA_ID` | não | ID do GA4 (padrão embutido: `G-8ZSKJGD105`). |
    | `NEXT_PUBLIC_META_PIXEL_ID` | quando houver ads | Meta Pixel para campanhas de Facebook/Instagram; dispara `PageView`, `Lead` e `Contact`. |
    | `NEXT_PUBLIC_SITE_URL` | não | URL canônica (padrão embutido: `https://educaadventistacentrooeste.com.br`). |
+   | `HOSTS_AUTORIZADOS` | recomendada | Hosts extras aceitos além dos dois domínios dos projetos, separados por vírgula — preview do Coolify, staging, health check interno. **Em produção, host fora dessa lista recebe 404**: sem isso, qualquer domínio apontado para o IP da origem passaria a servir o site num endereço não autorizado, o que o buscador lê como conteúdo duplicado. |
+   | `NEXT_PUBLIC_DOMINIO_MATRICULAS` | não | Domínio do site de matrículas (padrão: `educaadventistacentrooeste.com.br`). |
+   | `NEXT_PUBLIC_DOMINIO_SONHOS` | não | Domínio da landing do Educação dos Sonhos (padrão: `educacaodossonhos.com.br`). |
    | `SMTP_HOST`, `SMTP_PORTA`, `SMTP_USUARIO`, `SMTP_SENHA`, `SMTP_REMETENTE` | recomendada | Envio do "esqueci minha senha" do painel. Com Google Workspace: `smtp.gmail.com`, porta 587, usuário = e-mail da conta e senha = **senha de app** gerada na conta Google. Sem isso, o link some e o administrador cadastra a senha manualmente. |
    | `SEVENBEE_WEBHOOK_SEGREDO` | recomendada | Segredo do webhook de retorno do Sevenbee (status de atendimento). Cadastre no Sevenbee (Ajustes > Integrações > Webhooks) a URL `https://<dominio>/api/sevenbee/webhook?segredo=<valor>` assinando os eventos `SESSION_CREATED`, `SESSION_UPDATED` e `SESSION_ENDED`. |
 

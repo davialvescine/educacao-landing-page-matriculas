@@ -6,6 +6,7 @@ import {
 } from "@/lib/rede";
 import { slugificar } from "@/lib/site";
 import { salvarLead, type LeadNovo } from "@/lib/leads";
+import { projetoPorHostOuPadrao } from "@/lib/projetos";
 import { enviarLeadWebhook } from "@/lib/webhook";
 import { enviarConfirmacaoLead, type EscolaEmail } from "@/lib/email";
 
@@ -67,7 +68,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ erro: "Requisição inválida." }, { status: 400 });
   }
 
+  // Quem manda no projeto é o domínio de onde o formulário foi enviado,
+  // não um campo do corpo: campo do corpo qualquer um forja.
+  const projeto = projetoPorHostOuPadrao(req.headers.get("host"));
+
   const lead: LeadNovo = {
+    projeto: projeto.slug,
     nome: limpar(body.nome, 120),
     whatsapp: limpar(body.whatsapp, 20),
     email: limpar(body.email, 160),

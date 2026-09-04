@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS leads (
   estado             text NOT NULL,            -- slug da região (ex.: goias, leste-mt)
   escola             text NOT NULL DEFAULT '', -- escola de interesse
   cidade             text NOT NULL DEFAULT '', -- cidade onde a família mora
+  projeto            text NOT NULL DEFAULT 'matriculas', -- de qual site veio o lead
   nivel              text NOT NULL DEFAULT '',
   criado_em          timestamptz NOT NULL DEFAULT now(),
   webhook_status     text NOT NULL DEFAULT 'pendente', -- pendente | enviado | falhou:*
@@ -29,6 +30,11 @@ ALTER TABLE leads ADD COLUMN IF NOT EXISTS utm jsonb;
 
 -- Cidade da família, para bancos criados antes desta versão.
 ALTER TABLE leads ADD COLUMN IF NOT EXISTS cidade text NOT NULL DEFAULT '';
+
+-- Origem do lead: a mesma aplicação serve dois sites em domínios distintos.
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS projeto text NOT NULL DEFAULT 'matriculas';
+
+CREATE INDEX IF NOT EXISTS leads_projeto_idx ON leads (projeto);
 
 -- Registro de acesso (LGPD: quem viu e exportou dados de famílias).
 CREATE TABLE IF NOT EXISTS acessos (

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { listarLeads, resumoLeads } from "@/lib/leads";
 import { getEstados } from "@/lib/rede";
+import { PROJETOS, ehSlugDeProjeto } from "@/lib/projetos";
 import {
   autenticacaoConfigurada,
   existeAdmin,
@@ -53,6 +54,11 @@ export default async function PainelPage({ searchParams }: Props) {
       ? regiaoBruta
       : undefined;
 
+  // A mesma aplicação serve dois sites; sem este filtro os leads dos dois
+  // aparecem misturados na mesma tela.
+  const projetoBruto = typeof params.projeto === "string" ? params.projeto : "";
+  const projeto = ehSlugDeProjeto(projetoBruto) ? projetoBruto : undefined;
+
   const statusBruto = typeof params.status === "string" ? params.status : "";
   const status =
     statusBruto === "enviado" ||
@@ -62,7 +68,7 @@ export default async function PainelPage({ searchParams }: Props) {
       : undefined;
 
   const [leads, resumo] = await Promise.all([
-    listarLeads({ estado: regiao, status, regioesPermitidas: permitidas }),
+    listarLeads({ estado: regiao, status, projeto, regioesPermitidas: permitidas }),
     resumoLeads(permitidas),
   ]);
 
@@ -73,6 +79,8 @@ export default async function PainelPage({ searchParams }: Props) {
       regioes={regioesVisiveis}
       filtroRegiao={regiao ?? ""}
       filtroStatus={status ?? ""}
+      projetos={PROJETOS.map((p) => ({ slug: p.slug, nome: p.nome }))}
+      filtroProjeto={projeto ?? ""}
       integracaoConfigurada={integracaoConfigurada()}
       usuario={{
         nome: usuario.nome,

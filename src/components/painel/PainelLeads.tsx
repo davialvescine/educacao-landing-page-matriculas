@@ -29,6 +29,8 @@ interface Props {
   regioes: { slug: string; nome: string }[];
   filtroRegiao: string;
   filtroStatus: string;
+  projetos: { slug: string; nome: string }[];
+  filtroProjeto: string;
   integracaoConfigurada: boolean;
   usuario: { nome: string; papel: "admin" | "coordenador" };
 }
@@ -114,6 +116,8 @@ export default function PainelLeads({
   regioes,
   filtroRegiao,
   filtroStatus,
+  projetos,
+  filtroProjeto,
   integracaoConfigurada,
   usuario,
 }: Props) {
@@ -137,10 +141,11 @@ export default function PainelLeads({
     };
   }, [selecionado]);
 
-  function aplicarFiltro(regiao: string, status: string) {
+  function aplicarFiltro(regiao: string, status: string, projeto = filtroProjeto) {
     const q = new URLSearchParams();
     if (regiao) q.set("regiao", regiao);
     if (status) q.set("status", status);
+    if (projeto) q.set("projeto", projeto);
     router.push(`/painel${q.size ? `?${q}` : ""}`);
   }
 
@@ -313,6 +318,23 @@ export default function PainelLeads({
               </button>
             ))}
           </div>
+          {projetos.length > 1 && (
+            <select
+              value={filtroProjeto}
+              onChange={(e) =>
+                aplicarFiltro(filtroRegiao, filtroStatus, e.target.value)
+              }
+              className="h-9 rounded-full border border-line bg-surface px-4 text-sm font-bold text-brand-900"
+              aria-label="Filtrar por site de origem"
+            >
+              <option value="">Todos os sites</option>
+              {projetos.map((p) => (
+                <option key={p.slug} value={p.slug}>
+                  {p.nome}
+                </option>
+              ))}
+            </select>
+          )}
           <select
             value={filtroRegiao}
             onChange={(e) => aplicarFiltro(e.target.value, filtroStatus)}

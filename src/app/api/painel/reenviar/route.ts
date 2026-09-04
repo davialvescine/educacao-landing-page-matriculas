@@ -38,6 +38,7 @@ export async function POST(req: Request) {
     estado: lead.estado,
     escola: lead.escola,
     cidade: lead.cidade,
+    projeto: lead.projeto,
     nivel: lead.nivel,
   });
   if (!resultado.configurado) {

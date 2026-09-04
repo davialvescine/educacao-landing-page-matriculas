@@ -10,6 +10,8 @@ export interface LeadNovo {
   escola: string;
   /** Cidade onde a família mora — nem sempre a mesma da escola. */
   cidade: string;
+  /** De qual dos dois sites o lead veio. */
+  projeto: SlugProjeto;
   nivel: string;
   /** Origem de campanha: utm_source, utm_medium, utm_campaign, gclid... */
   utm?: Record<string, string> | null;
@@ -34,6 +36,8 @@ export function normalizarTelefone(telefone: string): string {
 
 export interface FiltroLeads {
   estado?: string;
+  /** Restringe a um dos dois sites. */
+  projeto?: SlugProjeto;
   status?: "pendente" | "enviado" | "falhou";
   limite?: number;
   /** Restringe às regiões do usuário (null/undefined = todas). */
@@ -42,6 +46,7 @@ export interface FiltroLeads {
 
 // Pool do Postgres compartilhado; em dev sem DATABASE_URL usamos arquivo.
 import { getPool } from "@/lib/db";
+import type { SlugProjeto } from "@/lib/projetos";
 
 const ARQUIVO_DEV = path.join(process.cwd(), "var", "leads.jsonl");
 
@@ -50,8 +55,8 @@ export async function salvarLead(lead: LeadNovo): Promise<string> {
   const db = getPool();
   if (db) {
     await db.query(
-      `INSERT INTO leads (id, nome, whatsapp, email, estado, escola, cidade, nivel, utm)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      `INSERT INTO leads (id, nome, whatsapp, email, estado, escola, cidade, projeto, nivel, utm)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
       [
         id,
         lead.nome,
@@ -60,6 +65,7 @@ export async function salvarLead(lead: LeadNovo): Promise<string> {
         lead.estado,
         lead.escola,
         lead.cidade,
+        lead.projeto,
         lead.nivel,
         lead.utm ? JSON.stringify(lead.utm) : null,
       ],
@@ -142,6 +148,7 @@ async function lerArquivoDev(): Promise<LeadRegistro[]> {
       email: String(obj.email ?? ""),
       estado: String(obj.estado ?? ""),
       cidade: String(obj.cidade ?? ""),
+      projeto: (obj.projeto ?? "matriculas") as SlugProjeto,
       escola: String(obj.escola ?? ""),
       nivel: String(obj.nivel ?? ""),
       criado_em: String(obj.criado_em ?? ""),
@@ -169,6 +176,10 @@ export async function listarLeads(filtro: FiltroLeads = {}): Promise<LeadRegistr
       valores.push(filtro.estado);
       clausulas.push(`estado = $${valores.length}`);
     }
+    if (filtro.projeto) {
+      valores.push(filtro.projeto);
+      clausulas.push(`projeto = $${valores.length}`);
+    }
     if (filtro.status === "enviado") clausulas.push(`webhook_status = 'enviado'`);
     if (filtro.status === "pendente") clausulas.push(`webhook_status = 'pendente'`);
     if (filtro.status === "falhou") clausulas.push(`webhook_status LIKE 'falhou:%'`);
@@ -178,7 +189,7 @@ export async function listarLeads(filtro: FiltroLeads = {}): Promise<LeadRegistr
       clausulas.push(`estado = ANY($${valores.length})`);
     }
     valores.push(limite);
-    const sql = `SELECT id, nome, whatsapp, email, estado, escola, cidade, nivel,
+    const sql = `SELECT id, nome, whatsapp, email, estado, escola, cidade, projeto, nivel,
                         criado_em, webhook_status, webhook_tentativas, enviado_em,
                         atendimento_status, atendimento_em, utm
                  FROM leads
@@ -201,6 +212,7 @@ export async function listarLeads(filtro: FiltroLeads = {}): Promise<LeadRegistr
     leads = leads.filter((l) => permitidas.has(l.estado));
   }
   if (filtro.estado) leads = leads.filter((l) => l.estado === filtro.estado);
+  if (filtro.projeto) leads = leads.filter((l) => l.projeto === filtro.projeto);
   if (filtro.status === "enviado")
     leads = leads.filter((l) => l.webhook_status === "enviado");
   if (filtro.status === "pendente")
@@ -214,7 +226,7 @@ export async function obterLead(id: string): Promise<LeadRegistro | null> {
   const db = getPool();
   if (db) {
     const { rows } = await db.query(
-      `SELECT id, nome, whatsapp, email, estado, escola, cidade, nivel,
+      `SELECT id, nome, whatsapp, email, estado, escola, cidade, projeto, nivel,
               criado_em, webhook_status, webhook_tentativas, enviado_em,
               atendimento_status, atendimento_em, utm
        FROM leads WHERE id = $1`,
