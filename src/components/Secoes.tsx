@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ExternalLink } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import CountUp from "@/components/CountUp";
 import CtaIabc from "@/components/CtaIabc";
 import Reveal from "@/components/Reveal";
@@ -274,18 +274,18 @@ export function IabcDestaque() {
         </Reveal>
         <Reveal delay={0.2} className="flex shrink-0 flex-col items-center gap-3 sm:flex-row">
           <CtaIabc />
-          <a
-            href={rede.iabc.site}
-            target="_blank"
-            rel="noopener noreferrer"
+          {/* A landing do internato é nossa. Mandar para o site externo
+              tirava a família do funil de matrícula no meio do caminho. */}
+          <Link
+            href="/iabc"
             className={cn(
               buttonVariants({ variant: "outline", size: "lg" }),
               "h-13 shrink-0 rounded-full border-2 border-white/30 bg-transparent px-6 font-bold text-white hover:bg-white/10",
             )}
           >
-            Conhecer o site
-            <ExternalLink aria-hidden className="size-4" />
-          </a>
+            Conhecer o internato
+            <ArrowRight aria-hidden className="size-4" />
+          </Link>
         </Reveal>
       </div>
 

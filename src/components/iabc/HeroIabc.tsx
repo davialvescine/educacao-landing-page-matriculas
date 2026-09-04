@@ -4,9 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+gsap.registerPlugin(ScrollTrigger);
 
 export interface QuadroHero {
   src: string;
@@ -93,7 +92,18 @@ export default function HeroIabc({
         0,
       );
     }
+
+    // Rede de segurança do deslize. O `fromTo` põe a foto nova fora da
+    // tela NA HORA e conta com o requestAnimationFrame para trazê-la; em
+    // aba de segundo plano o rAF congela e a foto "atual" fica parada em
+    // xPercent 100, com a tela em preto. setTimeout continua correndo
+    // nessas condições; se a animação já terminou, isto não muda nada.
+    const garantir = window.setTimeout(() => {
+      gsap.set(entra, { xPercent: 0 });
+    }, 1600);
+
     return () => {
+      window.clearTimeout(garantir);
       tl.kill();
     };
   }, [atual]);
@@ -104,16 +114,17 @@ export default function HeroIabc({
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const ctx = gsap.context(() => {
-      const titulo = alvo.querySelector<HTMLElement>(".hero-titulo");
+      // As linhas do título são marcadas no próprio JSX (.hero-linha),
+      // e não fatiadas pelo SplitText. Ele tropeçava no <br> e no <span>
+      // dentro do h1: a caixa do título ficava com a altura de UMA linha
+      // e o parágrafo subia por cima da segunda. Linha marcada à mão tem
+      // altura normal de bloco, e a animação é a mesma.
+      const linhas = gsap.utils.toArray<HTMLElement>(".hero-linha", alvo);
       const apoio = alvo.querySelectorAll<HTMLElement>(".hero-entra");
 
-      const linhas = titulo
-        ? new SplitText(titulo, { type: "lines", linesClass: "hero-linha" })
-        : null;
-
       const tl = gsap.timeline({ delay: 0.15 });
-      if (linhas) {
-        tl.from(linhas.lines, {
+      if (linhas.length) {
+        tl.from(linhas, {
           yPercent: 115,
           duration: 1,
           ease: "power3.out",
@@ -123,7 +134,7 @@ export default function HeroIabc({
       tl.from(
         apoio,
         { opacity: 0, y: 20, duration: 0.7, ease: "power2.out", stagger: 0.1 },
-        linhas ? "-=0.6" : 0,
+        linhas.length ? "-=0.6" : 0,
       );
 
       // A capa afunda de leve ao sair, passando a vez para a seção seguinte.
@@ -141,12 +152,12 @@ export default function HeroIabc({
         });
       }
 
-      return () => linhas?.revert();
     }, alvo);
 
     // Rede de segurança: conteúdo invisível é pior que sem animação.
     const destravar = window.setTimeout(() => {
       gsap.set(alvo.querySelectorAll(".hero-entra"), { opacity: 1, y: 0 });
+      gsap.set(alvo.querySelectorAll(".hero-linha"), { yPercent: 0 });
     }, 2500);
 
     return () => {

@@ -63,7 +63,17 @@ export default function PainelDia({ momentos }: { momentos: MomentoDia[] }) {
       });
     }, alvo);
 
-    return () => ctx.revert();
+    // Rede de segurança: `gsap.from` esconde na hora e só mostra quando o
+    // gatilho dispara. Se ele não disparar — página aberta já rolada,
+    // aba em segundo plano — as legendas ficariam invisíveis para sempre.
+    const destravar = window.setTimeout(() => {
+      gsap.set(alvo.querySelectorAll(".momento-texto"), { opacity: 1, y: 0 });
+    }, 2500);
+
+    return () => {
+      window.clearTimeout(destravar);
+      ctx.revert();
+    };
   }, []);
 
   return (

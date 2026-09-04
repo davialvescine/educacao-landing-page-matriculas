@@ -114,6 +114,11 @@ io.on("connection", (socket) => {
       if (mudou) {
         sairDeTudo(socket);
         anunciarPresenca();
+        // O que já está na tela dele foi carregado com a permissão
+        // antiga. Parar de mandar evento novo não tira nome e telefone
+        // do DOM; só a recarga, que volta a passar pelo filtro do
+        // servidor, faz isso.
+        socket.emit("recarregar");
       }
     } catch (e) {
       // Banco fora do ar não derruba quem já está conectado: a próxima

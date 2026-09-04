@@ -132,19 +132,13 @@ depois; se falhar, vira estado no banco com contador de tentativas e é
 reprocessado pela tarefa agendada. Integração de terceiro fora do ar não
 pode custar um lead.
 
-### Por que o dono do lead é um UPDATE condicional
+### Por que o painel não marca quem está atendendo
 
-```sql
-UPDATE leads SET atendente_id = $1
- WHERE id = $2 AND atendente_id IS NULL
-```
-
-Duas coordenadoras da mesma região veem o mesmo lead novo de manhã. Sem
-dono, as duas mandam mensagem e a família recebe dois "olá" da mesma
-escola. Quem chega em segundo recebe zero linhas afetadas e é avisada.
-
-Tempo real **não** substitui isso. Ele encurta a janela; a garantia é o
-banco. Fosse só o socket, duas telas em rede lenta ainda duplicariam.
+O atendimento acontece no Sevenbee, e o `atendimento_status` chega pelo
+webhook deles. O painel marcar dono criaria uma segunda verdade que
+divergiria da primeira no primeiro dia de uso. Chegou a existir e foi
+removido. O que o tempo real mostra é presença — quem está olhando o quê
+agora —, que é estado do instante e não compete com nada.
 
 ### Por que o consentimento é versionado
 

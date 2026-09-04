@@ -76,18 +76,25 @@ Duas tarefas agendadas a cadastrar no Coolify:
 curl -fsS "https://<dominio>/api/tarefas/reenviar-falhas?segredo=$CRON_SEGREDO"
 
 # todo dia de manhã — relatório do mês que fechou, por e-mail
-curl -fsS "https://<dominio>/api/tarefas/relatorio-mensal?segredo=$CRON_SEGREDO"
+curl -fsS -X POST -H "Authorization: Bearer $CRON_SEGREDO" \
+     "https://<dominio>/api/tarefas/relatorio-mensal"
 ```
+
+O segredo vai no cabeçalho, não na URL: URL fica em histórico de shell e
+em log de acesso. `-f` importa — a rota devolve 500 quando nenhum envio
+sai e 207 quando parte falha, e é isso que o monitor do Coolify enxerga.
 
 A segunda roda **todo dia** de propósito. Ela mesma confere se hoje é o
 primeiro dia útil e se aquele mês já foi enviado — o registro fica na
 trilha de auditoria. Agendar só para o dia 1 perderia o mês inteiro se o
 servidor estivesse fora naquele dia.
 
-Para conferir o layout antes do primeiro fechamento, sem esperar a data:
+Para conferir o layout antes do primeiro fechamento, sem esperar a data
+e **sem consumir a vez oficial** de ninguém:
 
 ```
-curl -fsS "https://<dominio>/api/tarefas/relatorio-mensal?segredo=$CRON_SEGREDO&ano=2026&mes=9"
+curl -fsS -X POST -H "Authorization: Bearer $CRON_SEGREDO" \
+     "https://<dominio>/api/tarefas/relatorio-mensal?teste=1&ano=2026&mes=9"
 ```
 
 ---
@@ -107,15 +114,10 @@ continuam entrando, e a tela volta a depender do botão Atualizar.
 não houver nem tentativa registrada, o problema é antes: `BETTER_AUTH_URL`
 diferente do domínio real derruba o cookie de sessão.
 
-**Uma família reclama de dois contatos.** Confira `atendente_id` e
-`atendente_nome` no lead. Se estiverem vazios com o atendimento já em
-curso, o lead foi trabalhado direto no Sevenbee, sem passar pelo painel —
-o dono só é gravado por quem clica em atender aqui.
-
-**O relatório do mês não chegou.** Rode a tarefa na mão com `&forcar=1` e
-leia a resposta: ela diz quantos foram enviados, quantos foram pulados e
-por quê. Coordenador sem região atribuída é pulado de propósito —
-relatório vazio só ensina a ignorar a mensagem.
+**Uma família reclama de dois contatos.** O atendimento é conduzido no
+Sevenbee, e é lá que se vê quem falou com quem. O painel só ajuda a
+prevenir: com o tempo real ligado, cada coordenação vê quem mais está
+olhando o mesmo lead antes de abrir a conversa.
 
 **Alguém questiona um consentimento.** A prova está em `consentimentos`,
 por `lead_id`: versão, data, IP e o resumo criptográfico. `intacto`

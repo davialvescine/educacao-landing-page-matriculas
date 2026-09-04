@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
 import { emailConfigurado } from "@/lib/email";
-import { mesAnterior, primeiroDiaUtil } from "@/lib/relatorio";
-import { enviarRelatorioMensal, jaEnviado } from "@/lib/relatorio-email";
+import { dataEmBrasilia, mesAnterior, primeiroDiaUtil } from "@/lib/relatorio";
+import { enviarRelatorioMensal } from "@/lib/relatorio-email";
 import { SITE_URL } from "@/lib/site";
 
 export const runtime = "nodejs";
@@ -11,35 +11,47 @@ export const runtime = "nodejs";
  * Tarefa agendada: relatório do mês que fechou, por e-mail.
  *
  * Agende TODO DIA, e não só no primeiro dia útil:
- *   curl -fsS "https://<dominio>/api/tarefas/relatorio-mensal?segredo=<CRON_SEGREDO>"
+ *   curl -fsS -X POST -H "Authorization: Bearer $CRON_SEGREDO" \
+ *        https://<dominio>/api/tarefas/relatorio-mensal
  *
  * Rodar diariamente é mais simples de configurar e, principalmente,
  * sobrevive ao servidor estar fora justamente no dia marcado — a tarefa
- * pega no dia seguinte. Quem garante que sai uma vez só é o registro na
- * trilha, conferido antes de qualquer envio.
+ * pega no dia seguinte. Quem garante que cada pessoa recebe uma vez só é
+ * a tabela relatorios_enviados, reivindicada antes de cada envio.
  *
- * `?forcar=1` manda agora, fora da data, para conferir o layout antes de
- * o primeiro mês fechar. Continua respeitando o "já enviado", então não
- * duplica; para reenviar de propósito, passe também `?ano=&mes=`.
+ * O segredo vai no cabeçalho, não na URL: URL fica em histórico de shell,
+ * log de acesso e tela de configuração do agendador, e este segredo agora
+ * dispara e-mail de verdade. `?segredo=` continua aceito por compatibilidade
+ * com o agendamento antigo, mas está deprecado.
+ *
+ * `?teste=1&ano=&mes=` manda agora, fora da data, marcado como TESTE: não
+ * consome a vez oficial daquela pessoa naquele mês. Sem `teste`, ano/mes
+ * mandam o oficial daquele mês — e precisam vir os dois, válidos.
  */
 
-function autorizado(segredo: string | null): boolean {
+function autorizado(req: Request): boolean {
   const esperado = process.env.CRON_SEGREDO;
-  if (!esperado || !segredo) return false;
-  const a = Buffer.from(segredo, "utf8");
+  if (!esperado) return false;
+  const cabecalho = req.headers.get("authorization") ?? "";
+  const doCabecalho = cabecalho.startsWith("Bearer ") ? cabecalho.slice(7) : "";
+  const daUrl = new URL(req.url).searchParams.get("segredo") ?? "";
+  const recebido = doCabecalho || daUrl;
+  if (!recebido) return false;
+  const a = Buffer.from(recebido, "utf8");
   const b = Buffer.from(esperado, "utf8");
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
-export async function GET(req: Request) {
+const ANO_MIN = 2025;
+
+export async function POST(req: Request) {
   if (!process.env.CRON_SEGREDO) {
     return NextResponse.json(
       { erro: "Tarefa não configurada. Defina CRON_SEGREDO." },
       { status: 503 },
     );
   }
-  const params = new URL(req.url).searchParams;
-  if (!autorizado(params.get("segredo"))) {
+  if (!autorizado(req)) {
     return NextResponse.json({ erro: "Não autorizado." }, { status: 401 });
   }
   if (!emailConfigurado()) {
@@ -49,46 +61,70 @@ export async function GET(req: Request) {
     );
   }
 
-  const hoje = new Date();
-  const forcar = params.get("forcar") === "1";
-  const anoPedido = Number(params.get("ano"));
-  const mesPedido = Number(params.get("mes"));
-  const manual =
-    Number.isInteger(anoPedido) &&
-    Number.isInteger(mesPedido) &&
-    mesPedido >= 1 &&
-    mesPedido <= 12;
+  const params = new URL(req.url).searchParams;
+  const teste = params.get("teste") === "1";
+  const anoBruto = params.get("ano");
+  const mesBruto = params.get("mes");
 
-  const alvo = manual
-    ? { ano: anoPedido, mes: mesPedido }
-    : mesAnterior(hoje.getFullYear(), hoje.getMonth() + 1);
+  // Parâmetro de mês informado tem de ser válido, senão a rota cairia
+  // em silêncio no mês anterior — e com um erro de digitação alguém
+  // dispararia o envio oficial errado.
+  let manual: { ano: number; mes: number } | null = null;
+  if (anoBruto !== null || mesBruto !== null) {
+    const ano = Number(anoBruto);
+    const mes = Number(mesBruto);
+    const hojeAno = dataEmBrasilia(new Date()).ano;
+    const valido =
+      Number.isInteger(ano) &&
+      Number.isInteger(mes) &&
+      ano >= ANO_MIN &&
+      ano <= hojeAno + 1 &&
+      mes >= 1 &&
+      mes <= 12;
+    if (!valido) {
+      return NextResponse.json(
+        { erro: "Informe ano e mes válidos, os dois (ex.: ano=2026&mes=9)." },
+        { status: 400 },
+      );
+    }
+    manual = { ano, mes };
+  }
+
+  // "Hoje" visto de Brasília, não do fuso do processo.
+  const hoje = dataEmBrasilia(new Date());
+  const alvo = manual ?? mesAnterior(hoje.ano, hoje.mes);
 
   // Fora do primeiro dia útil a tarefa não faz nada e responde ok: cron
   // que devolve erro todo dia treina a equipe a ignorar o alarme.
-  const dia = primeiroDiaUtil(hoje.getFullYear(), hoje.getMonth() + 1);
-  const noDia = hoje.getDate() === dia.getDate();
-  if (!noDia && !forcar && !manual) {
+  const diaUtil = primeiroDiaUtil(hoje.ano, hoje.mes);
+  if (!manual && hoje.dia !== diaUtil) {
     return NextResponse.json({
       ok: true,
       enviado: false,
-      motivo: `hoje não é o primeiro dia útil (é dia ${dia.getDate()})`,
-    });
-  }
-
-  if (!manual && (await jaEnviado(alvo.ano, alvo.mes))) {
-    return NextResponse.json({
-      ok: true,
-      enviado: false,
-      motivo: `relatório de ${alvo.mes}/${alvo.ano} já foi enviado`,
+      motivo: `hoje não é o primeiro dia útil (é dia ${diaUtil})`,
     });
   }
 
   const resultado = await enviarRelatorioMensal({
     ...alvo,
+    tipo: teste ? "teste" : "oficial",
     painelUrl: `${SITE_URL}/painel/relatorio?ano=${alvo.ano}&mes=${alvo.mes}`,
   });
 
-  return NextResponse.json({ ok: true, enviado: true, mes: alvo.mes, ano: alvo.ano, ...resultado });
+  // Falha precisa VOLTAR como falha: `curl -f` e o monitor do agendador
+  // só enxergam o status. 200 com vinte falhas dentro do JSON é sucesso
+  // para eles, e ninguém fica sabendo.
+  const status = resultado.semBanco || (resultado.falhas > 0 && resultado.enviados === 0)
+    ? 500
+    : resultado.falhas > 0
+      ? 207
+      : 200;
+
+  return NextResponse.json(
+    { ok: status === 200, enviado: resultado.enviados > 0, tipo: teste ? "teste" : "oficial", ...alvo, ...resultado },
+    { status },
+  );
 }
 
-export const POST = GET;
+/** GET continua funcionando para o agendamento antigo, mas é o mesmo POST. */
+export const GET = POST;

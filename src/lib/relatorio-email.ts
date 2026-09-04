@@ -1,6 +1,6 @@
 import "server-only";
 import { enviarEmail } from "@/lib/email";
-import { gerarRelatorio, mesAnterior, type Relatorio } from "@/lib/relatorio";
+import { gerarRelatorio, type Relatorio } from "@/lib/relatorio";
 import { nomeRegiaoParaFamilia } from "@/lib/rede";
 import { getPool } from "@/lib/db";
 import { registrarAcesso } from "@/lib/usuarios";
@@ -220,15 +220,25 @@ export interface ResultadoEnvio {
 /**
  * Monta e manda o relatório do mês para cada pessoa do painel.
  *
- * `mes`/`ano` omitidos = o mês que acabou de fechar, que é o que se
- * envia no primeiro dia útil.
+ * Cada destinatário é REIVINDICADO no banco antes do envio, com uma
+ * inserção que só entra se ainda não existir. É o que garante, ao mesmo
+ * tempo: que ninguém recebe duas vezes, que uma falha no décimo não
+ * impede o décimo primeiro, e que duas execuções simultâneas não
+ * dupliquem — a segunda perde a inserção e pula.
+ *
+ * Se o envio falhar depois da reivindicação, a linha é desfeita para a
+ * próxima rodada tentar de novo.
+ *
+ * `tipo: "teste"` é para conferir o layout antes do fechamento sem
+ * consumir a vez oficial daquela pessoa naquele mês.
  */
 export async function enviarRelatorioMensal(opcoes: {
-  ano?: number;
-  mes?: number;
+  ano: number;
+  mes: number;
   painelUrl: string;
-}): Promise<ResultadoEnvio> {
-  const resultado: ResultadoEnvio = {
+  tipo?: "oficial" | "teste";
+}): Promise<ResultadoEnvio & { semBanco?: boolean }> {
+  const resultado: ResultadoEnvio & { semBanco?: boolean } = {
     enviados: 0,
     pulados: 0,
     falhas: 0,
@@ -236,15 +246,11 @@ export async function enviarRelatorioMensal(opcoes: {
   };
   const db = getPool();
   if (!db) {
+    resultado.semBanco = true;
     resultado.detalhes.push("sem banco");
     return resultado;
   }
-
-  const hoje = new Date();
-  const alvo =
-    opcoes.ano && opcoes.mes
-      ? { ano: opcoes.ano, mes: opcoes.mes }
-      : mesAnterior(hoje.getFullYear(), hoje.getMonth() + 1);
+  const tipo = opcoes.tipo ?? "oficial";
 
   const { rows: pessoas } = await db.query(
     `SELECT id, name, email, role, regioes
@@ -264,14 +270,38 @@ export async function enviarRelatorioMensal(opcoes: {
       continue;
     }
 
+    // Reivindica antes de montar qualquer coisa: quem perder esta
+    // inserção (outra execução chegou primeiro, ou já foi enviado) pula.
+    const { rowCount } = await db.query(
+      `INSERT INTO relatorios_enviados (ano, mes, usuario_id, tipo)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT DO NOTHING`,
+      [opcoes.ano, opcoes.mes, p.id, tipo],
+    );
+    if (!rowCount) {
+      resultado.pulados += 1;
+      resultado.detalhes.push(`${p.email}: já enviado`);
+      continue;
+    }
+
+    const desfazer = () =>
+      db
+        .query(
+          `DELETE FROM relatorios_enviados
+            WHERE ano = $1 AND mes = $2 AND usuario_id = $3 AND tipo = $4`,
+          [opcoes.ano, opcoes.mes, p.id, tipo],
+        )
+        .catch(() => {});
+
     const dados = await gerarRelatorio({
-      ano: alvo.ano,
-      mes: alvo.mes,
+      ano: opcoes.ano,
+      mes: opcoes.mes,
       regioesPermitidas: admin ? null : regioes,
       nomeRegiao: nomeRegiaoParaFamilia,
     });
 
     if (!dados || dados.total === 0) {
+      await desfazer();
       resultado.pulados += 1;
       resultado.detalhes.push(`${p.email}: nenhum lead no mês`);
       continue;
@@ -290,32 +320,15 @@ export async function enviarRelatorioMensal(opcoes: {
       await registrarAcesso("relatorio_enviado", {
         usuarioId: p.id,
         usuarioNome: nome,
-        detalhe: `${alvo.mes}/${alvo.ano} · ${dados.total} leads`,
+        detalhe: `${opcoes.mes}/${opcoes.ano} · ${dados.total} leads${tipo === "teste" ? " · teste" : ""}`,
       });
     } else {
+      // Solta a vez para a próxima rodada tentar de novo.
+      await desfazer();
       resultado.falhas += 1;
       resultado.detalhes.push(`${p.email}: falha no envio`);
     }
   }
 
   return resultado;
-}
-
-/**
- * Este mês já foi enviado?
- *
- * A tarefa é agendada para rodar todo dia — é mais simples de configurar
- * e sobrevive ao servidor estar fora no primeiro dia útil. Sem esta
- * checagem, ela mandaria o mesmo relatório trinta vezes.
- */
-export async function jaEnviado(ano: number, mes: number): Promise<boolean> {
-  const db = getPool();
-  if (!db) return false;
-  const { rows } = await db.query(
-    `SELECT 1 FROM acessos
-      WHERE acao = 'relatorio_enviado' AND detalhe LIKE $1
-      LIMIT 1`,
-    [`${mes}/${ano} ·%`],
-  );
-  return rows.length > 0;
 }

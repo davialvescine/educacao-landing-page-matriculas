@@ -16,25 +16,30 @@ export async function GET(req: Request) {
     return new Response("Não autorizado.", { status: 401 });
   }
   // Recorte por mês, para o CSV bater com o relatório que a pessoa está
-  // olhando. Sem os parâmetros, exporta tudo, como antes.
+  // olhando. Parâmetro informado e inválido é 400, e não "sem filtro":
+  // devolver o histórico inteiro por causa de um mês digitado errado é
+  // exportar muito mais dado de família do que foi pedido.
   const url = new URL(req.url);
-  const ano = Number(url.searchParams.get("ano"));
-  const mes = Number(url.searchParams.get("mes"));
-  const doMes =
-    Number.isInteger(ano) && Number.isInteger(mes) && mes >= 1 && mes <= 12
-      ? faixaDoMes(ano, mes)
-      : null;
+  const anoBruto = url.searchParams.get("ano");
+  const mesBruto = url.searchParams.get("mes");
+  let doMes: ReturnType<typeof faixaDoMes> | null = null;
+  if (anoBruto !== null || mesBruto !== null) {
+    const ano = Number(anoBruto);
+    const mes = Number(mesBruto);
+    const valido =
+      Number.isInteger(ano) && Number.isInteger(mes) && ano >= 2025 && ano <= 2100 && mes >= 1 && mes <= 12;
+    if (!valido) {
+      return new Response("Informe ano e mes válidos, os dois.", { status: 400 });
+    }
+    doMes = faixaDoMes(ano, mes);
+  }
 
-  let leads = await listarLeads({
+  const leads = await listarLeads({
     limite: 2000,
     regioesPermitidas: regioesPermitidas(usuario),
+    inicio: doMes?.inicio,
+    fim: doMes?.fim,
   });
-  if (doMes) {
-    leads = leads.filter((l) => {
-      const d = new Date(l.criado_em);
-      return d >= doMes.inicio && d < doMes.fim;
-    });
-  }
   await registrarAcesso("exportou", {
     usuarioId: usuario.id,
     usuarioNome: usuario.nome,

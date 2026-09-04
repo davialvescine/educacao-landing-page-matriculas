@@ -139,11 +139,18 @@ export default function IabcPage() {
           <p className="hero-entra text-xs font-extrabold uppercase tracking-[0.24em] text-gold-300">
             Internato · Abadiânia, Goiás
           </p>
-          <h1 className="hero-titulo mt-6 max-w-4xl text-[2.6rem] font-extrabold leading-[0.98] tracking-tighter text-white sm:text-7xl lg:text-8xl [&_.hero-linha]:overflow-hidden [&_.hero-linha]:pb-[0.08em]">
-            Aqui ele não vai
-            <br />
-            só estudar. Vai{" "}
-            <span className="text-gold-300">viver</span>.
+          <h1 className="hero-titulo mt-6 max-w-4xl text-[2.6rem] font-extrabold leading-[0.98] tracking-tighter text-white sm:text-7xl lg:text-8xl">
+            {/* Cada linha em dois blocos: o de fora recorta, o de dentro
+                sobe. É o que deixa a linha "nascer" de baixo sem o título
+                perder a altura dele. */}
+            <span className="block overflow-hidden pb-[0.08em]">
+              <span className="hero-linha block">Aqui ele não vai</span>
+            </span>
+            <span className="block overflow-hidden pb-[0.08em]">
+              <span className="hero-linha block">
+                só estudar. Vai <span className="text-gold-300">viver</span>.
+              </span>
+            </span>
           </h1>
           <p className="hero-entra mt-7 max-w-lg text-lg leading-relaxed text-white/80">
             Escola, moradia e esporte no mesmo campus, com gente cuidando dele o

@@ -118,9 +118,9 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
             style={{ "--delay": "0.3s" } as React.CSSProperties}
           >
             {estado.escolas.length}{" "}
-            {estado.escolas.length === 1 ? "unidade" : "unidades"} da{" "}
-            {estado.associacao} esperando por você, da Educação Infantil ao
-            Ensino Médio.
+            {estado.escolas.length === 1 ? "unidade" : "unidades"} em{" "}
+            {estado.nome} esperando por você, da Educação Infantil ao Ensino
+            Médio.
           </p>
           <HeroCtas whatsapp={estado.whatsapp.link} />
         </Hero>
@@ -128,7 +128,10 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
         {/* Unidades */}
         <section className="mx-auto max-w-7xl px-4 py-24">
           <Reveal>
-            <Eyebrow>{estado.associacao}</Eyebrow>
+            {/* Nome da região, nunca a sigla da associação: "ABC" e "APlaC"
+                são recorte administrativo da rede e não dizem nada à
+                família — e a regra do projeto é que ela nunca os veja. */}
+            <Eyebrow>Educação Adventista em {estado.nome}</Eyebrow>
             <h2 className="mt-4 text-center text-4xl font-extrabold tracking-tighter text-brand-900 sm:text-5xl">
               Nossas unidades
             </h2>

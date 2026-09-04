@@ -105,7 +105,7 @@ if (antes.leads !== null) console.log(`leads gravados: ${antes.leads}`);
 // em db/schema.sql entra aqui, senão o ensaio diz "nada pendente" para um
 // banco que na verdade está atrasado — e foi assim que a checagem anterior
 // envelheceu sem ninguém perceber.
-const EXIGE_TABELA = ["leads", "acessos", "regioes_config", "consentimentos"];
+const EXIGE_TABELA = ["leads", "acessos", "regioes_config", "consentimentos", "relatorios_enviados"];
 const EXIGE_COLUNA = [
   "leads.cidade",
   "leads.utm",
@@ -126,6 +126,10 @@ const EXIGE_OBJETO = [
   "funcao:leads_avisar",
 ];
 
+// Colunas que saíram do sistema e precisam SUMIR. A migração é aditiva
+// no resto, mas coluna de recurso removido é dívida que confunde.
+const PROIBE_COLUNA = ["leads.atendente_id", "leads.atendente_nome", "leads.atendente_em"];
+
 const pendentes = [
   ...EXIGE_TABELA.filter((t) => !antes.tabelas.includes(t)).map(
     (t) => `tabela ${t}`,
@@ -136,6 +140,7 @@ const pendentes = [
     return antes.tabelas.includes(tabela) && !antes.colunas.has(c);
   }).map((c) => `coluna ${c}`),
   ...EXIGE_OBJETO.filter((o) => !antes.objetos.has(o)),
+  ...PROIBE_COLUNA.filter((c) => antes.colunas.has(c)).map((c) => `remover coluna ${c}`),
   // Definição existente mas desatualizada: o nome está lá, o
   // comportamento não.
   ...Object.entries(antes.definicoes)

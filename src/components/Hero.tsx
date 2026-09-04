@@ -45,8 +45,15 @@ export default function Hero({
           className="object-cover"
         />
       </div>
-      {/* Brilho pulsante */}
-      <div className="absolute -left-32 top-1/4 -z-10 opacity-80">
+      {/* Brilho pulsante.
+          A imagem é um retângulo, e sobre o amarelo a borda dela aparecia
+          como um quadrado mais claro atrás do título. A máscara radial
+          apaga as bordas antes de a luz chegar nelas, e o blend em screen
+          faz o brilho somar à cor de fundo em vez de cobri-la. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-32 top-1/4 -z-10 opacity-70 mix-blend-screen [mask-image:radial-gradient(closest-side,#000_35%,transparent_100%)]"
+      >
         <Image
           src="/imagens/campanha/brilho.webp"
           alt=""

@@ -39,6 +39,11 @@ export interface FiltroLeads {
   limite?: number;
   /** Restringe às regiões do usuário (null/undefined = todas). */
   regioesPermitidas?: string[] | null;
+  /** Intervalo de criação: `criado_em >= inicio AND < fim`. Vai para a
+   *  consulta, e não para um filtro depois — filtrar depois do LIMIT
+   *  devolvia mês vazio assim que houvesse 2.000 leads mais novos. */
+  inicio?: Date;
+  fim?: Date;
 }
 
 // Pool do Postgres compartilhado; em dev sem DATABASE_URL usamos arquivo.
@@ -178,6 +183,14 @@ export async function listarLeads(filtro: FiltroLeads = {}): Promise<LeadRegistr
       valores.push(filtro.regioesPermitidas);
       clausulas.push(`estado = ANY($${valores.length})`);
     }
+    if (filtro.inicio) {
+      valores.push(filtro.inicio);
+      clausulas.push(`criado_em >= $${valores.length}`);
+    }
+    if (filtro.fim) {
+      valores.push(filtro.fim);
+      clausulas.push(`criado_em < $${valores.length}`);
+    }
     valores.push(limite);
     const sql = `SELECT id, nome, whatsapp, email, estado, escola, cidade, nivel,
                         criado_em, webhook_status, webhook_tentativas, enviado_em,
@@ -202,6 +215,8 @@ export async function listarLeads(filtro: FiltroLeads = {}): Promise<LeadRegistr
     leads = leads.filter((l) => permitidas.has(l.estado));
   }
   if (filtro.estado) leads = leads.filter((l) => l.estado === filtro.estado);
+  if (filtro.inicio) leads = leads.filter((l) => new Date(l.criado_em) >= filtro.inicio!);
+  if (filtro.fim) leads = leads.filter((l) => new Date(l.criado_em) < filtro.fim!);
   if (filtro.status === "enviado")
     leads = leads.filter((l) => l.webhook_status === "enviado");
   if (filtro.status === "pendente")

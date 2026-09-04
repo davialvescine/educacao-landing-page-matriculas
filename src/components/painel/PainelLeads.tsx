@@ -158,8 +158,14 @@ export default function PainelLeads({
   // cópia própria e continuaria exibindo nome, telefone e e-mail de
   // alguém que não é mais desta coordenação.
   useEffect(() => {
-    if (selecionado && !leads.some((l) => l.id === selecionado.id)) {
+    if (!selecionado) return;
+    const atual = leads.find((l) => l.id === selecionado.id);
+    if (!atual) {
       setSelecionado(null);
+    } else if (atual !== selecionado) {
+      // Status do Sevenbee mudou enquanto o modal estava aberto: a cópia
+      // do modal acompanha, senão a tabela diz "atendido" e o modal, não.
+      setSelecionado(atual);
     }
   }, [leads, selecionado]);
 
@@ -594,15 +600,20 @@ export default function PainelLeads({
             </li>
           ) : (
             leads.map((l) => (
-              <li key={l.id}>
+              <li
+                key={l.id}
+                className={cn(
+                  "rounded-2xl border border-line bg-surface p-4 transition-colors duration-150",
+                  novos.has(l.id) && "border-gold-400 bg-gold-100/70",
+                )}
+              >
+                {/* Botão só na parte de texto: link dentro de botão é HTML
+                    inválido e confunde leitor de tela e teclado. O
+                    WhatsApp fica fora, como link de verdade. */}
                 <button
                   type="button"
                   onClick={() => setSelecionado(l)}
-                  className={cn(
-                    "w-full rounded-2xl border border-line bg-surface p-4 text-left transition-colors duration-150 active:bg-brand-50",
-                    novos.has(l.id) &&
-                      "border-gold-400 bg-gold-100/70",
-                  )}
+                  className="w-full text-left active:opacity-80"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -631,22 +642,21 @@ export default function PainelLeads({
                     </p>
                   ) : null}
 
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    {/* Alvo de toque com folga: 44px é o mínimo para o
-                        dedo não errar e ligar para a família errada. */}
-                    <a
-                      href={`https://wa.me/55${l.whatsapp.replace(/\D/g, "")}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="inline-flex h-11 items-center gap-2 rounded-full bg-emerald-600 px-4 text-sm font-bold text-white transition-colors duration-150 active:bg-emerald-700"
-                    >
-                      <MessageCircle aria-hidden className="size-4" />
-                      {l.whatsapp}
-                    </a>
-                    <BadgeStatus status={l.webhook_status} />
-                  </div>
                 </button>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  {/* Alvo de toque com folga: 44px é o mínimo para o
+                      dedo não errar e ligar para a família errada. */}
+                  <a
+                    href={`https://wa.me/55${l.whatsapp.replace(/\D/g, "")}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex h-11 items-center gap-2 rounded-full bg-emerald-600 px-4 text-sm font-bold text-white transition-colors duration-150 active:bg-emerald-700"
+                  >
+                    <MessageCircle aria-hidden className="size-4" />
+                    {l.whatsapp}
+                  </a>
+                  <BadgeStatus status={l.webhook_status} />
+                </div>
               </li>
             ))
           )}

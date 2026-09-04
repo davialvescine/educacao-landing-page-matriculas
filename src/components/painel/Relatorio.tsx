@@ -160,8 +160,8 @@ export default function Relatorio({ dados, meses, selecionado }: Props) {
 
             {[
               ["Atendidos", dados.atendidos, "concluídos no Sevenbee"],
-              ["Aguardando", dados.aguardando, "ainda sem atendimento"],
-              ["Deixaram e-mail", dados.comEmail, "receberam a confirmação"],
+              ["Em atendimento", dados.emAtendimento, "conversa em andamento"],
+              ["Aguardando", dados.aguardando, "ainda sem contato"],
             ].map(([rotulo, valor, nota]) => (
               <div
                 key={String(rotulo)}

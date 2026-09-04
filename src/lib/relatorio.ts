@@ -20,11 +20,35 @@
 import { getPool } from "@/lib/db";
 
 export interface FaixaMes {
-  /** Primeiro instante do mês, hora local do Brasil. */
+  /** Primeiro instante do mês, hora de Brasília. */
   inicio: Date;
   /** Primeiro instante do mês seguinte: o corte é `< fim`. */
   fim: Date;
   rotulo: string;
+}
+
+/**
+ * O fuso da rede, fixado em código.
+ *
+ * O container roda em UTC, e `new Date(ano, mes, 1)` usa o fuso do
+ * PROCESSO: um lead das 23h do dia 30 em Brasília é 02h do dia 1 em UTC,
+ * e caía no relatório do mês seguinte. O Brasil não tem mais horário de
+ * verão desde 2019, então -03:00 é constante — mas o nome IANA fica aqui
+ * para o SQL, que sabe lidar com o histórico caso ele volte.
+ */
+export const FUSO = "America/Sao_Paulo";
+const DESLOCAMENTO = "-03:00";
+
+/** Ano, mês e dia de um instante, vistos de Brasília. */
+export function dataEmBrasilia(d: Date): { ano: number; mes: number; dia: number } {
+  const partes = new Intl.DateTimeFormat("en-CA", {
+    timeZone: FUSO,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(d);
+  const pegar = (t: string) => Number(partes.find((p) => p.type === t)?.value);
+  return { ano: pegar("year"), mes: pegar("month"), dia: pegar("day") };
 }
 
 const MESES = [
@@ -38,8 +62,13 @@ const MESES = [
  * a troca que produz relatório do mês errado.
  */
 export function faixaDoMes(ano: number, mes: number): FaixaMes {
-  const inicio = new Date(ano, mes - 1, 1, 0, 0, 0, 0);
-  const fim = new Date(ano, mes, 1, 0, 0, 0, 0);
+  const mm = String(mes).padStart(2, "0");
+  const seguinte = mes === 12 ? { ano: ano + 1, mes: 1 } : { ano, mes: mes + 1 };
+  const mm2 = String(seguinte.mes).padStart(2, "0");
+  // Instante absoluto, com o deslocamento explícito: não depende do fuso
+  // em que o processo estiver rodando.
+  const inicio = new Date(`${ano}-${mm}-01T00:00:00${DESLOCAMENTO}`);
+  const fim = new Date(`${seguinte.ano}-${mm2}-01T00:00:00${DESLOCAMENTO}`);
   return { inicio, fim, rotulo: `${MESES[mes - 1]} de ${ano}` };
 }
 
@@ -64,10 +93,16 @@ export function variacao(atual: number, anterior: number): number | null {
  * por ano, e relatório que chega num feriado nacional continua sendo
  * lido no dia seguinte — errar para mais cedo é barato.
  */
-export function primeiroDiaUtil(ano: number, mes: number): Date {
-  const d = new Date(ano, mes - 1, 1);
-  while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
-  return d;
+export function primeiroDiaUtil(ano: number, mes: number): number {
+  // Dia da semana calculado em UTC de propósito: a data é só ano-mês-dia,
+  // sem hora, e Date.UTC não sofre com o fuso do processo.
+  let dia = 1;
+  let semana = new Date(Date.UTC(ano, mes - 1, dia)).getUTCDay();
+  while (semana === 0 || semana === 6) {
+    dia += 1;
+    semana = new Date(Date.UTC(ano, mes - 1, dia)).getUTCDay();
+  }
+  return dia;
 }
 
 /**
@@ -120,6 +155,7 @@ export interface Relatorio {
   totalAnterior: number;
   variacao: number | null;
   atendidos: number;
+  emAtendimento: number;
   aguardando: number;
   comEmail: number;
   /** Quantos chegaram em cada dia do mês. É o que mostra o ritmo: 78
@@ -206,12 +242,15 @@ export async function gerarRelatorio(opcoes: {
   const porRegiaoDetalhe = new Map<string, GrupoRegiao>();
 
   let atendidos = 0;
+  let emAtendimento = 0;
   let comEmail = 0;
   for (const r of rows) {
-    const dia = new Date(r.criado_em).getDate();
+    // Dia visto de Brasília, e não do fuso do processo.
+    const dia = dataEmBrasilia(new Date(r.criado_em)).dia;
     if (porDia[dia - 1]) porDia[dia - 1].total += 1;
     const atendido = r.atendimento_status === "atendido";
     if (atendido) atendidos += 1;
+    else if (r.atendimento_status === "em_atendimento") emAtendimento += 1;
     if (r.email) comEmail += 1;
     somar("regiao", opcoes.nomeRegiao?.(r.estado) ?? r.estado, atendido);
     somar("escola", r.escola || "Não informou a escola", atendido);
@@ -245,7 +284,10 @@ export async function gerarRelatorio(opcoes: {
     totalAnterior,
     variacao: variacao(rows.length, totalAnterior),
     atendidos,
-    aguardando: rows.length - atendidos,
+    emAtendimento,
+    // "Aguardando" é quem ainda não teve contato nenhum. Quem está em
+    // atendimento não é aguardando — a primeira versão somava os dois.
+    aguardando: rows.length - atendidos - emAtendimento,
     comEmail,
     porDia,
     porRegiao: ranquear([...acumular.get("regiao")!.values()], 20),
@@ -268,8 +310,8 @@ export async function mesesComDados(
   const filtro = regioesPermitidas ? `WHERE estado = ANY($1)` : "";
   const { rows } = await db.query(
     `SELECT DISTINCT
-            extract(year  FROM criado_em)::int AS ano,
-            extract(month FROM criado_em)::int AS mes
+            extract(year  FROM criado_em AT TIME ZONE '${FUSO}')::int AS ano,
+            extract(month FROM criado_em AT TIME ZONE '${FUSO}')::int AS mes
        FROM leads ${filtro}
       ORDER BY ano DESC, mes DESC
       LIMIT 24`,

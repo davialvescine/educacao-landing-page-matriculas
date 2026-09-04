@@ -197,3 +197,31 @@ ALTER TABLE consentimentos ADD COLUMN IF NOT EXISTS metodo text NOT NULL DEFAULT
 
 CREATE INDEX IF NOT EXISTS consentimentos_lead_idx ON consentimentos (lead_id);
 CREATE INDEX IF NOT EXISTS consentimentos_versao_idx ON consentimentos (versao);
+
+-- ============================================================
+-- Relatórios mensais enviados
+--
+-- A primeira versão usava a trilha de auditoria como estado da tarefa:
+-- "achou um registro do mês, então já foi". Bastava UM dos vinte envios
+-- dar certo para os outros dezenove nunca mais saírem. E duas execuções
+-- simultâneas passavam as duas pela checagem antes de existir registro.
+--
+-- Aqui a chave é (ano, mes, usuario_id, tipo): cada pessoa é reivindicada
+-- com INSERT ... ON CONFLICT DO NOTHING antes do envio, o que serve de
+-- trava por destinatário e por execução ao mesmo tempo. Envio de teste
+-- tem tipo próprio, para não ser confundido com o oficial do fechamento.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS relatorios_enviados (
+  ano         int  NOT NULL,
+  mes         int  NOT NULL,
+  usuario_id  text NOT NULL,
+  tipo        text NOT NULL DEFAULT 'oficial',  -- oficial | teste
+  enviado_em  timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (ano, mes, usuario_id, tipo)
+);
+
+-- Dono do lead saiu do sistema (o atendimento é conduzido no Sevenbee).
+-- Banco que chegou a receber as colunas fica limpo também.
+ALTER TABLE leads DROP COLUMN IF EXISTS atendente_id;
+ALTER TABLE leads DROP COLUMN IF EXISTS atendente_nome;
+ALTER TABLE leads DROP COLUMN IF EXISTS atendente_em;
