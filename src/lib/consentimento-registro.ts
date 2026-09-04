@@ -27,13 +27,6 @@ function resumo(texto: string): string {
   return createHash("sha256").update(texto, "utf8").digest("hex");
 }
 
-/** Primeiro IP da cadeia de proxies, que é o do visitante. */
-export function ipDaRequisicao(req: Request): string {
-  const encaminhado = req.headers.get("x-forwarded-for");
-  if (encaminhado) return encaminhado.split(",")[0].trim().slice(0, 45);
-  return req.headers.get("cf-connecting-ip")?.slice(0, 45) ?? "";
-}
-
 export async function registrarConsentimento(dados: {
   leadId: string;
   versao: string;

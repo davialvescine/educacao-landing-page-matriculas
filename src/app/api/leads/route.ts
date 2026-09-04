@@ -9,10 +9,8 @@ import { salvarLead, type LeadNovo } from "@/lib/leads";
 import { enviarLeadWebhook } from "@/lib/webhook";
 import { enviarConfirmacaoLead, type EscolaEmail } from "@/lib/email";
 import { getVersao } from "@/lib/consentimento";
-import {
-  ipDaRequisicao,
-  registrarConsentimento,
-} from "@/lib/consentimento-registro";
+import { registrarConsentimento } from "@/lib/consentimento-registro";
+import { agenteDaRequisicao, ipDaRequisicao } from "@/lib/requisicao";
 
 export const runtime = "nodejs";
 
@@ -148,7 +146,7 @@ export async function POST(req: Request) {
     leadId: id,
     versao: versaoConsentimento,
     ip: ipDaRequisicao(req),
-    agente: req.headers.get("user-agent") ?? "",
+    agente: agenteDaRequisicao(req),
     metodo: body.consentimentoMetodo === "caixa" ? "caixa" : "envio",
   }).catch((e: unknown) => console.error("[leads] consentimento não registrado:", e));
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { exigirPapel } from "@/lib/painel-auth";
-import { registrarAcesso } from "@/lib/usuarios";
+import { origem, registrarAcesso } from "@/lib/usuarios";
 import { getEstados } from "@/lib/rede";
 import { linkWhatsapp, salvarWhatsappRegiao } from "@/lib/regioes";
 
@@ -58,6 +58,7 @@ export async function POST(req: Request) {
     detalhe: numero
       ? `${slug}: WhatsApp atualizado`
       : `${slug}: WhatsApp removido`,
+    ...origem(req),
   });
 
   revalidatePath("/", "layout");

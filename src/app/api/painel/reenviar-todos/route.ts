@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { exigirPapel } from "@/lib/painel-auth";
-import { registrarAcesso } from "@/lib/usuarios";
+import { origem, registrarAcesso } from "@/lib/usuarios";
 import { reenviarFalhas } from "@/lib/reprocesso";
 import { integracaoConfigurada } from "@/lib/webhook";
 
 export const runtime = "nodejs";
 
 /** Botão "Reenviar todos" do painel: reprocessa falhas e pendentes. */
-export async function POST() {
+export async function POST(req: Request) {
   const usuario = await exigirPapel("admin");
   if (!usuario) {
     return NextResponse.json({ erro: "Não autorizado." }, { status: 401 });
@@ -22,6 +22,7 @@ export async function POST() {
     usuarioId: usuario.id,
     usuarioNome: usuario.nome,
     detalhe: "reprocessamento em massa",
+    ...origem(req),
   });
   const resultado = await reenviarFalhas();
   return NextResponse.json({ ok: true, ...resultado });

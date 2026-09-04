@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { exigirPapel } from "@/lib/painel-auth";
-import { registrarAcesso } from "@/lib/usuarios";
+import { origem, registrarAcesso } from "@/lib/usuarios";
 import { getEstados } from "@/lib/rede";
 
 export const runtime = "nodejs";
@@ -115,6 +115,7 @@ export async function POST(req: Request) {
       usuarioId: admin.id,
       usuarioNome: admin.nome,
       detalhe: `${nome} como ${papel}`,
+      ...origem(req),
     });
     return NextResponse.json({ ok: true });
   } catch (e) {
@@ -237,6 +238,7 @@ export async function PATCH(req: Request) {
     usuarioId: admin.id,
     usuarioNome: admin.nome,
     detalhe: `${alvo}: ${feito.join(", ")}`,
+    ...origem(req),
   });
   return NextResponse.json({ ok: true });
 }

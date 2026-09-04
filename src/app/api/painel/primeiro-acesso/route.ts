@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { autenticacaoConfigurada, existeAdmin } from "@/lib/painel-auth";
-import { registrarAcesso } from "@/lib/usuarios";
+import { origem, registrarAcesso } from "@/lib/usuarios";
 import { getPool } from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -70,6 +70,7 @@ export async function POST(req: Request) {
     await registrarAcesso("criou_usuario", {
       usuarioNome: nome,
       detalhe: "primeiro administrador do painel",
+      ...origem(req),
     });
 
     return NextResponse.json({ ok: true });

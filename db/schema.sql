@@ -37,10 +37,23 @@ CREATE TABLE IF NOT EXISTS acessos (
   usuario_nome text NOT NULL DEFAULT '',
   acao        text NOT NULL,          -- login | login_falhou | exportou | reenviou
   detalhe     text NOT NULL DEFAULT '',
+  ip          text NOT NULL DEFAULT '',
+  agente      text NOT NULL DEFAULT '',
   criado_em   timestamptz NOT NULL DEFAULT now()
 );
 
+-- De onde partiu a ação, para bancos criados antes desta versão. Sem isso
+-- a trilha diz que alguém entrou, mas não de onde — e é justamente o "de
+-- onde" que distingue a coordenadora viajando de alguém usando a senha
+-- dela do outro lado do país.
+ALTER TABLE acessos ADD COLUMN IF NOT EXISTS ip text NOT NULL DEFAULT '';
+ALTER TABLE acessos ADD COLUMN IF NOT EXISTS agente text NOT NULL DEFAULT '';
+
 CREATE INDEX IF NOT EXISTS acessos_criado_em_idx ON acessos (criado_em DESC);
+
+-- Tentativa de entrada é consulta de segurança: "quantas falhas neste
+-- e-mail na última hora". Sem índice, isso varre a tabela inteira.
+CREATE INDEX IF NOT EXISTS acessos_acao_idx ON acessos (acao, criado_em DESC);
 
 CREATE INDEX IF NOT EXISTS leads_estado_idx ON leads (estado);
 CREATE INDEX IF NOT EXISTS leads_criado_em_idx ON leads (criado_em DESC);
