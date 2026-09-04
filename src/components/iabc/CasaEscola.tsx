@@ -68,6 +68,17 @@ export default function CasaEscola({ fotos }: { fotos: FotoCampus[] }) {
             // invisível quando a página abre já rolada, vinda de uma âncora.
             start: "top 92%",
             once: true,
+            // A rede de segurança conta a partir DAQUI, e não do
+            // carregamento: a animação começa quando a seção entra na
+            // tela, e uma rede que já tinha disparado antes disso não
+            // protege nada. Em aba de segundo plano o rAF congela com o
+            // texto no meio do caminho — este prazo o destrava.
+            onEnter: () => {
+              window.setTimeout(() => {
+                gsap.set(alvo.querySelectorAll(".casa-fade"), { opacity: 1, y: 0 });
+                gsap.set(linhas, { yPercent: 0 });
+              }, 1500);
+            },
           },
         })
         .from(linhas, {
