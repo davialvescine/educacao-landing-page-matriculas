@@ -24,9 +24,6 @@ export interface LeadRegistro extends LeadNovo {
   enviado_em: string | null;
   atendimento_status: string; // aguardando | em_atendimento | atendido
   atendimento_em: string | null;
-  /** Quem pegou o atendimento. Vazio = ninguém pegou ainda. */
-  atendente_id: string | null;
-  atendente_nome: string;
 }
 
 /** Telefone reduzido a dígitos, sem o DDI 55, para casar lead × Sevenbee. */
@@ -154,8 +151,6 @@ async function lerArquivoDev(): Promise<LeadRegistro[]> {
       enviado_em: null,
       atendimento_status: "aguardando",
       atendimento_em: null,
-      atendente_id: null,
-      atendente_nome: "",
       utm:
         obj.utm && typeof obj.utm === "object"
           ? (obj.utm as Record<string, string>)
@@ -186,8 +181,7 @@ export async function listarLeads(filtro: FiltroLeads = {}): Promise<LeadRegistr
     valores.push(limite);
     const sql = `SELECT id, nome, whatsapp, email, estado, escola, cidade, nivel,
                         criado_em, webhook_status, webhook_tentativas, enviado_em,
-                        atendimento_status, atendimento_em, utm,
-                        atendente_id, atendente_nome
+                        atendimento_status, atendimento_em, utm
                  FROM leads
                  ${clausulas.length ? `WHERE ${clausulas.join(" AND ")}` : ""}
                  ORDER BY criado_em DESC

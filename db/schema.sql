@@ -56,21 +56,6 @@ CREATE INDEX IF NOT EXISTS acessos_criado_em_idx ON acessos (criado_em DESC);
 CREATE INDEX IF NOT EXISTS acessos_acao_idx ON acessos (acao, criado_em DESC);
 
 -- ============================================================
--- Dono do lead
---
--- Duas coordenadoras da mesma região abrem o painel de manhã e veem o
--- mesmo lead novo. Sem dono, as duas mandam mensagem e a família recebe
--- dois "olá" da mesma escola. O campo abaixo, tomado por UPDATE
--- condicional (WHERE atendente IS NULL), faz o segundo clique voltar sem
--- linha afetada: quem chega depois é avisada, não duplica o contato.
---
--- Tempo real não substitui isto. Ele reduz a janela; a garantia é o banco.
--- ============================================================
-ALTER TABLE leads ADD COLUMN IF NOT EXISTS atendente_id text;
-ALTER TABLE leads ADD COLUMN IF NOT EXISTS atendente_nome text NOT NULL DEFAULT '';
-ALTER TABLE leads ADD COLUMN IF NOT EXISTS atendente_em timestamptz;
-
--- ============================================================
 -- Aviso de mudança para as telas abertas
 --
 -- O gatilho dispara em qualquer escrita, venha de onde vier: do
@@ -117,8 +102,7 @@ BEGIN
       'criado_em', linha.criado_em,
       'webhook_status', linha.webhook_status,
       'atendimento_status', linha.atendimento_status,
-      'atendente_id', linha.atendente_id,
-      'atendente_nome', linha.atendente_nome
+      'atendimento_em', linha.atendimento_em
     )
   )::text;
 

@@ -16,8 +16,10 @@ import type { LeadRegistro } from "@/lib/leads";
  *
  * Se o serviço estiver fora do ar, `ligado` fica falso e o painel volta a
  * ser o que era: lista do servidor mais o botão Atualizar. Nada quebra —
- * tempo real aqui é conforto, e a garantia contra atendimento duplicado
- * está no banco, não neste arquivo.
+ * tempo real aqui é conforto.
+ *
+ * O atendimento é conduzido no Sevenbee, não aqui. O que este arquivo
+ * mostra é presença: quem está olhando o quê, agora.
  *
  * O endereço vem por parâmetro, do componente de servidor, e não de
  * `NEXT_PUBLIC_*`: variável pública é resolvida no BUILD. Definida só
@@ -152,18 +154,6 @@ export function useTempoReal(iniciais: LeadRegistro[], url: string) {
     socket.current?.emit("lead:largou");
   }, []);
 
-  /** Pede o atendimento. Quem decide é o banco: o segundo pedido volta
-   *  com `pego: false` e o nome de quem chegou primeiro. */
-  const pegar = useCallback(
-    (leadId: string) =>
-      new Promise<{ pego: boolean; de?: string; erro?: boolean }>((ok) => {
-        const s = socket.current;
-        if (!s?.connected) return ok({ pego: false, erro: true });
-        s.emit("lead:pegar", leadId, ok);
-      }),
-    [],
-  );
-
   const marcarVisto = useCallback((leadId: string) => {
     setNovos((n) => {
       if (!n.has(leadId)) return n;
@@ -173,5 +163,5 @@ export function useTempoReal(iniciais: LeadRegistro[], url: string) {
     });
   }, []);
 
-  return { leads, ligado, presenca, olhares, novos, olhar, largar, pegar, marcarVisto };
+  return { leads, ligado, presenca, olhares, novos, olhar, largar, marcarVisto };
 }

@@ -15,7 +15,7 @@ import {
   Send,
   Users,
   Eye,
-  Hand,
+  ChartColumn,
   TriangleAlert,
   X,
 } from "lucide-react";
@@ -147,7 +147,6 @@ export default function PainelLeads({
     novos,
     olhar,
     largar,
-    pegar,
     marcarVisto,
   } = useTempoReal(leadsDoServidor, tempoRealUrl);
 
@@ -163,17 +162,6 @@ export default function PainelLeads({
     marcarVisto(selecionado.id);
     return () => largar();
   }, [selecionado, olhar, largar, marcarVisto]);
-
-  async function atender(lead: LeadRegistro) {
-    const r = await pegar(lead.id);
-    if (r.pego) {
-      setAviso(`Você está atendendo ${lead.nome}.`);
-    } else if (r.erro) {
-      setAviso("Não consegui reservar agora. Tente de novo.");
-    } else {
-      setAviso(`${r.de || "Outra pessoa"} pegou este atendimento primeiro.`);
-    }
-  }
 
   // Fecha o modal com Esc e trava o scroll da página enquanto ele está aberto.
   useEffect(() => {
@@ -300,6 +288,12 @@ export default function PainelLeads({
                 {presenca.length > 1 ? ` · ${presenca.length}` : ""}
               </span>
             ) : null}
+            <Link
+              href="/painel/relatorio"
+              className="inline-flex h-9 items-center gap-2 rounded-full border border-white/25 px-4 text-sm font-bold text-white transition-colors hover:bg-white/10"
+            >
+              <ChartColumn aria-hidden className="size-4" /> Relatório
+            </Link>
             <a
               href="/api/painel/exportar"
               className="inline-flex h-9 items-center gap-2 rounded-full border border-white/25 px-4 text-sm font-bold text-white transition-colors hover:bg-white/10"
@@ -507,30 +501,8 @@ export default function PainelLeads({
                     </td>
                     <td className="whitespace-nowrap px-4 py-3">
                       <BadgeAtendimento status={l.atendimento_status} />
-                      {l.atendente_nome ? (
-                        <span className="mt-1 block text-xs text-muted-foreground">
-                          com {l.atendente_nome}
-                        </span>
-                      ) : null}
                     </td>
                     <td className="whitespace-nowrap px-4 py-3 text-right">
-                      {/* Reservar o atendimento. Quem decide é o banco:
-                          o segundo clique volta com o nome de quem
-                          chegou primeiro, e ninguém manda mensagem
-                          dobrada para a família. */}
-                      {ligado && !l.atendente_id ? (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            atender(l);
-                          }}
-                          className="mr-2 h-8 rounded-full text-xs font-bold"
-                        >
-                          <Hand aria-hidden className="size-3" /> Atender
-                        </Button>
-                      ) : null}
                       {integracaoConfigurada &&
                       l.webhook_status !== "enviado" ? (
                         <Button

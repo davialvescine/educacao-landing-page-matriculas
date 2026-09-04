@@ -5,14 +5,14 @@
  *
  *  ida    o Postgres avisa (LISTEN leads_mudou) e o evento cai nas telas
  *         de quem pode ver aquela região
- *  volta  a tela avisa que alguém está olhando um lead, e pede para pegar
- *         o atendimento
+ *  volta  a tela avisa que alguém está olhando um lead
  *
- * A volta é o que justifica o socket. Só ida daria para fazer com SSE e
- * sem processo separado. O que a mão dupla compra é impedir o dano antes
- * dele acontecer: a coordenadora vê "a Fulana está neste lead" enquanto a
- * Fulana ainda está lendo, e não depois de as duas já terem mandado
- * mensagem para a mesma família.
+ * O atendimento em si NÃO acontece aqui: acontece no Sevenbee, e o
+ * `atendimento_status` chega pelo webhook deles. O painel marcar dono
+ * criaria uma segunda verdade que divergiria da primeira no primeiro dia
+ * de uso. Por isso a volta guarda só presença, que é estado do instante
+ * e não compete com nada: a coordenadora vê que a colega já está nesse
+ * lead antes de abrir a conversa no Sevenbee.
  *
  * REGRA DURA, e ela vale em TODO evento daqui: coordenador só enxerga as
  * regiões atribuídas a ele. Isso inclui presença e "quem está olhando" —
@@ -129,50 +129,6 @@ io.on("connection", (socket) => {
 
   socket.on("lead:largou", () => sairDeTudo(socket));
 
-  // ---- volta: pegar o atendimento -----------------------------------
-  //
-  // A garantia contra atendimento duplicado NÃO é o socket: é o UPDATE
-  // condicional. O socket só encurta a janela. Se duas pessoas clicarem
-  // no mesmo milissegundo, o banco decide, e a segunda recebe
-  // `pego: false` com o nome de quem ganhou.
-  socket.on("lead:pegar", async (leadId, responder) => {
-    const resposta = typeof responder === "function" ? responder : () => {};
-    const usuario = socket.data.usuario;
-    try {
-      const estado = await regiaoDoLead(pool, leadId);
-      // Autorização primeiro, e a mesma condição repetida no WHERE: quem
-      // não pode ver a região não pode pegar o lead, e nem descobrir de
-      // quem ele é. Sem isto, bastava ter o identificador.
-      if (!estado || !podeVer(usuario, estado)) return resposta({ pego: false });
-
-      const { rows } = await pool.query(
-        `UPDATE leads
-            SET atendente_id = $1, atendente_nome = $2, atendente_em = now(),
-                atendimento_status = CASE
-                  WHEN atendimento_status = 'aguardando' THEN 'em_atendimento'
-                  ELSE atendimento_status END
-          WHERE id = $3 AND estado = $4 AND atendente_id IS NULL
-          RETURNING id`,
-        [usuario.id, usuario.nome, leadId, estado],
-      );
-      if (rows.length) {
-        // O gatilho do banco já avisa todas as telas: não repasso aqui.
-        // O registro na trilha não segura a resposta — auditoria lenta
-        // não pode virar botão travado.
-        registrar(usuario, "pegou_lead", leadId);
-        return resposta({ pego: true });
-      }
-      const { rows: dono } = await pool.query(
-        `SELECT atendente_nome FROM leads WHERE id = $1 AND estado = $2`,
-        [leadId, estado],
-      );
-      resposta({ pego: false, de: dono[0]?.atendente_nome ?? "" });
-    } catch (e) {
-      console.error("[tempo-real] falha ao pegar lead:", e);
-      resposta({ pego: false, erro: true });
-    }
-  });
-
   socket.on("disconnect", () => {
     clearInterval(conferir);
     sairDeTudo(socket);
@@ -229,16 +185,6 @@ function espalhar(estado, evento, carga) {
   for (const s of io.sockets.sockets.values()) {
     if (podeVer(s.data.usuario, estado)) s.emit(evento, carga);
   }
-}
-
-function registrar(usuario, acao, detalhe) {
-  pool
-    .query(
-      `INSERT INTO acessos (usuario_id, usuario_nome, acao, detalhe)
-       VALUES ($1, $2, $3, $4)`,
-      [usuario.id, usuario.nome, acao, detalhe],
-    )
-    .catch((e) => console.error("[tempo-real] falha ao registrar acesso:", e));
 }
 
 // ---- ida: o banco avisa, as telas recebem ---------------------------
