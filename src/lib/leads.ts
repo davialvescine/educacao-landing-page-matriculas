@@ -8,6 +8,8 @@ export interface LeadNovo {
   email: string;
   estado: string;
   escola: string;
+  /** Cidade onde a família mora — nem sempre a mesma da escola. */
+  cidade: string;
   nivel: string;
   /** Origem de campanha: utm_source, utm_medium, utm_campaign, gclid... */
   utm?: Record<string, string> | null;
@@ -48,8 +50,8 @@ export async function salvarLead(lead: LeadNovo): Promise<string> {
   const db = getPool();
   if (db) {
     await db.query(
-      `INSERT INTO leads (id, nome, whatsapp, email, estado, escola, nivel, utm)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      `INSERT INTO leads (id, nome, whatsapp, email, estado, escola, cidade, nivel, utm)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
       [
         id,
         lead.nome,
@@ -57,6 +59,7 @@ export async function salvarLead(lead: LeadNovo): Promise<string> {
         lead.email,
         lead.estado,
         lead.escola,
+        lead.cidade,
         lead.nivel,
         lead.utm ? JSON.stringify(lead.utm) : null,
       ],
@@ -138,6 +141,7 @@ async function lerArquivoDev(): Promise<LeadRegistro[]> {
       whatsapp: String(obj.whatsapp ?? ""),
       email: String(obj.email ?? ""),
       estado: String(obj.estado ?? ""),
+      cidade: String(obj.cidade ?? ""),
       escola: String(obj.escola ?? ""),
       nivel: String(obj.nivel ?? ""),
       criado_em: String(obj.criado_em ?? ""),
@@ -174,7 +178,7 @@ export async function listarLeads(filtro: FiltroLeads = {}): Promise<LeadRegistr
       clausulas.push(`estado = ANY($${valores.length})`);
     }
     valores.push(limite);
-    const sql = `SELECT id, nome, whatsapp, email, estado, escola, nivel,
+    const sql = `SELECT id, nome, whatsapp, email, estado, escola, cidade, nivel,
                         criado_em, webhook_status, webhook_tentativas, enviado_em,
                         atendimento_status, atendimento_em, utm
                  FROM leads
@@ -210,7 +214,7 @@ export async function obterLead(id: string): Promise<LeadRegistro | null> {
   const db = getPool();
   if (db) {
     const { rows } = await db.query(
-      `SELECT id, nome, whatsapp, email, estado, escola, nivel,
+      `SELECT id, nome, whatsapp, email, estado, escola, cidade, nivel,
               criado_em, webhook_status, webhook_tentativas, enviado_em,
               atendimento_status, atendimento_em, utm
        FROM leads WHERE id = $1`,

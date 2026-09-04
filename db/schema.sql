@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS leads (
   whatsapp           text NOT NULL,
   email              text NOT NULL DEFAULT '',
   estado             text NOT NULL,            -- slug da região (ex.: goias, leste-mt)
-  escola             text NOT NULL DEFAULT '', -- escola de interesse (opcional)
+  escola             text NOT NULL DEFAULT '', -- escola de interesse
+  cidade             text NOT NULL DEFAULT '', -- cidade onde a família mora
   nivel              text NOT NULL DEFAULT '',
   criado_em          timestamptz NOT NULL DEFAULT now(),
   webhook_status     text NOT NULL DEFAULT 'pendente', -- pendente | enviado | falhou:*
@@ -25,6 +26,9 @@ ALTER TABLE leads ADD COLUMN IF NOT EXISTS atendimento_em timestamptz;
 
 -- Origem de campanha (utm_source, utm_medium, utm_campaign, gclid, fbclid...).
 ALTER TABLE leads ADD COLUMN IF NOT EXISTS utm jsonb;
+
+-- Cidade da família, para bancos criados antes desta versão.
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS cidade text NOT NULL DEFAULT '';
 
 -- Registro de acesso (LGPD: quem viu e exportou dados de famílias).
 CREATE TABLE IF NOT EXISTS acessos (

@@ -401,10 +401,15 @@ export default function PainelLeads({
                     </td>
                     <td className="whitespace-nowrap px-4 py-3">
                       {nomeRegiao.get(l.estado) ?? l.estado}
+                      {l.cidade ? (
+                        <span className="block text-xs text-muted-foreground">
+                          {l.cidade}
+                        </span>
+                      ) : null}
                     </td>
                     <td className="max-w-56 px-4 py-3">
                       <span className="block truncate">
-                        {l.escola || "Qualquer unidade"}
+                        {l.escola || "—"}
                       </span>
                       {l.nivel ? (
                         <span className="block text-xs text-muted-foreground">
@@ -534,10 +539,18 @@ export default function PainelLeads({
               </div>
               <div>
                 <dt className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  Cidade da família
+                </dt>
+                <dd className="mt-1 font-medium text-brand-950">
+                  {selecionado.cidade || "—"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                   Escola de interesse
                 </dt>
                 <dd className="mt-1 font-medium text-brand-950">
-                  {selecionado.escola || "Ainda não sei / qualquer unidade"}
+                  {selecionado.escola || "—"}
                 </dd>
               </div>
               <div>

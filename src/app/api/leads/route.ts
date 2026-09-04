@@ -69,6 +69,7 @@ export async function POST(req: Request) {
     email: limpar(body.email, 160),
     estado: limpar(body.estado, 40),
     escola: limpar(body.escola, 120),
+    cidade: limpar(body.cidade, 90),
     nivel: limpar(body.nivel, 60),
     utm: limparUtm(body.utm),
   };
@@ -76,6 +77,20 @@ export async function POST(req: Request) {
   if (!lead.nome || !lead.whatsapp) {
     return NextResponse.json(
       { erro: "Informe nome e WhatsApp." },
+      { status: 400 },
+    );
+  }
+  if (!lead.cidade) {
+    return NextResponse.json(
+      { erro: "Informe a sua cidade." },
+      { status: 400 },
+    );
+  }
+  // A escola é o que diz qual equipe atende a família — e, no Mato Grosso,
+  // qual das duas associações fica com o lead.
+  if (!lead.escola) {
+    return NextResponse.json(
+      { erro: "Escolha a escola de interesse." },
       { status: 400 },
     );
   }
@@ -130,6 +145,7 @@ export async function POST(req: Request) {
       regiao: estado.nome,
       whatsapp: estado.whatsapp.link,
       telefone: lead.whatsapp,
+      cidade: lead.cidade,
       nivel: lead.nivel,
       escola: escolaDoEmail(estado.slug, lead.escola),
     }).catch((e) => console.error("[leads] confirmação não enviada:", e));
