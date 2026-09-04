@@ -16,11 +16,13 @@ import { Diferenciais, Eyebrow } from "@/components/Secoes";
 import {
   cidadeEscola,
   getFormEstados,
+  construirRegioesSite,
   getRegiaoSite,
   getRegioesSite,
   nomeEscola,
   slugEscola,
 } from "@/lib/rede";
+import { getWhatsappSobrescritos } from "@/lib/regioes";
 import { SITE_URL } from "@/lib/site";
 
 /** Fotos oficiais da campanha, alternadas entre as regiões. */
@@ -54,7 +56,9 @@ export async function generateMetadata({
 
 export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
   const { estado: slug } = await params;
-  const estado = getRegiaoSite(slug);
+  // Números salvos no painel; sem eles, valem os do rede.json.
+  const regioes = construirRegioesSite(await getWhatsappSobrescritos());
+  const estado = regioes.find((e) => e.slug === slug);
   if (!estado) notFound();
   const foto = FOTOS[estado.slug] ?? FOTOS["goias"];
 
@@ -166,7 +170,7 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
       </main>
       <WhatsFlutuante
         linkDireto={estado.whatsapp.link}
-        regioes={getRegioesSite().map((e) => ({
+        regioes={regioes.map((e) => ({
           slug: e.slug,
           nome: e.nome,
           link: e.whatsapp.link,

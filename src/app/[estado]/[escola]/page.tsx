@@ -21,6 +21,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   cidadeEscola,
+  construirRegioesSite,
   getEscola,
   getRegioesSite,
   getFormEstados,
@@ -29,6 +30,7 @@ import {
   slugEscola,
   whatsappDaEscola,
 } from "@/lib/rede";
+import { getWhatsappSobrescritos } from "@/lib/regioes";
 import { SITE_NOME, SITE_URL } from "@/lib/site";
 
 export function generateStaticParams() {
@@ -58,9 +60,10 @@ export default async function EscolaPage({
   params,
 }: PageProps<"/[estado]/[escola]">) {
   const { estado: estadoSlug, escola: escolaSlug } = await params;
-  const dados = getEscola(estadoSlug, escolaSlug);
-  if (!dados) notFound();
-  const { estado, escola } = dados;
+  const regioes = construirRegioesSite(await getWhatsappSobrescritos());
+  const estado = regioes.find((e) => e.slug === estadoSlug);
+  const escola = estado?.escolas.find((s) => slugEscola(s) === escolaSlug);
+  if (!estado || !escola) notFound();
   const rede = getRede();
   const nome = nomeEscola(escola);
   const cidade = cidadeEscola(escola);
@@ -332,7 +335,7 @@ export default async function EscolaPage({
       </main>
       <WhatsFlutuante
         linkDireto={whatsapp}
-        regioes={getRegioesSite().map((e) => ({
+        regioes={regioes.map((e) => ({
           slug: e.slug,
           nome: e.nome,
           link: e.whatsapp.link,

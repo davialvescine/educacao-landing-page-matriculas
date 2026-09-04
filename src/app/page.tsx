@@ -20,11 +20,12 @@ import {
   IabcDestaque,
   RedeMundialSection,
 } from "@/components/Secoes";
-import { getFormEstados, getRegioesSite } from "@/lib/rede";
+import { construirRegioesSite, getFormEstados } from "@/lib/rede";
+import { getWhatsappSobrescritos } from "@/lib/regioes";
 import { SITE_NOME, SITE_URL } from "@/lib/site";
 
-export default function Home() {
-  const estados = getRegioesSite();
+export default async function Home() {
+  const estados = construirRegioesSite(await getWhatsappSobrescritos());
   const totalEscolas = estados.reduce((n, e) => n + e.escolas.length, 0);
 
   return (

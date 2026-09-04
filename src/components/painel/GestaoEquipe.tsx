@@ -43,6 +43,7 @@ const ROTULO_ACAO: Record<string, string> = {
   reenviou: "reenviou lead",
   criou_usuario: "criou usuário",
   alterou_usuario: "alterou usuário",
+  alterou_regiao: "alterou WhatsApp da região",
 };
 
 function formatarData(iso: string | null): string {

@@ -67,3 +67,15 @@ create index if not exists "session_userId_idx" on "session" ("userId");
 create index if not exists "account_userId_idx" on "account" ("userId");
 
 create index if not exists "verification_identifier_idx" on "verification" ("identifier");
+
+-- ============================================================
+-- WhatsApp por região, editável no painel.
+-- A base continua em src/data/rede.json: esta tabela só guarda o que a
+-- coordenação sobrescreveu. Região sem linha aqui usa o número do arquivo.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS regioes_config (
+  slug            text PRIMARY KEY,   -- slug interno (distrito-federal, leste-mt...)
+  whatsapp_numero text NOT NULL DEFAULT '',
+  atualizado_em   timestamptz NOT NULL DEFAULT now(),
+  atualizado_por  text NOT NULL DEFAULT ''
+);

@@ -164,11 +164,24 @@ const GRUPOS: Record<string, { slug: string; nome: string; uf: string }> = {
  * Cada escola sai com o WhatsApp da própria associação preenchido, para
  * o card e a página da unidade continuarem falando com quem atende.
  */
-function montarRegioesSite(): Estado[] {
+function montarRegioesSite(
+  sobrescritos: Record<string, { numero: string; link: string }> = {},
+): Estado[] {
   const saida: Estado[] = [];
   const porGrupo = new Map<string, Estado>();
 
-  for (const estado of rede.estados) {
+  for (const bruto of rede.estados) {
+    const override = sobrescritos[bruto.slug];
+    const estado: Estado = override
+      ? {
+          ...bruto,
+          whatsapp: {
+            numero: override.numero,
+            link: override.link,
+            confirmar_numero: false,
+          },
+        }
+      : bruto;
     const grupo = GRUPOS[estado.slug];
     const escolas = estado.escolas.map((escola) => ({
       ...escola,
@@ -213,9 +226,22 @@ function montarRegioesSite(): Estado[] {
 
 const REGIOES_SITE = montarRegioesSite();
 
-/** As regiões que a família vê: 5 páginas, com o Mato Grosso unificado. */
+/**
+ * As regiões que a família vê: 5 páginas, com o Mato Grosso unificado.
+ * Usa os números do rede.json — serve para rotas e listas, onde o telefone
+ * não importa. Para renderizar telefone, use construirRegioesSite().
+ */
 export function getRegioesSite(): Estado[] {
   return REGIOES_SITE;
+}
+
+/** As mesmas regiões, com os números que a coordenação salvou no painel. */
+export function construirRegioesSite(
+  sobrescritos: Record<string, { numero: string; link: string }>,
+): Estado[] {
+  return Object.keys(sobrescritos).length
+    ? montarRegioesSite(sobrescritos)
+    : REGIOES_SITE;
 }
 
 export function getRegiaoSite(slug: string): Estado | undefined {

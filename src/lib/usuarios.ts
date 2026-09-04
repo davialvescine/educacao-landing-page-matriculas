@@ -11,7 +11,8 @@ export type AcaoAcesso =
   | "exportou"
   | "reenviou"
   | "criou_usuario"
-  | "alterou_usuario";
+  | "alterou_usuario"
+  | "alterou_regiao";
 
 export async function registrarAcesso(
   acao: AcaoAcesso,
