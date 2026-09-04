@@ -20,8 +20,8 @@ import {
   IabcDestaque,
   RedeMundialSection,
 } from "@/components/Secoes";
-import { getEstados, getFormEstados } from "@/lib/rede";
-import { SITE_NOME, SITE_URL } from "@/lib/site";
+import { getEstados, getFormEstados, nomeEscola, slugEscola } from "@/lib/rede";
+import { PERFIS_OFICIAIS, SITE_NOME, SITE_URL } from "@/lib/site";
 
 export default function Home() {
   const estados = getEstados();
@@ -33,14 +33,43 @@ export default function Home() {
         dados={{
           "@context": "https://schema.org",
           "@type": "EducationalOrganization",
+          "@id": `${SITE_URL}/#organizacao`,
           name: SITE_NOME,
           url: SITE_URL,
           logo: `${SITE_URL}/imagens/campanha/logo-ea.png`,
-          description:
-            "Rede de Educação Adventista no Centro-Oeste brasileiro: 39 escolas particulares cristãs da Educação Infantil ao Ensino Médio no DF, GO, MS, MT e TO.",
+          description: `Rede de Educação Adventista no Centro-Oeste brasileiro: ${totalEscolas} escolas particulares cristãs da Educação Infantil ao Ensino Médio no DF, GO, MS, MT e TO.`,
           areaServed: ["DF", "GO", "MS", "MT", "TO"],
-          sameAs: ["https://www.educacaoadventista.org.br/"],
+          sameAs: PERFIS_OFICIAIS,
           numberOfEmployees: { "@type": "QuantitativeValue", minValue: 1000 },
+          // Catálogo geral: as unidades penduradas na instituição. É o que
+          // faz o buscador entender 45 páginas de uma mesma rede, em vez de
+          // 45 sites soltos, e concentrar autoridade em vez de dispersar.
+          subOrganization: estados.flatMap((e) =>
+            e.escolas.map((s) => ({
+              "@type": "School",
+              name: nomeEscola(s),
+              url: `${SITE_URL}/${e.slug}/${slugEscola(s)}`,
+              ...(s.endereco
+                ? {
+                    address: {
+                      "@type": "PostalAddress",
+                      streetAddress: s.endereco,
+                      addressRegion: e.uf,
+                      addressCountry: "BR",
+                    },
+                  }
+                : {}),
+            })),
+          ),
+        }}
+      />
+      <JsonLd
+        dados={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Início", item: SITE_URL },
+          ],
         }}
       />
       <Header />

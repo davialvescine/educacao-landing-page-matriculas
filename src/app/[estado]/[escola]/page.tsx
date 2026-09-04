@@ -21,6 +21,7 @@ import DepoimentosSection from "@/components/DepoimentosSection";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
+  cidadeDaUnidade,
   cidadeEscola,
   getEscola,
   getEstados,
@@ -45,10 +46,18 @@ export async function generateMetadata({
   const dados = getEscola(estadoSlug, escolaSlug);
   if (!dados) return {};
   const nome = nomeEscola(dados.escola);
-  const cidade = cidadeEscola(dados.escola);
+  // Duas localidades e ambas valem busca: o bairro que batiza a unidade
+  // ("Taguatinga", "Setor Pedro Ludovico") e a cidade real do endereço.
+  // Quando diferem, as duas entram na descrição.
+  const cidade = cidadeDaUnidade(dados.escola);
+  const bairro = cidadeEscola(dados.escola);
+  const onde =
+    cidade && bairro && cidade.toLowerCase() !== bairro.toLowerCase()
+      ? `${bairro}, ${cidade}`
+      : (cidade ?? bairro);
   return {
     title: `${nome}: Matrículas Abertas 2027`,
-    description: `${nome}: escola particular cristã em ${cidade} (${dados.estado.uf}), da Educação Infantil ao Ensino Médio. Rede Adventista, 130 anos de tradição. Agende uma visita pelo WhatsApp.`,
+    description: `${nome}: escola particular cristã em ${onde} (${dados.estado.uf}), da Educação Infantil ao Ensino Médio. Rede Adventista, 130 anos de tradição. Agende uma visita pelo WhatsApp.`,
     alternates: {
       canonical: `${SITE_URL}/${estadoSlug}/${escolaSlug}`,
     },
@@ -64,7 +73,7 @@ export default async function EscolaPage({
   const { estado, escola } = dados;
   const rede = getRede();
   const nome = nomeEscola(escola);
-  const cidade = cidadeEscola(escola);
+  const cidade = cidadeDaUnidade(escola) ?? cidadeEscola(escola);
   const url = `${SITE_URL}/${estado.slug}/${slugEscola(escola)}`;
   const linkMaps = escola.endereco
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${nome}, ${escola.endereco}`)}`
@@ -92,6 +101,9 @@ export default async function EscolaPage({
                 },
               }
             : {}),
+          // O site próprio da unidade, quando existe, amarra as duas fontes
+          // como a mesma entidade — é o que os buscadores de IA seguem.
+          ...(escola.site ? { sameAs: [escola.site] } : {}),
           parentOrganization: {
             "@type": "EducationalOrganization",
             name: SITE_NOME,

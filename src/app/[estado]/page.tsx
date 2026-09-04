@@ -15,7 +15,7 @@ import JsonLd from "@/components/JsonLd";
 import FaqBloco from "@/components/FaqBloco";
 import { Diferenciais, Eyebrow } from "@/components/Secoes";
 import {
-  cidadeEscola,
+  cidadeDaUnidade,
   getEstado,
   getEstados,
   getFormEstados,
@@ -45,7 +45,7 @@ export async function generateMetadata({
   const { estado: slug } = await params;
   const estado = getEstado(slug);
   if (!estado) return {};
-  const cidades = [...new Set(estado.escolas.map(cidadeEscola))]
+  const cidades = [...new Set(estado.escolas.map(cidadeDaUnidade).filter(Boolean))]
     .slice(0, 6)
     .join(", ");
   return {
@@ -74,6 +74,21 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
             name: nomeEscola(s),
             url: `${SITE_URL}/${estado.slug}/${slugEscola(s)}`,
           })),
+        }}
+      />
+      <JsonLd
+        dados={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Início", item: SITE_URL },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: estado.nome,
+              item: `${SITE_URL}/${estado.slug}`,
+            },
+          ],
         }}
       />
       <Header />
