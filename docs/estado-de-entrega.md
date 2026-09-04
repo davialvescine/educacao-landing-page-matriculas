@@ -2,13 +2,13 @@
 
 *Apurado no código em 04 de setembro de 2026, contra a proposta comercial enviada em 02/09/2026. Os valores são os da proposta e não foram alterados.*
 
-De **R$ 34.140** de implantação, **R$ 25.500 já estão no ar**: **R$ 23.550** sem ressalva e **R$ 1.950** com um pedaço nomeado faltando. **R$ 8.640** ainda não começaram.
+De **R$ 34.140** de implantação, **R$ 28.800 já estão no ar**: **R$ 23.550** sem ressalva e **R$ 5.250** com um pedaço nomeado faltando. **R$ 5.340** ainda não começaram.
 
 | Estado | Valor | O que significa |
 | --- | --- | --- |
 | ✅ Pronto | R$ 23.550 | Construído, no ar e funcionando como está descrito. |
-| ⚠️ Parcial | R$ 1.950 | Já funciona, mas falta o pedaço nomeado na linha. |
-| ❌ Falta | R$ 8.640 | Não foi construído. |
+| ⚠️ Parcial | R$ 5.250 | Já funciona, mas falta o pedaço nomeado na linha. |
+| ❌ Falta | R$ 5.340 | Não foi construído. |
 
 ## § 01 — Página principal e estrutura
 
@@ -288,19 +288,21 @@ Um único modelo de página, alimentado pelos dados de cada unidade: foto, ender
 
 ## § 11 — Landing page — projeto Educação dos Sonhos
 
-*❌ Falta R$ 3.300*
+*⚠️ Parcial R$ 3.300*
 
-### ❌ Falta — Landing page do projeto · R$ 3.300
+### ⚠️ Parcial — Landing page do projeto · R$ 3.300
 
 Implementação da página, coleta de leads e envio ao Sevenbee com webhook de retorno (aguardando, em atendimento, atendido). A fila de resiliência com nova tentativa automática é a mesma do site principal, reaproveitada. Inclui a hospedagem do projeto.
 
-> **Estado atual.** Não iniciada: falta o briefing do projeto. O envio ao CRM e a fila de resiliência já existem no site principal e são reaproveitáveis, mas a página ainda não existe para ligá-los.
+> **Estado atual.** O projeto vai para repositório próprio, porque a identidade visual é outra e o único ponto em comum é o formulário. **O lado deste sistema está pronto:** rota `/api/leads/externo` autenticada por token, servidor-a-servidor, que grava antes de enviar, etiqueta o projeto no CRM e reprocessa pela fila; painel com filtro por site e coluna no CSV; contrato documentado. **Falta a landing em si** — depende do briefing e da identidade visual, e será construída fora deste repositório.
 
 
 ## Entregue além do escopo fechado
 
 Não estava no orçamento e não entrou em nenhum subtotal: veio junto porque o resto já estava construído.
 
+- **Suíte de testes automatizados.** 31 testes cobrindo as regras que quebram em silêncio: para qual associação o lead vai, qual WhatsApp cada unidade mostra, qual cidade a página anuncia, e de qual projeto o lead veio. Nada disso estoura erro ao falhar — só manda a família para a equipe errada.
+- **Migração de banco com ensaio.** Um executor que mostra o que vai mudar antes de mudar, roda dentro de transação e desfaz tudo se algo falhar. Já exercitado num banco com leads dentro.
 - **Mato Grosso como página única.** A família via duas regiões que só fazem sentido para a rede — Leste e Oeste são recorte administrativo. Agora é uma página com as 9 unidades; a divisão continua inteira no painel, e o lead nasce na associação certa pela escola escolhida. As rotas antigas respondem 301.
 - **WhatsApp editável no painel.** Trocar um telefone exigia mexer no código e publicar. Agora o administrador edita e o número entra no ar sozinho, sem deploy: as páginas continuam estáticas e são regeneradas no salvamento. Verificado do banco até o HTML.
 - **Cidade no formulário, e escola obrigatória.** A coordenação não sabia onde a família mora — só a região, que cobre um estado inteiro. A cidade agora viaja com o lead até o CRM e o e-mail. Em troca, quem ainda não escolheu a escola precisa escolher: troca conversão por qualificação.
