@@ -316,3 +316,18 @@ export function whatsappDaEscola(
   if (escola.associacao_slug) return null;
   return regiao.whatsapp.link;
 }
+
+/**
+ * Nome da região do jeito que a família conhece.
+ * "Leste Mato-Grossense" é recorte administrativo: quem preencheu o
+ * formulário escolheu "Mato Grosso" e nunca ouviu falar da divisão. O
+ * painel e a exportação continuam com o nome interno, via nomeRegiao().
+ */
+export function nomeRegiaoParaFamilia(slug: string): string {
+  return GRUPOS[slug]?.nome ?? nomeRegiao(slug);
+}
+
+/** Região de uma família a partir do slug do site ou do slug interno. */
+export function getRegiaoPublica(slug: string): Estado | undefined {
+  return getRegiaoSite(slug) ?? getRegiaoLead(slug);
+}

@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { getRegiaoLead } from "@/lib/rede";
+import { getRegiaoPublica } from "@/lib/rede";
 
 export const metadata: Metadata = {
   title: "Recebemos seu interesse!",
@@ -20,7 +20,8 @@ export default async function Obrigado({
   searchParams: Promise<{ regiao?: string }>;
 }) {
   const { regiao } = await searchParams;
-  const estado = regiao ? getRegiaoLead(regiao) : undefined;
+  // O formulário manda o slug do site ('mato-grosso'), não o interno.
+  const estado = regiao ? getRegiaoPublica(regiao) : undefined;
 
   return (
     <>

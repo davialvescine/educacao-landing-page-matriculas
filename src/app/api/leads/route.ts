@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { getEscola, resolverRegiaoInterna } from "@/lib/rede";
+import {
+  getEscola,
+  nomeRegiaoParaFamilia,
+  resolverRegiaoInterna,
+} from "@/lib/rede";
 import { slugificar } from "@/lib/site";
 import { salvarLead, type LeadNovo } from "@/lib/leads";
 import { enviarLeadWebhook } from "@/lib/webhook";
@@ -141,8 +145,13 @@ export async function POST(req: Request) {
     await enviarConfirmacaoLead({
       para: lead.email,
       nome: lead.nome,
-      equipe: estado.slug === "iabc" ? "do IABC" : `em ${estado.nome}`,
-      regiao: estado.nome,
+      // A família escolheu "Mato Grosso"; dizer "Leste Mato-Grossense" no
+      // e-mail é falar por uma divisão que ela não conhece.
+      equipe:
+        estado.slug === "iabc"
+          ? "do IABC"
+          : `em ${nomeRegiaoParaFamilia(estado.slug)}`,
+      regiao: nomeRegiaoParaFamilia(estado.slug),
       whatsapp: estado.whatsapp.link,
       telefone: lead.whatsapp,
       cidade: lead.cidade,

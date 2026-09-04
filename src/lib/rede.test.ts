@@ -3,9 +3,12 @@ import {
   cidadeDaUnidade,
   getEscola,
   getEstados,
+  getRegiaoPublica,
   getRegiaoSite,
   getRegioesSite,
   nomeEscola,
+  nomeRegiao,
+  nomeRegiaoParaFamilia,
   resolverRegiaoInterna,
   slugEscola,
   whatsappDaEscola,
@@ -198,5 +201,29 @@ describe("integridade dos dados da rede", () => {
       expect(e.nome, e.slug).toBeTruthy();
       expect(e.associacao, e.slug).toBeTruthy();
     }
+  });
+});
+
+describe("o que a família vê × o que o painel guarda", () => {
+  it("a família lê 'Mato Grosso', o painel guarda a associação", () => {
+    // Ela escolheu "Mato Grosso" no formulário e nunca ouviu falar de ALM.
+    expect(nomeRegiaoParaFamilia("leste-mt")).toBe("Mato Grosso");
+    expect(nomeRegiaoParaFamilia("oeste-mt")).toBe("Mato Grosso");
+    // O painel e a exportação continuam com o nome interno.
+    expect(nomeRegiao("leste-mt")).toBe("Leste Mato-Grossense");
+    expect(nomeRegiao("oeste-mt")).toBe("Oeste Mato-Grossense");
+  });
+
+  it("região sem agrupamento tem o mesmo nome dos dois lados", () => {
+    expect(nomeRegiaoParaFamilia("goias")).toBe(nomeRegiao("goias"));
+  });
+
+  it("a página de obrigado resolve o slug que o formulário manda", () => {
+    // O formulário manda o slug do site; antes isso caía em undefined e a
+    // família de Mato Grosso ficava sem o botão de WhatsApp.
+    expect(getRegiaoPublica("mato-grosso")?.slug).toBe("mato-grosso");
+    expect(getRegiaoPublica("goias")?.slug).toBe("goias");
+    expect(getRegiaoPublica("iabc")?.slug).toBe("iabc");
+    expect(getRegiaoPublica("leste-mt")?.slug).toBe("leste-mt");
   });
 });
