@@ -44,6 +44,14 @@ async function retrato() {
     `SELECT table_name FROM information_schema.tables
      WHERE table_schema = 'public' ORDER BY table_name`,
   );
+  const { rows: objetos } = await cliente.query(
+    `SELECT 'indice:' || indexname AS nome FROM pg_indexes WHERE schemaname = 'public'
+     UNION ALL
+     SELECT 'gatilho:' || tgname FROM pg_trigger WHERE NOT tgisinternal
+     UNION ALL
+     SELECT 'funcao:' || proname FROM pg_proc p
+       JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname = 'public'`,
+  );
   const { rows: colunas } = await cliente.query(
     `SELECT table_name, column_name FROM information_schema.columns
      WHERE table_schema = 'public' ORDER BY table_name, column_name`,
@@ -56,6 +64,7 @@ async function retrato() {
   return {
     tabelas: tabelas.map((t) => t.table_name),
     colunas: new Set(colunas.map((c) => `${c.table_name}.${c.column_name}`)),
+    objetos: new Set(objetos.map((o) => o.nome)),
     leads,
   };
 }
@@ -80,6 +89,17 @@ const EXIGE_COLUNA = [
   "consentimentos.metodo",
 ];
 
+// Índice, gatilho e função também envelhecem: a checagem só de tabela e
+// coluna dizia "atualizado" para banco sem o gatilho de aviso, e aí o
+// tempo real ficava mudo sem ninguém entender por quê.
+const EXIGE_OBJETO = [
+  "indice:acessos_acao_idx",
+  "indice:acessos_criado_em_idx",
+  "indice:consentimentos_lead_idx",
+  "gatilho:leads_avisar_trg",
+  "funcao:leads_avisar",
+];
+
 const pendentes = [
   ...EXIGE_TABELA.filter((t) => !antes.tabelas.includes(t)).map(
     (t) => `tabela ${t}`,
@@ -89,6 +109,7 @@ const pendentes = [
     const tabela = c.split(".")[0];
     return antes.tabelas.includes(tabela) && !antes.colunas.has(c);
   }).map((c) => `coluna ${c}`),
+  ...EXIGE_OBJETO.filter((o) => !antes.objetos.has(o)),
 ];
 console.log(`\npendente: ${pendentes.length ? pendentes.join(", ") : "nada — banco já está atualizado"}`);
 

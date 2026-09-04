@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { io, type Socket } from "socket.io-client";
 import type { LeadRegistro } from "@/lib/leads";
 
@@ -17,6 +18,11 @@ import type { LeadRegistro } from "@/lib/leads";
  * ser o que era: lista do servidor mais o botão Atualizar. Nada quebra —
  * tempo real aqui é conforto, e a garantia contra atendimento duplicado
  * está no banco, não neste arquivo.
+ *
+ * O endereço vem por parâmetro, do componente de servidor, e não de
+ * `NEXT_PUBLIC_*`: variável pública é resolvida no BUILD. Definida só
+ * como variável de ambiente no servidor, ela nunca entraria no pacote já
+ * compilado, e o tempo real ficaria desligado para sempre — em silêncio.
  */
 
 export interface Olhar {
@@ -30,11 +36,9 @@ export interface Presente {
 }
 
 interface Aviso {
-  acao: "insert" | "update" | "recarregar";
+  acao: "insert" | "update" | "delete" | "recarregar";
   lead: Partial<LeadRegistro> & { id: string };
 }
-
-const URL_TEMPO_REAL = process.env.NEXT_PUBLIC_TEMPO_REAL_URL ?? "";
 
 /** Troca a linha de mesmo id e preserva a referência das outras, para o
  *  React não redesenhar a tabela inteira por causa de um lead. */
@@ -54,7 +58,8 @@ function aplicarMudanca(
   return [mudou as LeadRegistro, ...lista];
 }
 
-export function useTempoReal(iniciais: LeadRegistro[]) {
+export function useTempoReal(iniciais: LeadRegistro[], url: string) {
+  const router = useRouter();
   const [leads, setLeads] = useState(iniciais);
   const [ligado, setLigado] = useState(false);
   const [presenca, setPresenca] = useState<Presente[]>([]);
@@ -70,9 +75,9 @@ export function useTempoReal(iniciais: LeadRegistro[]) {
   }, [iniciais]);
 
   useEffect(() => {
-    if (!URL_TEMPO_REAL) return;
+    if (!url) return;
 
-    const s = io(URL_TEMPO_REAL, {
+    const s = io(url, {
       withCredentials: true, // sem isto o cookie de sessão não viaja
       transports: ["websocket", "polling"],
     });
@@ -82,14 +87,43 @@ export function useTempoReal(iniciais: LeadRegistro[]) {
     s.on("disconnect", () => setLigado(false));
     s.on("connect_error", () => setLigado(false));
 
+    // A sessão caiu, expirou ou o acesso foi desativado enquanto a aba
+    // estava aberta. Recarregar leva a pessoa à tela de login em vez de
+    // deixá-la olhando uma lista que ela não pode mais ver.
+    s.on("sessao:encerrada", () => {
+      setLigado(false);
+      router.refresh();
+    });
+
     s.on("leads:mudou", (aviso: Aviso) => {
       if (!aviso?.lead?.id) return;
-      if (aviso.acao === "recarregar") return; // carga grande: espera o refresh
+      // Carga que não coube no aviso do banco: não dá para remendar com
+      // o que chegou, então busca de novo. Ignorar deixaria a tela
+      // mostrando um passado com cara de presente.
+      if (aviso.acao === "recarregar") {
+        router.refresh();
+        return;
+      }
+      if (aviso.acao === "delete") {
+        setLeads((atual) => atual.filter((l) => l.id !== aviso.lead.id));
+        return;
+      }
       setLeads((atual) => aplicarMudanca(atual, aviso.lead));
       if (aviso.acao === "insert") {
         setNovos((n) => new Set(n).add(aviso.lead.id));
       }
     });
+
+    // O lead mudou de região e deixou de ser meu: sai da tela agora, e
+    // não na próxima vez que alguém apertar Atualizar.
+    s.on("leads:sumiu", ({ id }: { id: string }) => {
+      setLeads((atual) => atual.filter((l) => l.id !== id));
+    });
+
+    // A escuta do banco caiu e voltou. O que aconteceu no intervalo não
+    // volta — o Postgres não guarda notificação — então a lista inteira
+    // é buscada de novo.
+    s.on("recarregar", () => router.refresh());
 
     s.on("presenca", (pessoas: Presente[]) => setPresenca(pessoas ?? []));
 
@@ -106,7 +140,7 @@ export function useTempoReal(iniciais: LeadRegistro[]) {
       s.close();
       socket.current = null;
     };
-  }, []);
+  }, [url, router]);
 
   /** Avisa que estou neste lead. É o que aparece para os outros antes de
    *  qualquer clique — e é o que de fato evita duas mensagens à família. */
@@ -139,10 +173,5 @@ export function useTempoReal(iniciais: LeadRegistro[]) {
     });
   }, []);
 
-  const outros = useMemo(
-    () => presenca.length,
-    [presenca],
-  );
-
-  return { leads, ligado, presenca, outros, olhares, novos, olhar, largar, pegar, marcarVisto };
+  return { leads, ligado, presenca, olhares, novos, olhar, largar, pegar, marcarVisto };
 }

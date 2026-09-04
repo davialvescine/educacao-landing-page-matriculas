@@ -85,33 +85,54 @@ ALTER TABLE leads ADD COLUMN IF NOT EXISTS atendente_em timestamptz;
 -- a lista mostra. Quem precisar do resto busca.
 -- ============================================================
 CREATE OR REPLACE FUNCTION leads_avisar() RETURNS trigger AS $$
-DECLARE carga text;
+DECLARE
+  linha   record;
+  anterior text;
+  carga   text;
 BEGIN
+  IF TG_OP = 'DELETE' THEN
+    linha := OLD;
+  ELSE
+    linha := NEW;
+  END IF;
+
+  -- Lead que muda de região precisa sumir da tela de quem via antes.
+  -- Sem isto, a coordenação antiga fica com nome e telefone de uma
+  -- família que deixou de ser dela.
+  IF TG_OP = 'UPDATE' AND OLD.estado IS DISTINCT FROM NEW.estado THEN
+    anterior := OLD.estado;
+  END IF;
+
   carga := json_build_object(
     'acao', lower(TG_OP),
+    'estado_anterior', anterior,
     'lead', json_build_object(
-      'id', NEW.id,
-      'nome', NEW.nome,
-      'whatsapp', NEW.whatsapp,
-      'email', NEW.email,
-      'estado', NEW.estado,
-      'escola', NEW.escola,
-      'nivel', NEW.nivel,
-      'criado_em', NEW.criado_em,
-      'webhook_status', NEW.webhook_status,
-      'atendimento_status', NEW.atendimento_status,
-      'atendente_id', NEW.atendente_id,
-      'atendente_nome', NEW.atendente_nome
+      'id', linha.id,
+      'nome', linha.nome,
+      'whatsapp', linha.whatsapp,
+      'email', linha.email,
+      'estado', linha.estado,
+      'escola', linha.escola,
+      'nivel', linha.nivel,
+      'criado_em', linha.criado_em,
+      'webhook_status', linha.webhook_status,
+      'atendimento_status', linha.atendimento_status,
+      'atendente_id', linha.atendente_id,
+      'atendente_nome', linha.atendente_nome
     )
   )::text;
-  -- Carga acima do limite do NOTIFY derrubaria a transação que gravou o
-  -- lead. Perder o aviso é aceitável; perder o lead não é.
-  IF length(carga) < 7900 THEN
+
+  -- octet_length, e não length: o limite do NOTIFY é em BYTES, e length
+  -- conta CARACTERES. Nome com acento passava na conta e estourava no
+  -- envio — e o estouro reverte a transação que gravou o lead. Perder o
+  -- aviso é aceitável; perder o lead não é.
+  IF octet_length(carga) < 7000 THEN
     PERFORM pg_notify('leads_mudou', carga);
   ELSE
     PERFORM pg_notify('leads_mudou',
-      json_build_object('acao', 'recarregar', 'lead',
-        json_build_object('id', NEW.id, 'estado', NEW.estado))::text);
+      json_build_object('acao', 'recarregar', 'estado_anterior', anterior,
+        'lead', json_build_object('id', linha.id,
+                                  'estado', left(linha.estado, 60)))::text);
   END IF;
   RETURN NULL; -- AFTER trigger: o retorno é ignorado
 END;
@@ -119,7 +140,7 @@ $$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS leads_avisar_trg ON leads;
 CREATE TRIGGER leads_avisar_trg
-  AFTER INSERT OR UPDATE ON leads
+  AFTER INSERT OR UPDATE OR DELETE ON leads
   FOR EACH ROW EXECUTE FUNCTION leads_avisar();
 
 CREATE INDEX IF NOT EXISTS leads_estado_idx ON leads (estado);

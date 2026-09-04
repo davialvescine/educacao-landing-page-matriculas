@@ -90,6 +90,7 @@ export default async function PainelPage({ searchParams }: Props) {
         nome: usuario.nome,
         papel: usuario.papel,
       }}
+      tempoRealUrl={process.env.TEMPO_REAL_URL ?? ""}
     />
   );
 }

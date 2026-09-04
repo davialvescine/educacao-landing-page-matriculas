@@ -39,6 +39,9 @@ interface Props {
   filtroStatus: string;
   integracaoConfigurada: boolean;
   usuario: { nome: string; papel: "admin" | "coordenador" };
+  /** Endereço do serviço de tempo real. Vem do servidor, e não de
+   *  NEXT_PUBLIC_*, que seria resolvido no build. Vazio = desligado. */
+  tempoRealUrl: string;
 }
 
 const STATUS_FILTROS = [
@@ -125,6 +128,7 @@ export default function PainelLeads({
   filtroStatus,
   integracaoConfigurada,
   usuario,
+  tempoRealUrl,
 }: Props) {
   const router = useRouter();
   const [reenviando, setReenviando] = useState<string | null>(null);
@@ -145,7 +149,7 @@ export default function PainelLeads({
     largar,
     pegar,
     marcarVisto,
-  } = useTempoReal(leadsDoServidor);
+  } = useTempoReal(leadsDoServidor, tempoRealUrl);
 
   // Enquanto o modal de um lead está aberto, os colegas veem que alguém
   // está nele. É o que evita a mensagem dobrada — antes de qualquer
