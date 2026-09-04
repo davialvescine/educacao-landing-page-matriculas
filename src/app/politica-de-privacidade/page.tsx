@@ -12,10 +12,15 @@ import { SITE_NOME, SITE_URL } from "@/lib/site";
  * mudar, esta página muda junto, senão ela deixa de ser verdadeira e
  * passa a ser um risco em vez de uma proteção.
  *
- * O QUE FALTA, E SÓ A UNIÃO PODE PREENCHER: a razão social e o CNPJ do
- * controlador, o contato do encarregado de dados que o art. 41 manda
- * divulgar, e os prazos de guarda. Estão marcados no texto. A página não
- * deve ir ao ar sem eles.
+ * O QUE AINDA É DE OUTRA PESSOA: a razão social exata do CNPJ, que é da
+ * união, e a revisão jurídica do texto inteiro, que é do departamento
+ * dela (§ 11 do orçamento). O resto está preenchido.
+ *
+ * Medir sem aviso de cookies é decisão do cliente, tomada em 04/09/2026:
+ * a campanha precisa da medição cheia e a analítica se apoia em legítimo
+ * interesse. Em troca, esta página declara isso na cara e oferece o
+ * caminho para quem não quiser ser medido — é o que sustenta essa base.
+ * Se a união voltar atrás, o banner entra por cima, sem mexer no resto.
  */
 
 const ATUALIZADA_EM = "4 de setembro de 2026";
@@ -46,15 +51,6 @@ function Secao({
         {children}
       </div>
     </section>
-  );
-}
-
-/** Lacuna que só a união preenche. Visível de propósito. */
-function Pendente({ children }: { children: React.ReactNode }) {
-  return (
-    <mark className="rounded bg-gold-100 px-1.5 py-0.5 font-semibold text-gold-700">
-      [{children}]
-    </mark>
   );
 }
 
@@ -144,11 +140,22 @@ export default function PoliticaPage() {
               <p>
                 Usamos ainda Google Analytics e Meta Pixel para medir o
                 desempenho das campanhas. Eles registram a navegação de forma
-                agregada. Hoje essa medição começa assim que a página abre;{" "}
-                <Pendente>
-                  a união decide se contrata o aviso de cookies que segura a
-                  medição até o aceite
-                </Pendente>
+                agregada, sem ligar essa navegação ao seu nome, e essa medição
+                começa quando a página abre — este site não exibe aviso de
+                cookies.
+              </p>
+              <p>
+                Se você não quiser ser medido, dá para bloquear cookies nas
+                configurações do seu navegador ou instalar o{" "}
+                <a
+                  href="https://tools.google.com/dlpage/gaoptout"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-brand-950 underline underline-offset-4 decoration-gold-400 decoration-2"
+                >
+                  complemento que desativa o Google Analytics
+                </a>
+                . Isso não atrapalha em nada o seu pedido de matrícula.
               </p>
               <p>
                 Não vendemos, alugamos nem cedemos os seus dados para
