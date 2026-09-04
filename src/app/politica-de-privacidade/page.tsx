@@ -20,6 +20,9 @@ import { SITE_NOME, SITE_URL } from "@/lib/site";
 
 const ATUALIZADA_EM = "4 de setembro de 2026";
 
+/** Canal do encarregado de dados da rede (art. 41 da LGPD). */
+const EMAIL_PRIVACIDADE = "privacidade@adventistas.org";
+
 export const metadata: Metadata = {
   title: "Política de Privacidade",
   description:
@@ -78,8 +81,8 @@ export default function PoliticaPage() {
             <Secao titulo="Quem trata os seus dados">
               <p>
                 O controlador dos dados é a {SITE_NOME}, CNPJ
-                60.833.910/0001-87, com sede em{" "}
-                <Pendente>a união preenche: endereço</Pendente>
+                60.833.910/0001-87, com sede na SGAN Quadra 608, Módulo B,
+                Via L3 — Asa Norte, Brasília (DF), CEP 70830-352.
               </p>
               <p className="text-sm">
                 A razão social registrada nesse CNPJ precisa aparecer aqui do
@@ -177,8 +180,15 @@ export default function PoliticaPage() {
               <p>
                 <strong className="text-brand-950">Como pedir:</strong> responda
                 a qualquer mensagem que a rede tenha enviado, por WhatsApp ou
-                e-mail, dizendo o que você quer. O pedido chega à coordenação da
-                sua região.
+                e-mail, dizendo o que você quer — o pedido chega à coordenação
+                da sua região. Ou escreva direto para{" "}
+                <a
+                  href={`mailto:${EMAIL_PRIVACIDADE}`}
+                  className="font-semibold text-brand-950 underline underline-offset-4 decoration-gold-400 decoration-2"
+                >
+                  {EMAIL_PRIVACIDADE}
+                </a>
+                .
               </p>
               <p>
                 Retirar a autorização não apaga o que já foi feito de forma
@@ -198,9 +208,16 @@ export default function PoliticaPage() {
 
             <Secao titulo="Como falar sobre privacidade">
               <p>
-                O encarregado de dados da rede, que a lei manda indicar e
-                divulgar, é{" "}
-                <Pendente>a união preenche: nome e e-mail do encarregado</Pendente>
+                O canal do encarregado de dados da rede, que a lei manda
+                indicar e divulgar, é o e-mail{" "}
+                <a
+                  href={`mailto:${EMAIL_PRIVACIDADE}`}
+                  className="font-semibold text-brand-950 underline underline-offset-4 decoration-gold-400 decoration-2"
+                >
+                  {EMAIL_PRIVACIDADE}
+                </a>
+                . Escreva por ali qualquer dúvida ou reclamação sobre o uso
+                dos seus dados.
               </p>
               <p>
                 Você também pode procurar a Autoridade Nacional de Proteção de
