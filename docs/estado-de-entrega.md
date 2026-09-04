@@ -2,13 +2,13 @@
 
 *Apurado no código em 04 de setembro de 2026, contra a proposta comercial enviada em 02/09/2026. Os valores são os da proposta e não foram alterados.*
 
-De **R$ 34.140** de implantação, **R$ 30.100 já estão no ar**: **R$ 25.100** sem ressalva e **R$ 5.000** com um pedaço nomeado faltando. **R$ 4.040** ainda não começaram.
+De **R$ 34.140** de implantação, **R$ 31.200 já estão no ar**: **R$ 26.450** sem ressalva e **R$ 4.750** com um pedaço nomeado faltando. **R$ 2.940** ainda não começaram.
 
 | Estado | Valor | O que significa |
 | --- | --- | --- |
-| ✅ Pronto | R$ 25.100 | Construído, no ar e funcionando como está descrito. |
-| ⚠️ Parcial | R$ 5.000 | Já funciona, mas falta o pedaço nomeado na linha. |
-| ❌ Falta | R$ 4.040 | Não foi construído. |
+| ✅ Pronto | R$ 26.450 | Construído, no ar e funcionando como está descrito. |
+| ⚠️ Parcial | R$ 4.750 | Já funciona, mas falta o pedaço nomeado na linha. |
+| ❌ Falta | R$ 2.940 | Não foi construído. |
 
 ## O que ainda não está no ar
 
@@ -16,12 +16,10 @@ Cada linha aparece detalhada no grupo dela. Aqui estão juntas, com o que trava 
 
 | Item | Estado | O que trava | Valor |
 | --- | --- | --- | --- |
-| § 04 Motor do relatório mensal | ❌ Falta | **Depende de construir.** O cruzamento por região, escola, série e campanha. | R$ 1.100 |
-| § 04 Envio automático por e-mail | ❌ Falta | **Depende de construir.** PDF por região e a tarefa do primeiro dia útil. | R$ 600 |
+| § 04 Envio automático por e-mail | ❌ Falta | **Depende de construir.** A tarefa do primeiro dia útil e o e-mail por região. O motor já existe. | R$ 600 |
 | § 02 Página do Dica Plus | ❌ Falta | **Esperando a rede.** Falta o layout que a rede vai desenhar. | R$ 1.300 |
 | § 05 Dica Plus: integração | ❌ Falta | **Esperando a rede.** Falta a documentação da API da plataforma. | R$ 790 |
 | § 06 Search Console e Core Web Vitals | ❌ Falta | **Esperando a publicação.** Só começa com o site no domínio da rede. | R$ 250 |
-| § 04 Trilha de auditoria de acesso | ⚠️ Parcial | **Depende de construir.** Registrar entrada e tentativa de entrada no painel. | R$ 250 |
 | § 06 Identidade da rede nos buscadores de IA | ⚠️ Parcial | **Esperando a rede.** Faltam o Facebook e o YouTube oficiais. | R$ 550 |
 | § 08 Infraestrutura de produção | ⚠️ Parcial | **Esperando a publicação.** Falta servidor e domínio contratados. | R$ 400 |
 | § 08 Documentação e treinamento | ⚠️ Parcial | **Esperando a rede.** Falta agendar o repasse com as coordenações. | R$ 250 |
@@ -111,7 +109,7 @@ Chat flutuante que troca o número conforme a página aberta, e barra de ação 
 
 ## § 04 — Painel administrativo
 
-*✅ Pronto R$ 2.950 · ⚠️ Parcial R$ 250 · ❌ Falta R$ 1.700*
+*✅ Pronto R$ 4.300 · ❌ Falta R$ 600*
 
 ### ✅ Pronto — Autenticação · R$ 650
 
@@ -149,17 +147,17 @@ Criar e editar pessoas, atribuir regiões e cortar o acesso na hora, sem esperar
 
 > **Estado atual.** Criação, edição, atribuição de regiões e corte de acesso imediato.
 
-### ⚠️ Parcial — Trilha de auditoria de acesso · R$ 250
+### ✅ Pronto — Trilha de auditoria de acesso · R$ 250
 
 Registro de login, exportação, reenvio e alterações de equipe: quem viu o dado da família, quando e de onde. Identificadores internos mascarados.
 
-> **Estado atual.** Grava exportação, reenvio e alterações de equipe, com o identificador interno mascarado. Falta gravar entrada e tentativa de entrada no painel.
+> **Estado atual.** Grava entrada no painel, tentativa de entrada negada, exportação, reenvio, leitura do relatório e alterações de equipe — com data, hora, IP e navegador. Tentativa negada aparece destacada: várias seguidas no mesmo e-mail é alguém testando senha, e antes isso passava invisível.
 
-### ❌ Falta — Motor do relatório mensal · R$ 1.100
+### ✅ Pronto — Motor do relatório mensal · R$ 1.100
 
 Não é uma tela, é o cruzamento por trás dela: lê a base de leads, agrupa por região, escola e série pretendida, separa por origem de campanha, compara com o mês anterior e traz de volta do CRM quem foi atendido e quem ficou esperando. **Por que vale o valor:** o número que interessa não é quantos leads chegaram. É **quais escolas recebem lead e não respondem**, qual associação converte melhor e qual campanha trouxe matrícula em vez de curiosidade. Esse cruzamento é o que transforma o painel de uma lista de contatos em instrumento de gestão da rede. **A alternativa** é alguém exportar CSV e montar a planilha à mão toda virada de mês, para seis coordenações, todo mês, para sempre. E planilha feita à mão diverge, atrasa e ninguém confia nela na hora de decidir.
 
-> **Estado atual.** Nenhum cruzamento construído: hoje a leitura por região, escola e série sai da exportação em CSV, montada à mão.
+> **Estado atual.** Tela de relatório por mês, com todos os leads separados por região e o mês anterior ao lado para comparação. Cruza escola, série e campanha, mostra a chegada dia a dia e exporta o CSV do mês. Abrir o relatório fica registrado na trilha, como a exportação.
 
 ### ❌ Falta — Envio automático por e-mail · R$ 600
 
@@ -319,6 +317,11 @@ Implementação da página, coleta de leads e envio ao Sevenbee com webhook de r
 
 Não estava no orçamento e não entrou em nenhum subtotal: veio junto porque o resto já estava construído.
 
+- **Consentimento LGPD que serve de prova.** O aceite é pelo ato de enviar, padrão de mercado, e fica gravado em tabela própria: data, hora, IP, navegador e a versão exata do texto lido, com a impressão digital dele. Anos depois dá para reconstruir a frase que aquela família aceitou.
+- **Política de privacidade própria.** A política nacional descreve o portal da rede, não este formulário — mandar a família para lá era apontar para um texto que não fala da coleta que ela acabou de fazer. A nossa descreve o que o sistema faz de fato, com controlador, CNPJ, endereço, encarregado e prazo de guarda. A redação jurídica final continua sendo da união.
+- **Painel que se atualiza sozinho.** Lead novo aparece na tela de todas as coordenações abertas, sem ninguém apertar nada, e cada uma vê quem mais está olhando o mesmo contato. O atendimento continua sendo conduzido no Sevenbee: o painel não marca dono, para não criar uma segunda verdade que divergiria da primeira.
+- **CI local e revisão adversarial obrigatórias.** Um comando roda tipos, testes, build e a checagem do serviço de tempo real antes de qualquer envio; depois dele, revisão de código por segunda ferramenta. Nesta rodada isso encontrou dois vazamentos de dado entre associações que os testes não pegariam.
+- **Documentação de arquitetura e operação.** O desenho do sistema com o porquê de cada decisão, o passo a passo de subir e migrar, e o que olhar quando algo quebra — inclusive a lista de dívida conhecida, escrita de propósito.
 - **Suíte de testes automatizados.** 31 testes cobrindo as regras que quebram em silêncio: para qual associação o lead vai, qual WhatsApp cada unidade mostra, qual cidade a página anuncia, e de qual projeto o lead veio. Nada disso estoura erro ao falhar — só manda a família para a equipe errada.
 - **Migração de banco com ensaio.** Um executor que mostra o que vai mudar antes de mudar, roda dentro de transação e desfaz tudo se algo falhar. Já exercitado num banco com leads dentro.
 - **Mato Grosso como página única.** A família via duas regiões que só fazem sentido para a rede — Leste e Oeste são recorte administrativo. Agora é uma página com as 9 unidades; a divisão continua inteira no painel, e o lead nasce na associação certa pela escola escolhida. As rotas antigas respondem 301.
