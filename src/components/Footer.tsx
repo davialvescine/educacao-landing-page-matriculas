@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { getEstados, getRede } from "@/lib/rede";
+import { getRede, getRegioesSite } from "@/lib/rede";
 
 export default function Footer() {
   const rede = getRede();
@@ -32,7 +32,7 @@ export default function Footer() {
         <div>
           <h3 className="font-bold text-primary-foreground">Nossas regiões</h3>
           <ul className="mt-4 space-y-2.5 text-sm">
-            {getEstados().map((e) => (
+            {getRegioesSite().map((e) => (
               <li key={e.slug}>
                 <Link
                   href={`/${e.slug}`}

@@ -22,16 +22,17 @@ import { cn } from "@/lib/utils";
 import {
   cidadeEscola,
   getEscola,
-  getEstados,
+  getRegioesSite,
   getFormEstados,
   getRede,
   nomeEscola,
   slugEscola,
+  whatsappDaEscola,
 } from "@/lib/rede";
 import { SITE_NOME, SITE_URL } from "@/lib/site";
 
 export function generateStaticParams() {
-  return getEstados().flatMap((e) =>
+  return getRegioesSite().flatMap((e) =>
     e.escolas.map((s) => ({ estado: e.slug, escola: slugEscola(s) })),
   );
 }
@@ -67,7 +68,7 @@ export default async function EscolaPage({
   const linkMaps = escola.endereco
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${nome}, ${escola.endereco}`)}`
     : null;
-  const whatsapp = escola.whatsapp_escola ?? estado.whatsapp.link;
+  const whatsapp = whatsappDaEscola(escola, estado);
 
   return (
     <>
@@ -331,7 +332,7 @@ export default async function EscolaPage({
       </main>
       <WhatsFlutuante
         linkDireto={whatsapp}
-        regioes={getEstados().map((e) => ({
+        regioes={getRegioesSite().map((e) => ({
           slug: e.slug,
           nome: e.nome,
           link: e.whatsapp.link,

@@ -12,6 +12,8 @@ export interface Escola {
   whatsapp_escola?: string;
   site?: string;
   obs?: string;
+  /** Associação interna dona da unidade; só preenchido em região agrupada. */
+  associacao_slug?: string;
   pendencias?: string[];
 }
 
@@ -108,7 +110,8 @@ export function getEscola(
   estadoSlug: string,
   escolaSlug: string,
 ): { estado: Estado; escola: Escola } | undefined {
-  const estado = getEstado(estadoSlug);
+  // Pelas regiões do site: as URLs de escola do MT vivem em /mato-grosso.
+  const estado = getRegiaoSite(estadoSlug) ?? getEstado(estadoSlug);
   if (!estado) return undefined;
   const escola = estado.escolas.find((s) => slugEscola(s) === escolaSlug);
   return escola ? { estado, escola } : undefined;
@@ -124,7 +127,7 @@ export function cidadeEscola(escola: Escola): string {
 /** Dados enxutos para o formulário de leads (client component). */
 export function getFormEstados() {
   return [
-    ...rede.estados.map((e) => ({
+    ...getRegioesSite().map((e) => ({
       slug: e.slug,
       nome: e.nome,
       uf: e.uf,
@@ -140,3 +143,120 @@ export function getFormEstados() {
 }
 
 export type FormEstado = ReturnType<typeof getFormEstados>[number];
+
+/* ------------------------------------------------------------------ *
+ *  Regiões do site × associações internas
+ *
+ *  A família vê uma página só de Mato Grosso. A divisão entre ALM
+ *  (Leste) e AOM (Oeste) é administrativa: continua valendo no painel,
+ *  no recorte por região do coordenador e no lead gravado no banco.
+ *  Quem faz a ponte é resolverRegiaoInterna(), pela escola escolhida.
+ * ------------------------------------------------------------------ */
+
+/** slug interno -> região agrupada que aparece no site. */
+const GRUPOS: Record<string, { slug: string; nome: string; uf: string }> = {
+  "leste-mt": { slug: "mato-grosso", nome: "Mato Grosso", uf: "MT" },
+  "oeste-mt": { slug: "mato-grosso", nome: "Mato Grosso", uf: "MT" },
+};
+
+/**
+ * As regiões como o site as apresenta: as agrupadas viram uma só.
+ * Cada escola sai com o WhatsApp da própria associação preenchido, para
+ * o card e a página da unidade continuarem falando com quem atende.
+ */
+function montarRegioesSite(): Estado[] {
+  const saida: Estado[] = [];
+  const porGrupo = new Map<string, Estado>();
+
+  for (const estado of rede.estados) {
+    const grupo = GRUPOS[estado.slug];
+    const escolas = estado.escolas.map((escola) => ({
+      ...escola,
+      ...(grupo
+        ? {
+            associacao_slug: estado.slug,
+            whatsapp_escola:
+              escola.whatsapp_escola ?? estado.whatsapp.link ?? undefined,
+          }
+        : {}),
+    }));
+
+    if (!grupo) {
+      saida.push(estado);
+      continue;
+    }
+
+    const existente = porGrupo.get(grupo.slug);
+    if (existente) {
+      existente.escolas.push(...escolas);
+      existente.total_escolas = existente.escolas.length;
+      // A primeira associação do grupo que tiver número fica com a página.
+      if (!existente.whatsapp.link && estado.whatsapp.link) {
+        existente.whatsapp = estado.whatsapp;
+      }
+      continue;
+    }
+
+    const agrupada: Estado = {
+      ...grupo,
+      associacao: "Educação Adventista",
+      whatsapp: estado.whatsapp,
+      total_escolas: escolas.length,
+      escolas,
+    };
+    porGrupo.set(grupo.slug, agrupada);
+    saida.push(agrupada);
+  }
+
+  return saida;
+}
+
+const REGIOES_SITE = montarRegioesSite();
+
+/** As regiões que a família vê: 5 páginas, com o Mato Grosso unificado. */
+export function getRegioesSite(): Estado[] {
+  return REGIOES_SITE;
+}
+
+export function getRegiaoSite(slug: string): Estado | undefined {
+  return REGIOES_SITE.find((e) => e.slug === slug);
+}
+
+/**
+ * Associação interna dona de uma escola, dentro de uma região do site.
+ * Em região não agrupada devolve a própria; no Mato Grosso, descobre pela
+ * escola se o lead é da ALM ou da AOM.
+ */
+export function resolverRegiaoInterna(
+  slugSite: string,
+  nomeDaEscola: string,
+): Estado | undefined {
+  const direta = getRegiaoLead(slugSite);
+  if (direta) return direta;
+
+  // Casa pelo nome oficial (o que o formulário manda) e também pelo nome
+  // curto da base: uma edição no rede.json não pode derrubar o roteamento.
+  const alvo = slugificar(nomeDaEscola);
+  return rede.estados.find(
+    (e) =>
+      GRUPOS[e.slug]?.slug === slugSite &&
+      e.escolas.some(
+        (s) => slugEscola(s) === alvo || slugificar(s.nome) === alvo,
+      ),
+  );
+}
+
+/**
+ * WhatsApp que atende uma unidade.
+ * Numa região agrupada a escola carrega o número da própria associação: se
+ * não tem, é porque a associação ainda não informou o dela, e herdar o
+ * número da associação vizinha mandaria a família para quem não atende.
+ */
+export function whatsappDaEscola(
+  escola: Escola,
+  regiao: Estado,
+): string | null {
+  if (escola.whatsapp_escola) return escola.whatsapp_escola;
+  if (escola.associacao_slug) return null;
+  return regiao.whatsapp.link;
+}

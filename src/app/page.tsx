@@ -20,11 +20,11 @@ import {
   IabcDestaque,
   RedeMundialSection,
 } from "@/components/Secoes";
-import { getEstados, getFormEstados } from "@/lib/rede";
+import { getFormEstados, getRegioesSite } from "@/lib/rede";
 import { SITE_NOME, SITE_URL } from "@/lib/site";
 
 export default function Home() {
-  const estados = getEstados();
+  const estados = getRegioesSite();
   const totalEscolas = estados.reduce((n, e) => n + e.escolas.length, 0);
 
   return (

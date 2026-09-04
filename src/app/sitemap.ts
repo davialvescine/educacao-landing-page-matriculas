@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
-import { getEstados, slugEscola } from "@/lib/rede";
+import { getRegioesSite, slugEscola } from "@/lib/rede";
 import { SITE_URL } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const estados = getEstados();
+  const estados = getRegioesSite();
   return [
     {
       url: SITE_URL,

@@ -83,9 +83,17 @@ export default function LeadForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // O Mato Grosso é uma página só, mas por trás são duas associações: é a
+  // escola que diz qual delas atende a família. Sem ela o lead não tem dono.
+  const exigeEscola = estado === "mato-grosso";
+
   function avancar() {
     if (!estado) {
       setErro("Selecione a sua região para continuar.");
+      return;
+    }
+    if (exigeEscola && !escola) {
+      setErro("Escolha a unidade de Mato Grosso para continuar.");
       return;
     }
     setErro("");
@@ -191,14 +199,23 @@ export default function LeadForm({
               </Select>
             </div>
             <div className="grid gap-2">
-              <Label>Escola de interesse</Label>
+              <Label>
+                Escola de interesse
+                {exigeEscola && <span aria-hidden className="text-destructive"> *</span>}
+              </Label>
               <Select
                 value={escola || undefined}
                 onValueChange={(v) => setEscola(v ?? "")}
                 disabled={escolas.length === 0}
               >
                 <SelectTrigger className="h-12 w-full rounded-xl">
-                  <SelectValue placeholder="Ainda não sei / qualquer unidade" />
+                  <SelectValue
+                    placeholder={
+                      exigeEscola
+                        ? "Escolha a unidade"
+                        : "Ainda não sei / qualquer unidade"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {escolas.map((s) => (

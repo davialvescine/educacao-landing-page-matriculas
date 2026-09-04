@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { getEstados } from "@/lib/rede";
+import { getRegioesSite } from "@/lib/rede";
 
 /**
  * Arte de compartilhamento da campanha (1200 × 630).
@@ -33,7 +33,7 @@ const OURO = "#f8c038";
 const OURO_CLARO = "#f8e068";
 
 export default function Image() {
-  const totalEscolas = getEstados().reduce((n, e) => n + e.escolas.length, 0);
+  const totalEscolas = getRegioesSite().reduce((n, e) => n + e.escolas.length, 0);
 
   return new ImageResponse(
     (

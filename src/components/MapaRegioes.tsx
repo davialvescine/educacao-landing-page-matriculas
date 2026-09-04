@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import MapaInterativo from "@/components/MapaInterativo";
 import Reveal from "@/components/Reveal";
 import { MAPA_PATHS, MAPA_VIEWBOX } from "@/data/mapa-paths";
-import { getEstados } from "@/lib/rede";
+import { getRegioesSite } from "@/lib/rede";
 
 const OURO = "#f2b541";
 
@@ -16,8 +16,7 @@ const PINS: {
   y: number;
   delay: string;
 }[] = [
-  { slug: "oeste-mt", rotulo: "Oeste Mato-Grossense", x: 950, y: 640, delay: "0s" },
-  { slug: "leste-mt", rotulo: "Leste Mato-Grossense", x: 470, y: 950, delay: "0.4s" },
+  { slug: "mato-grosso", rotulo: "Mato Grosso", x: 720, y: 800, delay: "0s" },
   { slug: "tocantins", rotulo: "Tocantins", x: 1390, y: 380, delay: "0.8s" },
   { slug: "goias", rotulo: "Goiás", x: 1250, y: 1260, delay: "1.2s" },
   { slug: "distrito-federal", rotulo: "DF", x: 1620, y: 990, delay: "1.6s" },
@@ -48,7 +47,7 @@ function Forma({ chave }: { chave: string }) {
 }
 
 function Pin({ pin }: { pin: (typeof PINS)[number] }) {
-  const contagem = getEstados().find((e) => e.slug === pin.slug)?.escolas.length ?? 0;
+  const contagem = getRegioesSite().find((e) => e.slug === pin.slug)?.escolas.length ?? 0;
   const rotulo = `${pin.rotulo} · ${contagem}`;
   const largura = rotulo.length * 21 + 56;
   return (
@@ -76,7 +75,7 @@ function Pin({ pin }: { pin: (typeof PINS)[number] }) {
 
 /** Seção do seletor de regiões: números editoriais, lista land-book e mapa em relevo. */
 export default function MapaRegioes() {
-  const estados = getEstados();
+  const estados = getRegioesSite();
   const totalEscolas = estados.reduce((n, e) => n + e.escolas.length, 0);
 
   return (

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getEscola, getRegiaoLead } from "@/lib/rede";
+import { getEscola, resolverRegiaoInterna } from "@/lib/rede";
 import { slugificar } from "@/lib/site";
 import { salvarLead, type LeadNovo } from "@/lib/leads";
 import { enviarLeadWebhook } from "@/lib/webhook";
@@ -79,10 +79,23 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
-  const estado = getRegiaoLead(lead.estado);
+  // O site tem uma página só de Mato Grosso; o lead precisa nascer já na
+  // associação certa (ALM ou AOM), que é o recorte do painel. Quem decide
+  // é a escola escolhida.
+  const estado = resolverRegiaoInterna(lead.estado, lead.escola);
   if (!estado) {
-    return NextResponse.json({ erro: "Selecione a região." }, { status: 400 });
+    return NextResponse.json(
+      {
+        erro:
+          lead.estado === "mato-grosso"
+            ? "Selecione a escola de Mato Grosso."
+            : "Selecione a região.",
+      },
+      { status: 400 },
+    );
   }
+  // A partir daqui o lead viaja e é gravado com a associação interna.
+  lead.estado = estado.slug;
   const digitos = lead.whatsapp.replace(/\D/g, "");
   if (digitos.length < 10 || digitos.length > 13) {
     return NextResponse.json(

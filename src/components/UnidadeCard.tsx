@@ -3,7 +3,13 @@ import Link from "next/link";
 import { ArrowRight, MapPin, MessageCircle } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { nomeEscola, slugEscola, type Escola, type Estado } from "@/lib/rede";
+import {
+  nomeEscola,
+  slugEscola,
+  whatsappDaEscola,
+  type Escola,
+  type Estado,
+} from "@/lib/rede";
 
 export default function UnidadeCard({
   escola,
@@ -13,7 +19,8 @@ export default function UnidadeCard({
   estado: Estado;
 }) {
   const nome = nomeEscola(escola);
-  const temWhats = Boolean(estado.whatsapp.link);
+  const whatsapp = whatsappDaEscola(escola, estado);
+  const temWhats = Boolean(whatsapp);
   const href = `/${estado.slug}/${slugEscola(escola)}`;
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-surface shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:border-gold-400/60 hover:shadow-card-hover">
@@ -61,7 +68,7 @@ export default function UnidadeCard({
         <div className="mt-auto flex items-center gap-2 border-t border-line pt-4">
           {temWhats && (
             <a
-              href={estado.whatsapp.link!}
+              href={whatsapp!}
               target="_blank"
               rel="noopener noreferrer"
               className={cn(

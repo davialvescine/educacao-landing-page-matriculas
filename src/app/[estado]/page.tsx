@@ -15,9 +15,9 @@ import JsonLd from "@/components/JsonLd";
 import { Diferenciais, Eyebrow } from "@/components/Secoes";
 import {
   cidadeEscola,
-  getEstado,
-  getEstados,
   getFormEstados,
+  getRegiaoSite,
+  getRegioesSite,
   nomeEscola,
   slugEscola,
 } from "@/lib/rede";
@@ -28,20 +28,19 @@ const FOTOS: Record<string, { src: string; w: number; h: number }> = {
   "distrito-federal": { src: "/imagens/campanha/pedro.webp", w: 1440, h: 1600 },
   goias: { src: "/imagens/campanha/camila.webp", w: 1467, h: 1600 },
   "mato-grosso-do-sul": { src: "/imagens/campanha/daniel.webp", w: 1457, h: 1600 },
-  "oeste-mt": { src: "/imagens/campanha/sofia.webp", w: 1352, h: 1600 },
   tocantins: { src: "/imagens/campanha/marlon.webp", w: 1088, h: 1600 },
-  "leste-mt": { src: "/imagens/campanha/malu.webp", w: 1160, h: 1600 },
+  "mato-grosso": { src: "/imagens/campanha/sofia.webp", w: 1352, h: 1600 },
 };
 
 export function generateStaticParams() {
-  return getEstados().map((e) => ({ estado: e.slug }));
+  return getRegioesSite().map((e) => ({ estado: e.slug }));
 }
 
 export async function generateMetadata({
   params,
 }: PageProps<"/[estado]">): Promise<Metadata> {
   const { estado: slug } = await params;
-  const estado = getEstado(slug);
+  const estado = getRegiaoSite(slug);
   if (!estado) return {};
   const cidades = [...new Set(estado.escolas.map(cidadeEscola))]
     .slice(0, 6)
@@ -55,7 +54,7 @@ export async function generateMetadata({
 
 export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
   const { estado: slug } = await params;
-  const estado = getEstado(slug);
+  const estado = getRegiaoSite(slug);
   if (!estado) notFound();
   const foto = FOTOS[estado.slug] ?? FOTOS["goias"];
 
@@ -167,7 +166,7 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
       </main>
       <WhatsFlutuante
         linkDireto={estado.whatsapp.link}
-        regioes={getEstados().map((e) => ({
+        regioes={getRegioesSite().map((e) => ({
           slug: e.slug,
           nome: e.nome,
           link: e.whatsapp.link,
