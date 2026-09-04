@@ -14,6 +14,7 @@ import Footer from "@/components/Footer";
 import LeadForm from "@/components/LeadForm";
 import Reveal from "@/components/Reveal";
 import JsonLd from "@/components/JsonLd";
+import FaqBloco from "@/components/FaqBloco";
 import BarraCtaMobile from "@/components/BarraCtaMobile";
 import WhatsFlutuante from "@/components/WhatsFlutuante";
 import DepoimentosSection from "@/components/DepoimentosSection";
@@ -28,6 +29,7 @@ import {
   nomeEscola,
   slugEscola,
 } from "@/lib/rede";
+import { perguntasEscola } from "@/lib/faq";
 import { SITE_NOME, SITE_URL } from "@/lib/site";
 
 export function generateStaticParams() {
@@ -287,6 +289,13 @@ export default async function EscolaPage({
         </section>
 
         <DepoimentosSection />
+
+        {/* AEO: as perguntas da unidade, visíveis e marcadas em FAQPage */}
+        <FaqBloco
+          perguntas={perguntasEscola(escola, estado)}
+          titulo={`Dúvidas sobre ${nome}`}
+          chamada="O que as famílias mais perguntam antes de conhecer a unidade."
+        />
 
         {/* Formulário (finale) */}
         <section

@@ -12,6 +12,7 @@ import WhatsFlutuante from "@/components/WhatsFlutuante";
 import DepoimentosSection from "@/components/DepoimentosSection";
 import UnidadeCard from "@/components/UnidadeCard";
 import JsonLd from "@/components/JsonLd";
+import FaqBloco from "@/components/FaqBloco";
 import { Diferenciais, Eyebrow } from "@/components/Secoes";
 import {
   cidadeEscola,
@@ -21,6 +22,7 @@ import {
   nomeEscola,
   slugEscola,
 } from "@/lib/rede";
+import { perguntasRegiao } from "@/lib/faq";
 import { SITE_URL } from "@/lib/site";
 
 /** Fotos oficiais da campanha, alternadas entre as regiões. */
@@ -127,6 +129,13 @@ export default async function EstadoPage({ params }: PageProps<"/[estado]">) {
 
         <Diferenciais />
         <DepoimentosSection />
+
+        {/* AEO: as perguntas da região, visíveis e marcadas em FAQPage */}
+        <FaqBloco
+          perguntas={perguntasRegiao(estado)}
+          titulo={`Dúvidas de quem procura escola em ${estado.nome}`}
+          chamada="As perguntas que as famílias da região mais fazem antes de decidir."
+        />
 
         {/* Formulário (finale) */}
         <section
