@@ -4,9 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+gsap.registerPlugin(ScrollTrigger);
 
 export interface QuadroHero {
   src: string;
@@ -43,16 +42,24 @@ export default function HeroIabc({
   const fundo = useRef<HTMLDivElement>(null);
   const [atual, setAtual] = useState(0);
   const anterior = useRef(0);
+  /** O quadro que estava no ar antes deste, para ficar por baixo durante
+   *  o deslize. Estado (e não ref) porque o render precisa dele. */
+  const [porBaixo, setPorBaixo] = useState(0);
 
+  const [pausado, setPausado] = useState(false);
+
+  // Depende de `atual` de propósito: cada troca — automática ou por
+  // clique — reinicia a contagem. Sem isso, um clique aos 5,1 segundos
+  // era desfeito pela troca automática 0,1 segundo depois.
   useEffect(() => {
-    if (quadros.length < 2) return;
+    if (quadros.length < 2 || pausado) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const t = setInterval(
       () => setAtual((i) => (i + 1) % quadros.length),
       TROCA,
     );
     return () => clearInterval(t);
-  }, [quadros.length]);
+  }, [quadros.length, atual, pausado]);
 
   // A foto anda para o lado, não pisca.
   //
@@ -71,6 +78,11 @@ export default function HeroIabc({
     const sai = caixa.querySelector<HTMLElement>(
       `[data-quadro="${anterior.current}"]`,
     );
+    // Atualiza AGORA, antes de qualquer saída: a primeira versão nunca
+    // atualizava, e a animação tratava o quadro 0 como "anterior" para
+    // sempre — na volta a ele, entra === sai e a transição nem rodava.
+    setPorBaixo(anterior.current);
+    anterior.current = atual;
     if (!entra || entra === sai) return;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -93,7 +105,18 @@ export default function HeroIabc({
         0,
       );
     }
+
+    // Rede de segurança do deslize. O `fromTo` põe a foto nova fora da
+    // tela NA HORA e conta com o requestAnimationFrame para trazê-la; em
+    // aba de segundo plano o rAF congela e a foto "atual" fica parada em
+    // xPercent 100, com a tela em preto. setTimeout continua correndo
+    // nessas condições; se a animação já terminou, isto não muda nada.
+    const garantir = window.setTimeout(() => {
+      gsap.set(entra, { xPercent: 0 });
+    }, 1600);
+
     return () => {
+      window.clearTimeout(garantir);
       tl.kill();
     };
   }, [atual]);
@@ -104,16 +127,17 @@ export default function HeroIabc({
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const ctx = gsap.context(() => {
-      const titulo = alvo.querySelector<HTMLElement>(".hero-titulo");
+      // As linhas do título são marcadas no próprio JSX (.hero-linha),
+      // e não fatiadas pelo SplitText. Ele tropeçava no <br> e no <span>
+      // dentro do h1: a caixa do título ficava com a altura de UMA linha
+      // e o parágrafo subia por cima da segunda. Linha marcada à mão tem
+      // altura normal de bloco, e a animação é a mesma.
+      const linhas = gsap.utils.toArray<HTMLElement>(".hero-linha", alvo);
       const apoio = alvo.querySelectorAll<HTMLElement>(".hero-entra");
 
-      const linhas = titulo
-        ? new SplitText(titulo, { type: "lines", linesClass: "hero-linha" })
-        : null;
-
       const tl = gsap.timeline({ delay: 0.15 });
-      if (linhas) {
-        tl.from(linhas.lines, {
+      if (linhas.length) {
+        tl.from(linhas, {
           yPercent: 115,
           duration: 1,
           ease: "power3.out",
@@ -123,7 +147,7 @@ export default function HeroIabc({
       tl.from(
         apoio,
         { opacity: 0, y: 20, duration: 0.7, ease: "power2.out", stagger: 0.1 },
-        linhas ? "-=0.6" : 0,
+        linhas.length ? "-=0.6" : 0,
       );
 
       // A capa afunda de leve ao sair, passando a vez para a seção seguinte.
@@ -141,12 +165,12 @@ export default function HeroIabc({
         });
       }
 
-      return () => linhas?.revert();
     }, alvo);
 
     // Rede de segurança: conteúdo invisível é pior que sem animação.
     const destravar = window.setTimeout(() => {
       gsap.set(alvo.querySelectorAll(".hero-entra"), { opacity: 1, y: 0 });
+      gsap.set(alvo.querySelectorAll(".hero-linha"), { yPercent: 0 });
     }, 2500);
 
     return () => {
@@ -171,7 +195,7 @@ export default function HeroIabc({
               // Ninguém some: a foto que sai continua no ar por baixo da
               // cortina. Apagar a de baixo é o que deixava o fundo da
               // seção aparecer por um instante, e era isso que piscava.
-              zIndex: i === atual ? 3 : i === anterior.current ? 2 : 1,
+              zIndex: i === atual ? 3 : i === porBaixo ? 2 : 1,
             }}
           >
             <Image
@@ -180,7 +204,11 @@ export default function HeroIabc({
               fill
               priority={i === 0}
               sizes="100vw"
-              className={`object-cover object-center ${i === atual ? "anim-respiro" : ""}`}
+              // Todas respiram o tempo todo. Tirar a classe da foto que sai
+              // fazia a escala dela voltar a 1 de uma vez, um "pulo para
+              // trás" visível um instante antes de a próxima cobrir. Quem
+              // está por baixo respirando não aparece; não custa nada.
+              className="anim-respiro object-cover object-center"
             />
           </div>
         ))}
@@ -200,6 +228,50 @@ export default function HeroIabc({
 
       <div className="mx-auto flex min-h-[100dvh] max-w-7xl flex-col justify-end px-4 pb-16 pt-24 sm:px-6 lg:pb-24">
         {children}
+
+        {/* Rodapé da capa: onde estamos na sequência de fotos, e a pista
+            de que a página continua. Sem o contador, a troca de foto
+            parecia acidente; com ele, parece intenção. */}
+        <div
+          className="hero-entra mt-12 flex items-center justify-between text-white/70"
+          // Parar de trocar enquanto a pessoa está nos controles: conteúdo
+          // que gira sozinho precisa de um jeito de parar, e este é o
+          // menos intrusivo — passou o mouse, parou.
+          onMouseEnter={() => setPausado(true)}
+          onMouseLeave={() => setPausado(false)}
+          onFocus={() => setPausado(true)}
+          onBlur={() => setPausado(false)}
+        >
+          <div className="flex items-center gap-1">
+            {quadros.map((q, i) => (
+              <button
+                key={q.src}
+                type="button"
+                aria-label={`Foto ${i + 1}: ${q.alt}`}
+                aria-current={i === atual}
+                onClick={() => setAtual(i)}
+                // Alvo de toque de 44px; a barrinha de 4px é só o desenho.
+                className="group flex h-11 items-center px-1"
+              >
+                <span
+                  className={`block h-1 rounded-full transition-all duration-500 ${
+                    i === atual ? "w-10 bg-gold-400" : "w-4 bg-white/35 group-hover:bg-white/60"
+                  }`}
+                />
+              </button>
+            ))}
+            <span className="ml-2 text-xs font-bold tabular-nums tracking-widest">
+              {String(atual + 1).padStart(2, "0")} / {String(quadros.length).padStart(2, "0")}
+            </span>
+          </div>
+          <a
+            href="#o-campus"
+            className="hidden items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] transition-colors hover:text-white sm:inline-flex"
+          >
+            Conhecer
+            <span aria-hidden className="anim-bounce inline-block">↓</span>
+          </a>
+        </div>
       </div>
 
     </section>

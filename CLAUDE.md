@@ -75,6 +75,21 @@ isto quebra". Se apontar algo real, conserte e rode o CI de novo.
 Um passo que falha invalida os seguintes. CI vermelho não vai para
 revisão; revisão com apontamento aberto não vira PR.
 
+## Agentes especialistas
+
+Em `.claude/agents/`. Cada um existe por causa de um erro que já
+aconteceu neste projeto, e o nome diz o que ele caça:
+
+| Agente | Quando rodar |
+|---|---|
+| `caca-vazamento-regiao` | antes de PR que toque painel, API, tempo real, relatório, exportação ou e-mail |
+| `guarda-lgpd` | ao mexer em rota, e-mail, trilha de auditoria ou consentimento |
+| `auditor-migracao` | ao mexer em `db/schema.sql`, `db/migrar.mjs` ou em consulta SQL |
+| `revisor-familia` | antes de PR que toque página pública ou e-mail para a família |
+
+Eles complementam a revisão do Codex, não a substituem: o Codex lê o
+diff inteiro; cada agente lê o sistema inteiro por UM ângulo.
+
 ## Banco
 
 Fonte única: `db/schema.sql`. Toda mudança entra como `CREATE TABLE IF

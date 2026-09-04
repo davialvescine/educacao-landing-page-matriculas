@@ -44,13 +44,36 @@ async function retrato() {
     `SELECT table_name FROM information_schema.tables
      WHERE table_schema = 'public' ORDER BY table_name`,
   );
+  // Nome não basta. Um banco vindo da versão anterior já tem a função e
+  // o gatilho com ESTES MESMOS nomes, só que sem DELETE e com `length`
+  // no lugar de `octet_length` — e o ensaio diria "atualizado" para um
+  // banco que ainda derruba a transação num nome com acento. Por isso a
+  // checagem olha o CORPO da função e a definição do gatilho, e amarra o
+  // gatilho à tabela certa.
   const { rows: objetos } = await cliente.query(
     `SELECT 'indice:' || indexname AS nome FROM pg_indexes WHERE schemaname = 'public'
      UNION ALL
-     SELECT 'gatilho:' || tgname FROM pg_trigger WHERE NOT tgisinternal
+     SELECT 'gatilho:' || t.tgname || ' em ' || c.relname
+       FROM pg_trigger t
+       JOIN pg_class c ON c.oid = t.tgrelid
+      WHERE NOT t.tgisinternal
      UNION ALL
      SELECT 'funcao:' || proname FROM pg_proc p
        JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname = 'public'`,
+  );
+
+  // Marcas que só existem na versão atual das definições.
+  const { rows: marcas } = await cliente.query(
+    `SELECT
+       coalesce(bool_or(p.prosrc LIKE '%octet_length%'), false)  AS aviso_em_bytes,
+       coalesce(bool_or(p.prosrc LIKE '%estado_anterior%'), false) AS aviso_troca_regiao
+     FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+     WHERE n.nspname = 'public' AND p.proname = 'leads_avisar'`,
+  );
+  const { rows: gatilho } = await cliente.query(
+    `SELECT coalesce(bool_or(pg_get_triggerdef(t.oid) LIKE '%DELETE%'), false) AS cobre_delete
+       FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
+      WHERE t.tgname = 'leads_avisar_trg' AND c.relname = 'leads'`,
   );
   const { rows: colunas } = await cliente.query(
     `SELECT table_name, column_name FROM information_schema.columns
@@ -65,6 +88,11 @@ async function retrato() {
     tabelas: tabelas.map((t) => t.table_name),
     colunas: new Set(colunas.map((c) => `${c.table_name}.${c.column_name}`)),
     objetos: new Set(objetos.map((o) => o.nome)),
+    definicoes: {
+      "aviso de mudança conta bytes (octet_length)": marcas[0]?.aviso_em_bytes ?? false,
+      "aviso de mudança avisa troca de região": marcas[0]?.aviso_troca_regiao ?? false,
+      "gatilho de aviso cobre DELETE": gatilho[0]?.cobre_delete ?? false,
+    },
     leads,
   };
 }
@@ -77,16 +105,15 @@ if (antes.leads !== null) console.log(`leads gravados: ${antes.leads}`);
 // em db/schema.sql entra aqui, senão o ensaio diz "nada pendente" para um
 // banco que na verdade está atrasado — e foi assim que a checagem anterior
 // envelheceu sem ninguém perceber.
-const EXIGE_TABELA = ["leads", "acessos", "regioes_config", "consentimentos"];
+const EXIGE_TABELA = ["leads", "acessos", "regioes_config", "consentimentos", "relatorios_enviados"];
 const EXIGE_COLUNA = [
   "leads.cidade",
   "leads.utm",
   "leads.atendimento_status",
-  "leads.atendente_id",
-  "leads.atendente_nome",
   "acessos.ip",
   "acessos.agente",
   "consentimentos.metodo",
+  "relatorios_enviados.reivindicado_em",
 ];
 
 // Índice, gatilho e função também envelhecem: a checagem só de tabela e
@@ -96,9 +123,13 @@ const EXIGE_OBJETO = [
   "indice:acessos_acao_idx",
   "indice:acessos_criado_em_idx",
   "indice:consentimentos_lead_idx",
-  "gatilho:leads_avisar_trg",
+  "gatilho:leads_avisar_trg em leads",
   "funcao:leads_avisar",
 ];
+
+// Colunas que saíram do sistema e precisam SUMIR. A migração é aditiva
+// no resto, mas coluna de recurso removido é dívida que confunde.
+const PROIBE_COLUNA = ["leads.atendente_id", "leads.atendente_nome", "leads.atendente_em"];
 
 const pendentes = [
   ...EXIGE_TABELA.filter((t) => !antes.tabelas.includes(t)).map(
@@ -110,6 +141,12 @@ const pendentes = [
     return antes.tabelas.includes(tabela) && !antes.colunas.has(c);
   }).map((c) => `coluna ${c}`),
   ...EXIGE_OBJETO.filter((o) => !antes.objetos.has(o)),
+  ...PROIBE_COLUNA.filter((c) => antes.colunas.has(c)).map((c) => `remover coluna ${c}`),
+  // Definição existente mas desatualizada: o nome está lá, o
+  // comportamento não.
+  ...Object.entries(antes.definicoes)
+    .filter(([, ok]) => !ok)
+    .map(([o]) => `desatualizado: ${o}`),
 ];
 console.log(`\npendente: ${pendentes.length ? pendentes.join(", ") : "nada — banco já está atualizado"}`);
 

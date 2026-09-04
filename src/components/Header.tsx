@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/#regioes", label: "Nossas regiões" },
   { href: "/#diferenciais", label: "Diferenciais" },
-  { href: "/#iabc", label: "IABC" },
+  { href: "/iabc", label: "IABC" },
 ];
 
 /**

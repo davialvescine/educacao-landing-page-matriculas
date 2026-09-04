@@ -5,14 +5,14 @@
  *
  *  ida    o Postgres avisa (LISTEN leads_mudou) e o evento cai nas telas
  *         de quem pode ver aquela região
- *  volta  a tela avisa que alguém está olhando um lead, e pede para pegar
- *         o atendimento
+ *  volta  a tela avisa que alguém está olhando um lead
  *
- * A volta é o que justifica o socket. Só ida daria para fazer com SSE e
- * sem processo separado. O que a mão dupla compra é impedir o dano antes
- * dele acontecer: a coordenadora vê "a Fulana está neste lead" enquanto a
- * Fulana ainda está lendo, e não depois de as duas já terem mandado
- * mensagem para a mesma família.
+ * O atendimento em si NÃO acontece aqui: acontece no Sevenbee, e o
+ * `atendimento_status` chega pelo webhook deles. O painel marcar dono
+ * criaria uma segunda verdade que divergiria da primeira no primeiro dia
+ * de uso. Por isso a volta guarda só presença, que é estado do instante
+ * e não compete com nada: a coordenadora vê que a colega já está nesse
+ * lead antes de abrir a conversa no Sevenbee.
  *
  * REGRA DURA, e ela vale em TODO evento daqui: coordenador só enxerga as
  * regiões atribuídas a ele. Isso inclui presença e "quem está olhando" —
@@ -79,6 +79,7 @@ io.use(async (socket, next) => {
     if (!usuario) return next(new Error("sem sessão"));
     socket.data.usuario = usuario;
     socket.data.token = token;
+    socket.data.vez = 0;
     next();
   } catch (e) {
     console.error("[tempo-real] falha ao conferir sessão:", e);
@@ -103,7 +104,22 @@ io.on("connection", (socket) => {
         socket.emit("sessao:encerrada");
         return socket.disconnect(true);
       }
+      // Região tirada de alguém muda quem pode vê-lo na lista de
+      // presença dos outros. Sem recalcular, a lista fica obsoleta até
+      // a próxima conexão ou desconexão de qualquer pessoa.
+      const mudou =
+        atual.admin !== socket.data.usuario.admin ||
+        atual.regioes.join("|") !== socket.data.usuario.regioes.join("|");
       socket.data.usuario = atual;
+      if (mudou) {
+        sairDeTudo(socket);
+        anunciarPresenca();
+        // O que já está na tela dele foi carregado com a permissão
+        // antiga. Parar de mandar evento novo não tira nome e telefone
+        // do DOM; só a recarga, que volta a passar pelo filtro do
+        // servidor, faz isso.
+        socket.emit("recarregar");
+      }
     } catch (e) {
       // Banco fora do ar não derruba quem já está conectado: a próxima
       // volta reconfere. Derrubar aqui transformaria instabilidade de
@@ -114,7 +130,13 @@ io.on("connection", (socket) => {
 
   // ---- volta: quem está olhando o quê -------------------------------
   socket.on("lead:olhando", async (leadId) => {
+    // A consulta de região é assíncrona, e nesse meio-tempo a pessoa
+    // pode fechar o modal, abrir outro lead ou cair. Sem esta marca, a
+    // resposta atrasada inseria alguém que já tinha saído — presença
+    // fantasma, que ninguém consegue limpar depois.
+    const marca = ++socket.data.vez;
     const estado = await regiaoDoLead(pool, leadId).catch(() => null);
+    if (marca !== socket.data.vez) return;
     if (!estado || !podeVer(socket.data.usuario, estado)) return;
     sairDeTudo(socket);
     if (!olhando.has(leadId)) olhando.set(leadId, { estado, pessoas: new Map() });
@@ -127,53 +149,13 @@ io.on("connection", (socket) => {
     anunciarOlhares(leadId);
   });
 
-  socket.on("lead:largou", () => sairDeTudo(socket));
-
-  // ---- volta: pegar o atendimento -----------------------------------
-  //
-  // A garantia contra atendimento duplicado NÃO é o socket: é o UPDATE
-  // condicional. O socket só encurta a janela. Se duas pessoas clicarem
-  // no mesmo milissegundo, o banco decide, e a segunda recebe
-  // `pego: false` com o nome de quem ganhou.
-  socket.on("lead:pegar", async (leadId, responder) => {
-    const resposta = typeof responder === "function" ? responder : () => {};
-    const usuario = socket.data.usuario;
-    try {
-      const estado = await regiaoDoLead(pool, leadId);
-      // Autorização primeiro, e a mesma condição repetida no WHERE: quem
-      // não pode ver a região não pode pegar o lead, e nem descobrir de
-      // quem ele é. Sem isto, bastava ter o identificador.
-      if (!estado || !podeVer(usuario, estado)) return resposta({ pego: false });
-
-      const { rows } = await pool.query(
-        `UPDATE leads
-            SET atendente_id = $1, atendente_nome = $2, atendente_em = now(),
-                atendimento_status = CASE
-                  WHEN atendimento_status = 'aguardando' THEN 'em_atendimento'
-                  ELSE atendimento_status END
-          WHERE id = $3 AND estado = $4 AND atendente_id IS NULL
-          RETURNING id`,
-        [usuario.id, usuario.nome, leadId, estado],
-      );
-      if (rows.length) {
-        // O gatilho do banco já avisa todas as telas: não repasso aqui.
-        // O registro na trilha não segura a resposta — auditoria lenta
-        // não pode virar botão travado.
-        registrar(usuario, "pegou_lead", leadId);
-        return resposta({ pego: true });
-      }
-      const { rows: dono } = await pool.query(
-        `SELECT atendente_nome FROM leads WHERE id = $1 AND estado = $2`,
-        [leadId, estado],
-      );
-      resposta({ pego: false, de: dono[0]?.atendente_nome ?? "" });
-    } catch (e) {
-      console.error("[tempo-real] falha ao pegar lead:", e);
-      resposta({ pego: false, erro: true });
-    }
+  socket.on("lead:largou", () => {
+    socket.data.vez += 1; // invalida consulta ainda em voo
+    sairDeTudo(socket);
   });
 
   socket.on("disconnect", () => {
+    socket.data.vez += 1;
     clearInterval(conferir);
     sairDeTudo(socket);
     anunciarPresenca();
@@ -189,6 +171,19 @@ function sairDeTudo(socket) {
       continue;
     }
     anunciarOlhares(leadId);
+  }
+}
+
+/** Zera quem está olhando um lead e avisa todas as regiões envolvidas. */
+function esquecerOlhares(leadId, ...estados) {
+  const alvo = olhando.get(leadId);
+  if (!alvo) return;
+  olhando.delete(leadId);
+  for (const s of io.sockets.sockets.values()) {
+    if (alvo.pessoas.has(s.id)) s.data.vez += 1;
+  }
+  for (const e of new Set([alvo.estado, ...estados].filter(Boolean))) {
+    espalhar(e, "lead:olhares", { leadId, pessoas: [] });
   }
 }
 
@@ -231,16 +226,6 @@ function espalhar(estado, evento, carga) {
   }
 }
 
-function registrar(usuario, acao, detalhe) {
-  pool
-    .query(
-      `INSERT INTO acessos (usuario_id, usuario_nome, acao, detalhe)
-       VALUES ($1, $2, $3, $4)`,
-      [usuario.id, usuario.nome, acao, detalhe],
-    )
-    .catch((e) => console.error("[tempo-real] falha ao registrar acesso:", e));
-}
-
 // ---- ida: o banco avisa, as telas recebem ---------------------------
 //
 // Conexão dedicada, fora do pool: uma conexão em LISTEN fica ocupada, e
@@ -253,7 +238,13 @@ async function escutarBanco() {
   if (escuta.religando) return;
   escuta.religando = true;
 
-  const cliente = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  const cliente = new pg.Client({
+    connectionString: process.env.DATABASE_URL,
+    // Sem prazo, uma conexão que nunca resolve prende a trava
+    // `religando` e o serviço fica sem escuta para sempre — de pé,
+    // respondendo, e sem fazer nada.
+    connectionTimeoutMillis: 10_000,
+  });
   const cair = (motivo) => {
     if (escuta.cliente !== cliente) return;
     escuta.ligada = false;
@@ -297,7 +288,13 @@ async function escutarBanco() {
       espalharSó(carga.estado_anterior, lead.estado, "leads:sumiu", {
         id: lead.id,
       });
+      // E a presença ACOMPANHA o lead se não for zerada aqui: quem
+      // estava olhando pela região antiga continuaria no mapa, e o
+      // próximo aviso levaria o nome dessa pessoa para a região nova.
+      // Foi assim que a correção anterior reabriu o vazamento.
+      esquecerOlhares(lead.id, carga.estado_anterior, lead.estado);
     }
+    if (carga.acao === "delete") esquecerOlhares(lead.id, lead.estado);
     espalhar(lead.estado, "leads:mudou", carga);
   });
 }

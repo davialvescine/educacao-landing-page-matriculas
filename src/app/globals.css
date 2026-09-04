@@ -157,21 +157,35 @@ body {
 .anim-glow     { animation: glow-pulse 7s ease-in-out infinite; }
 .anim-bounce   { animation: bounce-soft 2.2s ease-in-out infinite; }
 .anim-marquee  { animation: marquee 42s linear infinite; }
-.brilho-letras { position: relative; overflow: hidden; }
-.brilho-letras::after {
-  content: "";
+/* Luz que varre o lettering da capa. Camada por cima da arte, com a
+   própria arte como máscara: a luz só existe onde há letra. O que anda é
+   a posição do gradiente, não a caixa — assim não há borda nenhuma para
+   aparecer. Se o navegador não aplicar a máscara, some só a luz; a arte
+   embaixo continua intacta. */
+.luz-lettering { display: none; }
+/* Sem suporte a máscara, a faixa branca atravessaria a arte como um
+   retângulo — pior que luz nenhuma. Só existe onde a máscara existe. */
+@supports (mask-image: url("")) or (-webkit-mask-image: url("")) {
+.luz-lettering {
+  display: block;
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 32%;
-  transform: translateX(-260%) skewX(-18deg);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.38), transparent);
-  animation: brilho-letras 7s ease-in-out infinite;
+  inset: 0;
   pointer-events: none;
+  -webkit-mask-image: var(--mascara, none);
+  mask-image: var(--mascara, none);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, 0.5) 50%, transparent 65%);
+  background-size: 300% 100%;
+  background-repeat: no-repeat;
+  animation: luz-lettering 7s ease-in-out infinite;
 }
-@keyframes brilho-letras {
-  0%        { transform: translateX(-260%) skewX(-18deg); }
-  45%, 100% { transform: translateX(460%) skewX(-18deg); }
+}
+@keyframes luz-lettering {
+  0%        { background-position: 150% 0; }
+  45%, 100% { background-position: -150% 0; }
 }
 
 @keyframes varredura {
@@ -194,8 +208,12 @@ body {
 
 /* Respiro da capa: a foto cresce devagar enquanto está no ar, o que tira
    a sensação de slide parado sem virar movimento chamativo. */
+/* Vai e volta, sem parar: com `forwards` a foto zumava uma vez e ficava
+   presa em 1.07, e a que saía voltava a 1 num pulo. Alternando, nenhuma
+   foto tem "fim" — em qualquer instante da troca ela está no meio de um
+   movimento suave. */
 @keyframes respiro { from { transform: scale(1); } to { transform: scale(1.07); } }
-.anim-respiro { animation: respiro 9s ease-out forwards; }
+.anim-respiro { animation: respiro 9s ease-in-out infinite alternate; }
 
 @keyframes digitando {
   0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
@@ -278,13 +296,22 @@ a:focus-visible .estado-topo { transform: translateY(-16px); }
 }
 
 /* Reveal ao scroll (ativado pelo componente <Reveal>) */
+/* O estado escondido só existe com JS: sem ele não haveria quem
+   mostrasse depois, e a página inteira ficaria em branco. */
 .reveal {
-  opacity: 0;
-  transform: translateY(32px);
   transition:
     opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--delay, 0s);
+}
+/* `reveal-oculto` é posta pelo próprio componente, num layout effect,
+   e só no que ainda NÃO está na tela. Sem JS a classe nunca existe e
+   tudo aparece; com JS, o que está acima da dobra nunca é escondido, e o
+   que está abaixo é escondido antes de alguém rolar até ele. Nenhum
+   script inline, nenhuma media query que navegador velho não entende. */
+.reveal.reveal-oculto:not(.is-visible) {
+  opacity: 0;
+  transform: translateY(32px);
 }
 .reveal.is-visible {
   opacity: 1;
@@ -293,7 +320,7 @@ a:focus-visible .estado-topo { transform: translateY(-16px); }
 
 @media (prefers-reduced-motion: reduce) {
   .anim-kenburns, .anim-float, .anim-glow, .anim-bounce, .anim-marquee, .anim-chip, .pin-pulso, .anim-aurora, .anim-esteira, .anim-esteira-rev, .anim-orbita, .anim-orbita-rev, .anim-varredura, .ponto-digitando, .anim-zoom-lento, .anim-flutuar, .anim-respiro { animation: none; }
-  .brilho-letras::after { animation: none; opacity: 0; }
+  .luz-lettering { animation: none; opacity: 0; }
   .tarja::before { transform: scaleX(1); transition: none; }
   .hero-enter, .hero-pop { animation: none; opacity: 1; }
   .reveal { opacity: 1; transform: none; transition: none; }

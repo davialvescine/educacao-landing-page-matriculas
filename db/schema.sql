@@ -56,21 +56,6 @@ CREATE INDEX IF NOT EXISTS acessos_criado_em_idx ON acessos (criado_em DESC);
 CREATE INDEX IF NOT EXISTS acessos_acao_idx ON acessos (acao, criado_em DESC);
 
 -- ============================================================
--- Dono do lead
---
--- Duas coordenadoras da mesma região abrem o painel de manhã e veem o
--- mesmo lead novo. Sem dono, as duas mandam mensagem e a família recebe
--- dois "olá" da mesma escola. O campo abaixo, tomado por UPDATE
--- condicional (WHERE atendente IS NULL), faz o segundo clique voltar sem
--- linha afetada: quem chega depois é avisada, não duplica o contato.
---
--- Tempo real não substitui isto. Ele reduz a janela; a garantia é o banco.
--- ============================================================
-ALTER TABLE leads ADD COLUMN IF NOT EXISTS atendente_id text;
-ALTER TABLE leads ADD COLUMN IF NOT EXISTS atendente_nome text NOT NULL DEFAULT '';
-ALTER TABLE leads ADD COLUMN IF NOT EXISTS atendente_em timestamptz;
-
--- ============================================================
 -- Aviso de mudança para as telas abertas
 --
 -- O gatilho dispara em qualquer escrita, venha de onde vier: do
@@ -117,8 +102,7 @@ BEGIN
       'criado_em', linha.criado_em,
       'webhook_status', linha.webhook_status,
       'atendimento_status', linha.atendimento_status,
-      'atendente_id', linha.atendente_id,
-      'atendente_nome', linha.atendente_nome
+      'atendimento_em', linha.atendimento_em
     )
   )::text;
 
@@ -213,3 +197,40 @@ ALTER TABLE consentimentos ADD COLUMN IF NOT EXISTS metodo text NOT NULL DEFAULT
 
 CREATE INDEX IF NOT EXISTS consentimentos_lead_idx ON consentimentos (lead_id);
 CREATE INDEX IF NOT EXISTS consentimentos_versao_idx ON consentimentos (versao);
+
+-- ============================================================
+-- Relatórios mensais enviados
+--
+-- A primeira versão usava a trilha de auditoria como estado da tarefa:
+-- "achou um registro do mês, então já foi". Bastava UM dos vinte envios
+-- dar certo para os outros dezenove nunca mais saírem. E duas execuções
+-- simultâneas passavam as duas pela checagem antes de existir registro.
+--
+-- Aqui a chave é (ano, mes, usuario_id, tipo): cada pessoa é reivindicada
+-- com INSERT ... ON CONFLICT DO NOTHING antes do envio, o que serve de
+-- trava por destinatário e por execução ao mesmo tempo. Envio de teste
+-- tem tipo próprio, para não ser confundido com o oficial do fechamento.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS relatorios_enviados (
+  ano             int  NOT NULL,
+  mes             int  NOT NULL,
+  usuario_id      text NOT NULL,
+  tipo            text NOT NULL DEFAULT 'oficial',  -- oficial | teste
+  -- Duas fases. A reivindicação entra com enviado_em NULO; o envio bem
+  -- sucedido preenche. Linha reivindicada há mais de 15 minutos e ainda
+  -- sem envio é um processo que caiu no meio — pode ser retomada. Sem
+  -- isso, a queda deixava o destinatário marcado como "enviado" para
+  -- sempre.
+  reivindicado_em timestamptz NOT NULL DEFAULT now(),
+  enviado_em      timestamptz,
+  PRIMARY KEY (ano, mes, usuario_id, tipo)
+);
+ALTER TABLE relatorios_enviados ADD COLUMN IF NOT EXISTS reivindicado_em timestamptz NOT NULL DEFAULT now();
+ALTER TABLE relatorios_enviados ALTER COLUMN enviado_em DROP NOT NULL;
+ALTER TABLE relatorios_enviados ALTER COLUMN enviado_em DROP DEFAULT;
+
+-- Dono do lead saiu do sistema (o atendimento é conduzido no Sevenbee).
+-- Banco que chegou a receber as colunas fica limpo também.
+ALTER TABLE leads DROP COLUMN IF EXISTS atendente_id;
+ALTER TABLE leads DROP COLUMN IF EXISTS atendente_nome;
+ALTER TABLE leads DROP COLUMN IF EXISTS atendente_em;

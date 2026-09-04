@@ -22,9 +22,12 @@ export async function POST(req: Request) {
   if (!lead) {
     return NextResponse.json({ erro: "Lead não encontrado." }, { status: 404 });
   }
+  // Mesma resposta de "não existe": 403 aqui diria a um coordenador de
+  // outra região que aquele identificador existe, e existência de lead
+  // já é informação de região alheia.
   const permitidas = regioesPermitidas(usuario);
   if (permitidas && !permitidas.includes(lead.estado)) {
-    return NextResponse.json({ erro: "Não autorizado." }, { status: 403 });
+    return NextResponse.json({ erro: "Lead não encontrado." }, { status: 404 });
   }
   await registrarAcesso("reenviou", {
     usuarioId: usuario.id,

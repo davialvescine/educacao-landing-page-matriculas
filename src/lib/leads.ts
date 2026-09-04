@@ -24,9 +24,6 @@ export interface LeadRegistro extends LeadNovo {
   enviado_em: string | null;
   atendimento_status: string; // aguardando | em_atendimento | atendido
   atendimento_em: string | null;
-  /** Quem pegou o atendimento. Vazio = ninguém pegou ainda. */
-  atendente_id: string | null;
-  atendente_nome: string;
 }
 
 /** Telefone reduzido a dígitos, sem o DDI 55, para casar lead × Sevenbee. */
@@ -42,6 +39,11 @@ export interface FiltroLeads {
   limite?: number;
   /** Restringe às regiões do usuário (null/undefined = todas). */
   regioesPermitidas?: string[] | null;
+  /** Intervalo de criação: `criado_em >= inicio AND < fim`. Vai para a
+   *  consulta, e não para um filtro depois — filtrar depois do LIMIT
+   *  devolvia mês vazio assim que houvesse 2.000 leads mais novos. */
+  inicio?: Date;
+  fim?: Date;
 }
 
 // Pool do Postgres compartilhado; em dev sem DATABASE_URL usamos arquivo.
@@ -154,8 +156,6 @@ async function lerArquivoDev(): Promise<LeadRegistro[]> {
       enviado_em: null,
       atendimento_status: "aguardando",
       atendimento_em: null,
-      atendente_id: null,
-      atendente_nome: "",
       utm:
         obj.utm && typeof obj.utm === "object"
           ? (obj.utm as Record<string, string>)
@@ -183,11 +183,18 @@ export async function listarLeads(filtro: FiltroLeads = {}): Promise<LeadRegistr
       valores.push(filtro.regioesPermitidas);
       clausulas.push(`estado = ANY($${valores.length})`);
     }
+    if (filtro.inicio) {
+      valores.push(filtro.inicio);
+      clausulas.push(`criado_em >= $${valores.length}`);
+    }
+    if (filtro.fim) {
+      valores.push(filtro.fim);
+      clausulas.push(`criado_em < $${valores.length}`);
+    }
     valores.push(limite);
     const sql = `SELECT id, nome, whatsapp, email, estado, escola, cidade, nivel,
                         criado_em, webhook_status, webhook_tentativas, enviado_em,
-                        atendimento_status, atendimento_em, utm,
-                        atendente_id, atendente_nome
+                        atendimento_status, atendimento_em, utm
                  FROM leads
                  ${clausulas.length ? `WHERE ${clausulas.join(" AND ")}` : ""}
                  ORDER BY criado_em DESC
@@ -208,6 +215,8 @@ export async function listarLeads(filtro: FiltroLeads = {}): Promise<LeadRegistr
     leads = leads.filter((l) => permitidas.has(l.estado));
   }
   if (filtro.estado) leads = leads.filter((l) => l.estado === filtro.estado);
+  if (filtro.inicio) leads = leads.filter((l) => new Date(l.criado_em) >= filtro.inicio!);
+  if (filtro.fim) leads = leads.filter((l) => new Date(l.criado_em) < filtro.fim!);
   if (filtro.status === "enviado")
     leads = leads.filter((l) => l.webhook_status === "enviado");
   if (filtro.status === "pendente")

@@ -11,6 +11,7 @@ import { enviarConfirmacaoLead, type EscolaEmail } from "@/lib/email";
 import { getVersao } from "@/lib/consentimento";
 import { registrarConsentimento } from "@/lib/consentimento-registro";
 import { agenteDaRequisicao, ipDaRequisicao } from "@/lib/requisicao";
+import { chaveDoPedido, lembrar, permitido, repetido } from "@/lib/limite";
 
 export const runtime = "nodejs";
 
@@ -63,6 +64,15 @@ function escolaDoEmail(
 }
 
 export async function POST(req: Request) {
+  // Trava por IP antes de ler o corpo: rota pública sem trava é um
+  // convite para encher o banco e o CRM com script.
+  if (!permitido(ipDaRequisicao(req))) {
+    return NextResponse.json(
+      { erro: "Muitos envios seguidos. Aguarde um minuto e tente de novo." },
+      { status: 429, headers: { "Retry-After": "60" } },
+    );
+  }
+
   let body: Record<string, unknown>;
   try {
     body = await req.json();
@@ -87,6 +97,7 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
+
   // A escola é o que diz qual equipe atende a família — e, no Mato Grosso,
   // qual das duas associações fica com o lead.
   if (!lead.escola) {
@@ -129,9 +140,22 @@ export async function POST(req: Request) {
     );
   }
 
+  // Deduplicação SÓ aqui, com tudo validado: clique duplo, reenvio do
+  // outro portal ou "não sei se foi" é o mesmo pedido duas vezes em
+  // poucos minutos. Responde como sucesso — para a família, foi — sem
+  // criar a segunda linha nem o segundo contato no CRM. A chave inclui
+  // nome e série: dois filhos no mesmo telefone são dois pedidos.
+  const chave = chaveDoPedido(lead);
+  if (repetido(chave)) {
+    return NextResponse.json({ ok: true, repetido: true });
+  }
+
   let id: string;
   try {
     id = await salvarLead(lead);
+    // Marcar só depois de gravar: marcar antes fazia um reenvio depois
+    // de falha ganhar "sucesso" falso, e o lead sumia.
+    lembrar(chave);
   } catch (e) {
     console.error("[leads] falha ao salvar:", e);
     return NextResponse.json(

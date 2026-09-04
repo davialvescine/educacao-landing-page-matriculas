@@ -15,7 +15,7 @@ import {
   Send,
   Users,
   Eye,
-  Hand,
+  ChartColumn,
   TriangleAlert,
   X,
 } from "lucide-react";
@@ -147,13 +147,28 @@ export default function PainelLeads({
     novos,
     olhar,
     largar,
-    pegar,
     marcarVisto,
   } = useTempoReal(leadsDoServidor, tempoRealUrl);
 
   // Enquanto o modal de um lead está aberto, os colegas veem que alguém
   // está nele. É o que evita a mensagem dobrada — antes de qualquer
   // clique em atender.
+  // O lead aberto no modal sumiu da lista — foi apagado ou mudou de
+  // região e deixou de ser meu. A lista filtra, mas o modal guarda uma
+  // cópia própria e continuaria exibindo nome, telefone e e-mail de
+  // alguém que não é mais desta coordenação.
+  useEffect(() => {
+    if (!selecionado) return;
+    const atual = leads.find((l) => l.id === selecionado.id);
+    if (!atual) {
+      setSelecionado(null);
+    } else if (atual !== selecionado) {
+      // Status do Sevenbee mudou enquanto o modal estava aberto: a cópia
+      // do modal acompanha, senão a tabela diz "atendido" e o modal, não.
+      setSelecionado(atual);
+    }
+  }, [leads, selecionado]);
+
   useEffect(() => {
     if (!selecionado) {
       largar();
@@ -163,17 +178,6 @@ export default function PainelLeads({
     marcarVisto(selecionado.id);
     return () => largar();
   }, [selecionado, olhar, largar, marcarVisto]);
-
-  async function atender(lead: LeadRegistro) {
-    const r = await pegar(lead.id);
-    if (r.pego) {
-      setAviso(`Você está atendendo ${lead.nome}.`);
-    } else if (r.erro) {
-      setAviso("Não consegui reservar agora. Tente de novo.");
-    } else {
-      setAviso(`${r.de || "Outra pessoa"} pegou este atendimento primeiro.`);
-    }
-  }
 
   // Fecha o modal com Esc e trava o scroll da página enquanto ele está aberto.
   useEffect(() => {
@@ -253,11 +257,14 @@ export default function PainelLeads({
     router.refresh();
   }
 
-  const cartoes = [
-    { rotulo: "Total de leads", valor: resumo.total },
-    { rotulo: "Hoje", valor: resumo.hoje },
-    { rotulo: "Enviados ao sistema", valor: resumo.enviados },
-    { rotulo: "Aguardando envio", valor: resumo.pendentes + resumo.falhas },
+  // Cinco números de peso igual não são um resumo, são uma lista. Estes
+  // três são contexto; o que chegou hoje e o que está travado ganham
+  // destaque próprio, porque são os dois que mudam o que a pessoa faz
+  // nos próximos minutos.
+  const naFila = resumo.pendentes + resumo.falhas;
+  const contexto = [
+    { rotulo: "Total", valor: resumo.total },
+    { rotulo: "No sistema", valor: resumo.enviados },
     { rotulo: "Atendidos", valor: resumo.atendidos },
   ];
 
@@ -265,7 +272,7 @@ export default function PainelLeads({
     <main className="flex min-h-dvh flex-col bg-paper">
       {/* Barra superior */}
       <header className="bg-brand-950">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-3">
             <Image
               src="/imagens/logos/logo_colegio.png"
@@ -274,15 +281,15 @@ export default function PainelLeads({
               height={150}
               className="h-10 w-auto"
             />
-            <span className="hidden text-sm font-bold uppercase tracking-widest text-white/70 sm:block">
+            <span className="hidden whitespace-nowrap text-sm font-bold uppercase tracking-widest text-white/70 lg:block">
               Painel de leads
             </span>
-            <span className="hidden rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white/80 lg:block">
+            <span className="hidden whitespace-nowrap rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white/80 xl:block">
               {usuario.nome}
               {usuario.papel === "admin" ? " · admin" : ""}
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             {/* Estado da conexão ao vivo. Aparece só quando ligado: selo
                 apagado permanente vira ruído para quem nunca teve o
                 serviço no ar. */}
@@ -296,29 +303,41 @@ export default function PainelLeads({
                 className="inline-flex h-9 items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-400/10 px-3 text-xs font-bold text-emerald-200"
               >
                 <span className="size-2 animate-pulse rounded-full bg-emerald-400" />
-                Ao vivo
-                {presenca.length > 1 ? ` · ${presenca.length}` : ""}
+                <span className="hidden sm:inline">
+                  Ao vivo
+                  {presenca.length > 1 ? ` · ${presenca.length}` : ""}
+                </span>
               </span>
             ) : null}
+            <Link
+              href="/painel/relatorio"
+              className="inline-flex h-9 items-center gap-2 rounded-full border border-white/25 px-3 text-sm font-bold text-white transition-colors duration-150 hover:bg-white/10 lg:px-4"
+            >
+              <ChartColumn aria-hidden className="size-4" />
+              <span className="hidden lg:inline">Relatório</span>
+            </Link>
             <a
               href="/api/painel/exportar"
-              className="inline-flex h-9 items-center gap-2 rounded-full border border-white/25 px-4 text-sm font-bold text-white transition-colors hover:bg-white/10"
+              className="inline-flex h-9 items-center gap-2 rounded-full border border-white/25 px-3 text-sm font-bold text-white transition-colors duration-150 hover:bg-white/10 lg:px-4"
             >
-              <Download aria-hidden className="size-4" /> CSV
+              <Download aria-hidden className="size-4" />
+              <span className="hidden lg:inline">CSV</span>
             </a>
             <button
               type="button"
               onClick={() => router.refresh()}
-              className="inline-flex h-9 items-center gap-2 rounded-full border border-white/25 px-4 text-sm font-bold text-white transition-colors hover:bg-white/10"
+              className="inline-flex h-9 items-center gap-2 rounded-full border border-white/25 px-3 text-sm font-bold text-white transition-colors duration-150 hover:bg-white/10 lg:px-4"
             >
-              <RefreshCw aria-hidden className="size-4" /> Atualizar
+              <RefreshCw aria-hidden className="size-4" />
+              <span className="hidden lg:inline">Atualizar</span>
             </button>
             {usuario.papel === "admin" ? (
               <Link
                 href="/painel/equipe"
-                className="inline-flex h-9 items-center gap-2 rounded-full border border-white/25 px-4 text-sm font-bold text-white transition-colors hover:bg-white/10"
+                className="inline-flex h-9 items-center gap-2 rounded-full border border-white/25 px-3 text-sm font-bold text-white transition-colors duration-150 hover:bg-white/10 lg:px-4"
               >
-                <Users aria-hidden className="size-4" /> Equipe
+                <Users aria-hidden className="size-4" />
+              <span className="hidden lg:inline">Equipe</span>
               </Link>
             ) : null}
             <button
@@ -326,37 +345,84 @@ export default function PainelLeads({
               onClick={sair}
               className="inline-flex h-9 items-center gap-2 rounded-full px-3 text-sm font-bold text-white/70 transition-colors hover:text-white"
             >
-              <LogOut aria-hidden className="size-4" /> Sair
+              <LogOut aria-hidden className="size-4" />
+              <span className="hidden lg:inline">Sair</span>
             </button>
           </div>
         </div>
       </header>
 
       <div className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
-        {/* Resumo */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {cartoes.map((c) => (
-            <div
-              key={c.rotulo}
-              className="rounded-2xl border border-line bg-surface p-5 shadow-card"
-            >
-              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                {c.rotulo}
-              </p>
-              <p className="mt-2 text-3xl font-extrabold tracking-tight text-brand-950">
-                {c.valor}
-              </p>
-            </div>
-          ))}
-        </div>
+        {/* Resumo, com hierarquia: o de hoje é o que muda a manhã de
+            quem abre o painel; o resto é contexto. */}
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)]">
+          <div className="relative flex flex-col justify-center overflow-hidden rounded-2xl bg-gold-400 px-6 py-7">
+            <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-brand-950/70">
+              Chegaram hoje
+            </p>
+            <p className="mt-1 text-5xl font-extrabold leading-none tracking-tighter text-brand-950 tabular-nums">
+              {resumo.hoje}
+            </p>
+            <p className="mt-2 max-w-xs text-sm font-semibold text-brand-950/75">
+              {resumo.hoje === 0
+                ? "Nenhuma família ainda hoje. A lista abaixo atualiza sozinha."
+                : resumo.hoje === 1
+                  ? "Uma família pediu contato hoje."
+                  : `${resumo.hoje} famílias pediram contato hoje.`}
+            </p>
+          </div>
 
-        {!integracaoConfigurada ? (
-          <p className="mt-6 rounded-xl bg-gold-100 p-4 text-sm text-brand-900">
-            A integração com o Sevenbee ainda não foi configurada. Defina{" "}
-            <code className="font-bold">SEVENBEE_TOKEN</code> no servidor para os
-            leads serem enviados automaticamente como contatos.
-          </p>
-        ) : null}
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-3 gap-3">
+              {contexto.map((c) => (
+                <div
+                  key={c.rotulo}
+                  className="rounded-2xl border border-line bg-surface px-4 py-4"
+                >
+                  <p className="text-[11px] font-extrabold uppercase tracking-[0.15em] text-muted-foreground">
+                    {c.rotulo}
+                  </p>
+                  <p className="mt-1 text-3xl font-extrabold tracking-tighter text-brand-950 tabular-nums">
+                    {c.valor}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Só aparece quando existe: aviso permanente vira paisagem
+                e ninguém mais lê. */}
+            {naFila > 0 ? (
+              <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-amber-300/70 bg-amber-50 px-4 py-3">
+                <TriangleAlert aria-hidden className="size-5 shrink-0 text-amber-600" />
+                <p className="text-sm font-semibold text-amber-900">
+                  <strong className="font-extrabold">{naFila}</strong>{" "}
+                  {naFila === 1 ? "lead ainda não chegou" : "leads ainda não chegaram"}{" "}
+                  ao sistema de atendimento.
+                </p>
+                {integracaoConfigurada ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={reenviando === "todos"}
+                    onClick={reenviarTodos}
+                    className="ml-auto h-8 rounded-full border-amber-400 bg-white text-xs font-bold text-amber-900 hover:bg-amber-100"
+                  >
+                    <RefreshCw aria-hidden className="size-3.5" />
+                    {reenviando === "todos" ? "Reprocessando..." : "Reenviar todos"}
+                  </Button>
+                ) : null}
+              </div>
+            ) : null}
+
+            {!integracaoConfigurada ? (
+              <p className="rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-muted-foreground">
+                A integração com o Sevenbee ainda não foi configurada. Defina{" "}
+                <code className="font-bold text-brand-950">SEVENBEE_TOKEN</code>{" "}
+                no servidor para os leads virarem contatos automaticamente.
+              </p>
+            ) : null}
+          </div>
+        </div>
         {aviso ? (
           <p className="mt-6 rounded-xl bg-red-50 p-4 text-sm font-medium text-red-800">
             {aviso}
@@ -372,10 +438,10 @@ export default function PainelLeads({
                 type="button"
                 onClick={() => aplicarFiltro(filtroRegiao, f.valor)}
                 className={cn(
-                  "h-9 rounded-full px-4 text-sm font-bold transition-colors",
+                  "h-9 rounded-full px-4 text-sm font-bold transition-colors duration-150 cursor-pointer",
                   filtroStatus === f.valor
-                    ? "bg-brand-700 text-white"
-                    : "border border-line bg-surface text-brand-900 hover:bg-brand-50",
+                    ? "bg-brand-950 text-white"
+                    : "border border-line bg-surface text-brand-900 hover:border-brand-300 hover:bg-brand-50",
                 )}
               >
                 {f.rotulo}
@@ -385,7 +451,7 @@ export default function PainelLeads({
           <select
             value={filtroRegiao}
             onChange={(e) => aplicarFiltro(e.target.value, filtroStatus)}
-            className="h-9 rounded-full border border-line bg-surface px-4 text-sm font-bold text-brand-900"
+            className="h-9 cursor-pointer rounded-full border border-line bg-surface px-4 text-sm font-bold text-brand-900 transition-colors duration-150 hover:border-brand-300"
             aria-label="Filtrar por região"
           >
             <option value="">Todas as regiões</option>
@@ -395,26 +461,16 @@ export default function PainelLeads({
               </option>
             ))}
           </select>
-          {integracaoConfigurada && resumo.pendentes + resumo.falhas > 0 ? (
-            <Button
-              variant="outline"
-              disabled={reenviando === "todos"}
-              onClick={reenviarTodos}
-              className="ml-auto h-9 rounded-full text-sm font-bold"
-            >
-              <RefreshCw aria-hidden className="size-4" />
-              {reenviando === "todos"
-                ? "Reprocessando..."
-                : `Reenviar todos (${resumo.pendentes + resumo.falhas})`}
-            </Button>
-          ) : null}
+          <p className="ml-auto text-sm text-muted-foreground">
+            {leads.length} lead{leads.length === 1 ? "" : "s"}
+          </p>
         </div>
 
         {/* Tabela */}
-        <div className="mt-4 overflow-x-auto rounded-2xl border border-line bg-surface shadow-card">
+        <div className="mt-4 hidden overflow-x-auto rounded-2xl border border-line bg-surface md:block">
           <table className="w-full min-w-[1000px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-line text-xs font-bold uppercase tracking-widest text-muted-foreground">
+            <thead className="sticky top-0 z-10 bg-surface">
+              <tr className="border-b border-line text-[11px] font-extrabold uppercase tracking-[0.15em] text-muted-foreground">
                 <th className="px-4 py-3">Data</th>
                 <th className="px-4 py-3">Nome</th>
                 <th className="px-4 py-3">WhatsApp</th>
@@ -507,30 +563,8 @@ export default function PainelLeads({
                     </td>
                     <td className="whitespace-nowrap px-4 py-3">
                       <BadgeAtendimento status={l.atendimento_status} />
-                      {l.atendente_nome ? (
-                        <span className="mt-1 block text-xs text-muted-foreground">
-                          com {l.atendente_nome}
-                        </span>
-                      ) : null}
                     </td>
                     <td className="whitespace-nowrap px-4 py-3 text-right">
-                      {/* Reservar o atendimento. Quem decide é o banco:
-                          o segundo clique volta com o nome de quem
-                          chegou primeiro, e ninguém manda mensagem
-                          dobrada para a família. */}
-                      {ligado && !l.atendente_id ? (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            atender(l);
-                          }}
-                          className="mr-2 h-8 rounded-full text-xs font-bold"
-                        >
-                          <Hand aria-hidden className="size-3" /> Atender
-                        </Button>
-                      ) : null}
                       {integracaoConfigurada &&
                       l.webhook_status !== "enviado" ? (
                         <Button
@@ -553,10 +587,86 @@ export default function PainelLeads({
             </tbody>
           </table>
         </div>
-        <p className="mt-3 text-xs text-muted-foreground">
-          Mostrando {leads.length} lead{leads.length === 1 ? "" : "s"}
-          {filtroRegiao || filtroStatus ? " com os filtros aplicados" : ""}.
-        </p>
+        {/* Celular: cartão no lugar da tabela.
+            Tabela de oito colunas em tela de 390px vira rolagem lateral,
+            e coordenação vai abrir isto no telefone o tempo todo. O que
+            sobra aqui é o que decide a ação: quem é, de onde, e o botão
+            de falar no WhatsApp. */}
+        <ul className="mt-4 flex flex-col gap-3 md:hidden">
+          {leads.length === 0 ? (
+            <li className="rounded-2xl border border-line bg-surface px-4 py-10 text-center text-sm text-muted-foreground">
+              Nenhum lead por aqui ainda. Assim que alguém preencher o
+              formulário, ele aparece nesta lista.
+            </li>
+          ) : (
+            leads.map((l) => (
+              <li
+                key={l.id}
+                className={cn(
+                  "rounded-2xl border border-line bg-surface p-4 transition-colors duration-150",
+                  novos.has(l.id) && "border-gold-400 bg-gold-100/70",
+                )}
+              >
+                {/* Botão só na parte de texto: link dentro de botão é HTML
+                    inválido e confunde leitor de tela e teclado. O
+                    WhatsApp fica fora, como link de verdade. */}
+                <button
+                  type="button"
+                  onClick={() => setSelecionado(l)}
+                  className="w-full text-left active:opacity-80"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-extrabold text-brand-950">
+                        {l.nome}
+                      </p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {nomeRegiao.get(l.estado) ?? l.estado}
+                        {" · "}
+                        <span suppressHydrationWarning>
+                          {formatarData(l.criado_em)}
+                        </span>
+                      </p>
+                    </div>
+                    <BadgeAtendimento status={l.atendimento_status} />
+                  </div>
+
+                  {l.escola || l.nivel ? (
+                    <p className="mt-3 text-sm text-brand-900">
+                      {l.escola || "Escola não informada"}
+                      {l.nivel ? (
+                        <span className="block text-xs text-muted-foreground">
+                          {l.nivel}
+                        </span>
+                      ) : null}
+                    </p>
+                  ) : null}
+
+                </button>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  {/* Alvo de toque com folga: 44px é o mínimo para o
+                      dedo não errar e ligar para a família errada. */}
+                  <a
+                    href={`https://wa.me/55${l.whatsapp.replace(/\D/g, "")}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex h-11 items-center gap-2 rounded-full bg-emerald-600 px-4 text-sm font-bold text-white transition-colors duration-150 active:bg-emerald-700"
+                  >
+                    <MessageCircle aria-hidden className="size-4" />
+                    {l.whatsapp}
+                  </a>
+                  <BadgeStatus status={l.webhook_status} />
+                </div>
+              </li>
+            ))
+          )}
+        </ul>
+
+        {filtroRegiao || filtroStatus ? (
+          <p className="mt-3 text-xs text-muted-foreground">
+            Com os filtros aplicados.
+          </p>
+        ) : null}
       </div>
 
       {/* Rodapé */}

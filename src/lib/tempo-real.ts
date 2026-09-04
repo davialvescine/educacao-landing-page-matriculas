@@ -16,8 +16,10 @@ import type { LeadRegistro } from "@/lib/leads";
  *
  * Se o serviço estiver fora do ar, `ligado` fica falso e o painel volta a
  * ser o que era: lista do servidor mais o botão Atualizar. Nada quebra —
- * tempo real aqui é conforto, e a garantia contra atendimento duplicado
- * está no banco, não neste arquivo.
+ * tempo real aqui é conforto.
+ *
+ * O atendimento é conduzido no Sevenbee, não aqui. O que este arquivo
+ * mostra é presença: quem está olhando o quê, agora.
  *
  * O endereço vem por parâmetro, do componente de servidor, e não de
  * `NEXT_PUBLIC_*`: variável pública é resolvida no BUILD. Definida só
@@ -66,6 +68,20 @@ export function useTempoReal(iniciais: LeadRegistro[], url: string) {
   const [olhares, setOlhares] = useState<Record<string, Olhar[]>>({});
   const [novos, setNovos] = useState<Set<string>>(new Set());
   const socket = useRef<Socket | null>(null);
+  const recarga = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /** Recarrega uma vez só, com atraso sorteado, mesmo que o pedido
+   *  chegue várias vezes seguidas. */
+  const agendarRecarga = useCallback(() => {
+    if (recarga.current) return;
+    recarga.current = setTimeout(
+      () => {
+        recarga.current = null;
+        router.refresh();
+      },
+      Math.random() * 4000,
+    );
+  }, [router]);
 
   // Nova renderização do servidor (filtro trocado, botão Atualizar):
   // manda na lista. O que veio por socket já está gravado no banco, então
@@ -101,7 +117,7 @@ export function useTempoReal(iniciais: LeadRegistro[], url: string) {
       // o que chegou, então busca de novo. Ignorar deixaria a tela
       // mostrando um passado com cara de presente.
       if (aviso.acao === "recarregar") {
-        router.refresh();
+        agendarRecarga();
         return;
       }
       if (aviso.acao === "delete") {
@@ -123,7 +139,18 @@ export function useTempoReal(iniciais: LeadRegistro[], url: string) {
     // A escuta do banco caiu e voltou. O que aconteceu no intervalo não
     // volta — o Postgres não guarda notificação — então a lista inteira
     // é buscada de novo.
-    s.on("recarregar", () => router.refresh());
+    //
+    // Com atraso sorteado: o aviso chega a todas as abas no mesmo
+    // instante, e vinte recarregando juntas viram uma rajada de
+    // consultas em cima do banco que acabou de voltar. Espalhar em
+    // alguns segundos custa nada a quem olha e evita derrubar de novo o
+    // que estava se recuperando.
+    s.on("recarregar", () => agendarRecarga());
+
+    // Reconexão da PRÓPRIA aba: o serviço pode ter reiniciado, ou a
+    // rede caiu. De um jeito ou de outro, o que aconteceu enquanto ela
+    // esteve fora não chega — então ela também precisa buscar de novo.
+    s.io.on("reconnect", () => agendarRecarga());
 
     s.on("presenca", (pessoas: Presente[]) => setPresenca(pessoas ?? []));
 
@@ -139,8 +166,9 @@ export function useTempoReal(iniciais: LeadRegistro[], url: string) {
     return () => {
       s.close();
       socket.current = null;
+      if (recarga.current) clearTimeout(recarga.current);
     };
-  }, [url, router]);
+  }, [url, router, agendarRecarga]);
 
   /** Avisa que estou neste lead. É o que aparece para os outros antes de
    *  qualquer clique — e é o que de fato evita duas mensagens à família. */
@@ -152,18 +180,6 @@ export function useTempoReal(iniciais: LeadRegistro[], url: string) {
     socket.current?.emit("lead:largou");
   }, []);
 
-  /** Pede o atendimento. Quem decide é o banco: o segundo pedido volta
-   *  com `pego: false` e o nome de quem chegou primeiro. */
-  const pegar = useCallback(
-    (leadId: string) =>
-      new Promise<{ pego: boolean; de?: string; erro?: boolean }>((ok) => {
-        const s = socket.current;
-        if (!s?.connected) return ok({ pego: false, erro: true });
-        s.emit("lead:pegar", leadId, ok);
-      }),
-    [],
-  );
-
   const marcarVisto = useCallback((leadId: string) => {
     setNovos((n) => {
       if (!n.has(leadId)) return n;
@@ -173,5 +189,5 @@ export function useTempoReal(iniciais: LeadRegistro[], url: string) {
     });
   }, []);
 
-  return { leads, ligado, presenca, olhares, novos, olhar, largar, pegar, marcarVisto };
+  return { leads, ligado, presenca, olhares, novos, olhar, largar, marcarVisto };
 }

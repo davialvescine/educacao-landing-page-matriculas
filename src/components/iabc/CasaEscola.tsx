@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { BedDouble, GraduationCap, Users } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+gsap.registerPlugin(ScrollTrigger);
 
 export interface FotoCampus {
   src: string;
@@ -58,10 +58,7 @@ export default function CasaEscola({ fotos }: { fotos: FotoCampus[] }) {
       gsap.set(alvo.querySelectorAll(".casa-fade"), { opacity: 0 });
 
       // O título se monta linha a linha; os parágrafos vêm depois, atrás.
-      const linhas = new SplitText(titulo, {
-        type: "lines",
-        linesClass: "casa-linha",
-      });
+      const linhas = gsap.utils.toArray<HTMLElement>(".casa-linha", alvo);
 
       gsap
         .timeline({
@@ -71,9 +68,20 @@ export default function CasaEscola({ fotos }: { fotos: FotoCampus[] }) {
             // invisível quando a página abre já rolada, vinda de uma âncora.
             start: "top 92%",
             once: true,
+            // A rede de segurança conta a partir DAQUI, e não do
+            // carregamento: a animação começa quando a seção entra na
+            // tela, e uma rede que já tinha disparado antes disso não
+            // protege nada. Em aba de segundo plano o rAF congela com o
+            // texto no meio do caminho — este prazo o destrava.
+            onEnter: () => {
+              window.setTimeout(() => {
+                gsap.set(alvo.querySelectorAll(".casa-fade"), { opacity: 1, y: 0 });
+                gsap.set(linhas, { yPercent: 0 });
+              }, 1500);
+            },
           },
         })
-        .from(linhas.lines, {
+        .from(linhas, {
           yPercent: 118,
           duration: 0.85,
           ease: "power3.out",
@@ -92,7 +100,6 @@ export default function CasaEscola({ fotos }: { fotos: FotoCampus[] }) {
           "-=0.45",
         );
 
-      return () => linhas.revert();
     }, alvo);
 
     // As fotos mudam a altura da página depois de carregar; sem recalcular,
@@ -104,7 +111,7 @@ export default function CasaEscola({ fotos }: { fotos: FotoCampus[] }) {
     // o texto aparece mesmo assim. Conteúdo invisível é pior que sem animação.
     const destravar = window.setTimeout(() => {
       gsap.set(alvo.querySelectorAll(".casa-fade"), { opacity: 1, y: 0 });
-      gsap.set(alvo.querySelectorAll(".casa-linha > *"), { yPercent: 0 });
+      gsap.set(alvo.querySelectorAll(".casa-linha"), { yPercent: 0 });
     }, 2500);
 
     return () => {
@@ -118,38 +125,84 @@ export default function CasaEscola({ fotos }: { fotos: FotoCampus[] }) {
     <section id="o-campus" ref={secao} className="scroll-mt-10 bg-paper">
       <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:gap-20 lg:py-32">
         <div>
-          <h2 className="casa-titulo text-3xl font-extrabold leading-[1.08] tracking-tighter text-brand-950 sm:text-5xl [&_.casa-linha]:overflow-hidden [&_.casa-linha]:pb-[0.12em]">
-            A casa e a escola
-            <br />
-            no mesmo lugar
+          <p className="casa-fade text-xs font-extrabold uppercase tracking-[0.24em] text-gold-600">
+            Por que internato
+          </p>
+          <h2 className="casa-titulo mt-4 text-3xl font-extrabold leading-[1.08] tracking-tighter text-brand-950 sm:text-5xl">
+            {/* Linhas marcadas à mão, não fatiadas pelo SplitText: ele
+                tropeçava no <br> e a caixa do título ficava com a altura
+                de uma linha só — o parágrafo subia por cima da segunda. */}
+            <span className="block overflow-hidden pb-[0.12em]">
+              <span className="casa-linha block">A casa e a escola</span>
+            </span>
+            <span className="block overflow-hidden pb-[0.12em]">
+              <span className="casa-linha block">no mesmo lugar</span>
+            </span>
           </h2>
-          <div className="mt-7 flex max-w-xl flex-col gap-5 text-lg leading-relaxed text-muted-foreground">
-            <p className="casa-fade">
-              O IABC reúne num só lugar uma estrutura de ponta, educação de
-              excelência e uma infraestrutura de internato na qual os alunos se
-              sentem confortáveis e em casa.
-            </p>
-            <p className="casa-fade">
-              Sem trânsito entre a aula e o treino, sem depender de carona para
-              a atividade da tarde. O tempo que se perde no deslocamento vira
-              estudo, esporte e convivência.
-            </p>
-          </div>
-          <dl className="casa-fade mt-10 grid max-w-lg grid-cols-2 gap-x-6 gap-y-7 border-t border-line pt-8">
-            <div>
-              <dt className="text-sm font-semibold text-muted-foreground">
-                Etapas atendidas
-              </dt>
-              <dd className="mt-1 text-lg font-extrabold tracking-tight text-brand-950">
-                Da Educação Infantil ao Ensino Médio
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm font-semibold text-muted-foreground">
+          <p className="casa-fade mt-6 max-w-xl text-xl leading-relaxed text-brand-950">
+            O tempo que se perde no deslocamento vira{" "}
+            <span className="font-extrabold">estudo, esporte e convivência</span>.
+          </p>
+
+          {/* Três provas em vez de dois parágrafos: a família lê em
+              varredura, e cada uma responde a uma pergunta que ela já
+              trouxe de casa. */}
+          <ul className="mt-9 flex flex-col divide-y divide-line border-y border-line">
+            {[
+              {
+                Icone: BedDouble,
+                titulo: "Dormitório e refeitório no campus",
+                texto: "Sem trânsito entre a aula e o treino, sem depender de carona para a atividade da tarde.",
+              },
+              {
+                Icone: GraduationCap,
+                titulo: "Da Educação Infantil ao Ensino Médio",
+                texto: "Uma estrutura de ponta com o material didático próprio da rede e professores que conhecem o aluno pelo nome.",
+              },
+              {
+                Icone: Users,
+                titulo: "Gente cuidando o dia inteiro",
+                texto: "Equipe responsável pelos alunos fora da sala, com rotina definida e acompanhamento diário.",
+              },
+            ].map(({ Icone, titulo, texto }, i) => (
+              <li key={titulo} className="casa-fade flex gap-5 py-5">
+                <span className="mt-0.5 flex size-11 shrink-0 items-center justify-center rounded-full bg-gold-100 text-gold-700">
+                  <Icone aria-hidden className="size-5" />
+                </span>
+                <div>
+                  <p className="flex items-baseline gap-3 text-lg font-extrabold tracking-tight text-brand-950">
+                    <span className="text-xs font-extrabold tabular-nums text-gold-600">
+                      0{i + 1}
+                    </span>
+                    {titulo}
+                  </p>
+                  <p className="mt-1 leading-relaxed text-muted-foreground">{texto}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <dl className="casa-fade mt-8 grid max-w-lg grid-cols-2 gap-4">
+            <div className="rounded-2xl bg-gold-400 px-5 py-4">
+              <dt className="text-[11px] font-extrabold uppercase tracking-[0.15em] text-brand-950/70">
                 Onde fica
               </dt>
-              <dd className="mt-1 text-lg font-extrabold tracking-tight text-brand-950">
-                Abadiânia, a 100 km de Brasília e de Goiânia
+              <dd className="mt-1 text-lg font-extrabold leading-tight tracking-tight text-brand-950">
+                Abadiânia, GO
+              </dd>
+              <dd className="mt-0.5 text-sm text-brand-950/70">
+                100 km de Brasília e de Goiânia
+              </dd>
+            </div>
+            <div className="rounded-2xl border border-line bg-surface px-5 py-4">
+              <dt className="text-[11px] font-extrabold uppercase tracking-[0.15em] text-muted-foreground">
+                Regime
+              </dt>
+              <dd className="mt-1 text-lg font-extrabold leading-tight tracking-tight text-brand-950">
+                Internato
+              </dd>
+              <dd className="mt-0.5 text-sm text-muted-foreground">
+                escola e moradia no campus
               </dd>
             </div>
           </dl>

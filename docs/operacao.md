@@ -69,13 +69,34 @@ aberto não vira PR.
 Container do Next (standalone) e container do tempo real, os dois no
 Coolify, contra o mesmo Postgres. O `docker-compose.yml` tem os dois.
 
-Tarefa agendada a cadastrar no Coolify, a cada 10 minutos:
+Duas tarefas agendadas a cadastrar no Coolify:
 
 ```
+# a cada 10 min — reprocessa lead que falhou ao ir para o Sevenbee
 curl -fsS "https://<dominio>/api/tarefas/reenviar-falhas?segredo=$CRON_SEGREDO"
+
+# todo dia de manhã — relatório do mês que fechou, por e-mail
+curl -fsS -X POST -H "Authorization: Bearer $CRON_SEGREDO" \
+     "https://<dominio>/api/tarefas/relatorio-mensal"
 ```
 
-É ela que reprocessa lead que falhou ao ir para o Sevenbee.
+O segredo vai **só** no cabeçalho: URL fica em histórico de shell e em
+log de acesso.
+
+A segunda roda **todo dia** de propósito. A regra dela não é "hoje é o
+dia X": é "há alguém sem o oficial deste mês, e estamos entre o primeiro
+dia útil e o dia 7". Servidor fora no dia 1, sai no dia 2; dez de vinte
+falharam, os dez saem no dia seguinte; todo mundo recebeu, ela não faz
+nada até o mês que vem. Qualquer falha responde **500** — é o que o
+`-f` do curl e o monitor do Coolify enxergam.
+
+Para conferir o layout antes do primeiro fechamento, sem esperar a data
+e **sem consumir a vez oficial** de ninguém:
+
+```
+curl -fsS -X POST -H "Authorization: Bearer $CRON_SEGREDO" \
+     "https://<dominio>/api/tarefas/relatorio-mensal?teste=1&ano=2026&mes=9"
+```
 
 ---
 
@@ -94,10 +115,10 @@ continuam entrando, e a tela volta a depender do botão Atualizar.
 não houver nem tentativa registrada, o problema é antes: `BETTER_AUTH_URL`
 diferente do domínio real derruba o cookie de sessão.
 
-**Uma família reclama de dois contatos.** Confira `atendente_id` e
-`atendente_nome` no lead. Se estiverem vazios com o atendimento já em
-curso, o lead foi trabalhado direto no Sevenbee, sem passar pelo painel —
-o dono só é gravado por quem clica em atender aqui.
+**Uma família reclama de dois contatos.** O atendimento é conduzido no
+Sevenbee, e é lá que se vê quem falou com quem. O painel só ajuda a
+prevenir: com o tempo real ligado, cada coordenação vê quem mais está
+olhando o mesmo lead antes de abrir a conversa.
 
 **Alguém questiona um consentimento.** A prova está em `consentimentos`,
 por `lead_id`: versão, data, IP e o resumo criptográfico. `intacto`

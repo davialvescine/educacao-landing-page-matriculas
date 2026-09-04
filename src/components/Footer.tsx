@@ -44,14 +44,14 @@ export default function Footer() {
               </li>
             ))}
             <li>
-              <a
-                href={rede.iabc.site}
-                target="_blank"
-                rel="noopener noreferrer"
+              {/* A landing do internato é nossa: mandar para o site
+                  externo tirava a família do funil de matrícula. */}
+              <Link
+                href="/iabc"
                 className="transition-colors hover:text-primary-foreground"
               >
                 IABC · Internato
-              </a>
+              </Link>
             </li>
             <li>
               <Link
