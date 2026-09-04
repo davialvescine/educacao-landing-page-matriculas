@@ -158,10 +158,16 @@ export default function PoliticaPage() {
 
             <Secao titulo="Por quanto tempo guardamos">
               <p>
-                Enquanto a finalidade existir: o contato da matrícula e o
-                histórico de atendimento da sua família na rede. O prazo exato
-                de descarte é{" "}
-                <Pendente>a união define: prazo de guarda por tipo de dado</Pendente>
+                Pelo tempo necessário à finalidade que os coletou: o contato da
+                matrícula e o histórico de atendimento da sua família na rede.
+                Não há um prazo fixo, e sim um critério — quando a finalidade
+                acaba, o dado sai.
+              </p>
+              <p>
+                Você pode pedir a exclusão ou a anonimização a qualquer
+                momento. A rede só mantém o que a lei mandar manter: registro
+                escolar obrigatório, defesa em processo judicial ou outra
+                obrigação legal.
               </p>
               <p>
                 O registro do seu consentimento é guardado separadamente e
