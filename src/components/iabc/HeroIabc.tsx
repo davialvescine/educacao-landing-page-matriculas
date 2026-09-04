@@ -42,6 +42,7 @@ export default function HeroIabc({
   const secao = useRef<HTMLElement>(null);
   const fundo = useRef<HTMLDivElement>(null);
   const [atual, setAtual] = useState(0);
+  const anterior = useRef(0);
 
   useEffect(() => {
     if (quadros.length < 2) return;
@@ -52,6 +53,37 @@ export default function HeroIabc({
     );
     return () => clearInterval(t);
   }, [quadros.length]);
+
+  // A foto nova entra por cortina, não por fade. O fade é a transição que
+  // todo carrossel faz; a cortina dá direção ao movimento e faz a troca
+  // parecer decisão, não desbotamento.
+  useEffect(() => {
+    const quadro = fundo.current?.querySelector<HTMLElement>(
+      `[data-quadro="${atual}"]`,
+    );
+    if (!quadro) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      gsap.set(quadro, { clipPath: "inset(0% 0% 0% 0%)", opacity: 1 });
+      return;
+    }
+    gsap.fromTo(
+      quadro,
+      { clipPath: "inset(0% 0% 0% 100%)" },
+      {
+        clipPath: "inset(0% 0% 0% 0%)",
+        duration: 1.15,
+        ease: "power3.inOut",
+      },
+    );
+  }, [atual]);
+
+  // Guarda quem estava no ar: é ela que fica embaixo durante a cortina.
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      anterior.current = atual;
+    }, 1200);
+    return () => window.clearTimeout(t);
+  }, [atual]);
 
   useEffect(() => {
     const alvo = secao.current;
@@ -113,37 +145,45 @@ export default function HeroIabc({
   return (
     <section
       ref={secao}
-      className="relative isolate min-h-[100dvh] overflow-hidden bg-brand-950"
+      className="relative isolate min-h-[100dvh] overflow-hidden bg-neutral-900"
     >
       <div ref={fundo} className="absolute inset-0 -z-10">
         {quadros.map((q, i) => (
-          <Image
+          <div
             key={q.src}
-            src={q.src}
-            alt={i === 0 ? q.alt : ""}
-            fill
-            priority={i === 0}
-            sizes="100vw"
+            data-quadro={i}
             aria-hidden={i !== atual}
-            className={`object-cover object-center transition-opacity duration-[1400ms] ease-out motion-reduce:transition-none ${
-              i === atual ? "opacity-100" : "opacity-0"
-            } ${i === atual ? "anim-respiro" : ""}`}
-          />
+            className="absolute inset-0"
+            style={{
+              // Ninguém some: a foto que sai continua no ar por baixo da
+              // cortina. Apagar a de baixo é o que deixava o fundo da
+              // seção aparecer por um instante, e era isso que piscava.
+              zIndex: i === atual ? 3 : i === anterior.current ? 2 : 1,
+              clipPath: i === atual ? undefined : "inset(0% 0% 0% 0%)",
+            }}
+          >
+            <Image
+              src={q.src}
+              alt={i === 0 ? q.alt : ""}
+              fill
+              priority={i === 0}
+              sizes="100vw"
+              className={`object-cover object-center ${i === atual ? "anim-respiro" : ""}`}
+            />
+          </div>
         ))}
       </div>
 
-      {/* Véu: a foto precisa continuar foto, e o texto precisa ser legível */}
+      {/* Véu neutro de propósito: navy por cima de foto de luz quente
+          esfria a imagem inteira e some com o fim de tarde. Preto em baixa
+          opacidade escurece sem tingir, e a foto continua com a cor dela. */}
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-gradient-to-t from-brand-950 via-brand-950/45 to-transparent"
+        className="absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/35 to-transparent"
       />
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-gradient-to-r from-brand-950/80 via-brand-950/25 to-transparent"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-x-0 top-0 -z-10 h-32 bg-gradient-to-b from-brand-950/60 to-transparent"
+        className="absolute inset-0 -z-10 bg-gradient-to-r from-black/70 via-black/15 to-transparent"
       />
 
       <div className="mx-auto flex min-h-[100dvh] max-w-7xl flex-col justify-end px-4 pb-16 pt-24 sm:px-6 lg:pb-24">
