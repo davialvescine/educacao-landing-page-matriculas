@@ -55,6 +55,73 @@ CREATE INDEX IF NOT EXISTS acessos_criado_em_idx ON acessos (criado_em DESC);
 -- e-mail na última hora". Sem índice, isso varre a tabela inteira.
 CREATE INDEX IF NOT EXISTS acessos_acao_idx ON acessos (acao, criado_em DESC);
 
+-- ============================================================
+-- Dono do lead
+--
+-- Duas coordenadoras da mesma região abrem o painel de manhã e veem o
+-- mesmo lead novo. Sem dono, as duas mandam mensagem e a família recebe
+-- dois "olá" da mesma escola. O campo abaixo, tomado por UPDATE
+-- condicional (WHERE atendente IS NULL), faz o segundo clique voltar sem
+-- linha afetada: quem chega depois é avisada, não duplica o contato.
+--
+-- Tempo real não substitui isto. Ele reduz a janela; a garantia é o banco.
+-- ============================================================
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS atendente_id text;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS atendente_nome text NOT NULL DEFAULT '';
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS atendente_em timestamptz;
+
+-- ============================================================
+-- Aviso de mudança para as telas abertas
+--
+-- O gatilho dispara em qualquer escrita, venha de onde vier: do
+-- formulário, do webhook do Sevenbee, da fila de reenvio ou de um UPDATE
+-- feito na mão no banco. Por isso ele mora aqui, e não na aplicação — a
+-- aplicação tem quatro caminhos de escrita e esqueceria um.
+--
+-- O serviço de tempo real escuta este canal e reparte para as telas,
+-- filtrando por região: coordenadora de Goiás não recebe lead do MT.
+--
+-- A carga do NOTIFY tem limite de 8000 bytes, então vão só os campos que
+-- a lista mostra. Quem precisar do resto busca.
+-- ============================================================
+CREATE OR REPLACE FUNCTION leads_avisar() RETURNS trigger AS $$
+DECLARE carga text;
+BEGIN
+  carga := json_build_object(
+    'acao', lower(TG_OP),
+    'lead', json_build_object(
+      'id', NEW.id,
+      'nome', NEW.nome,
+      'whatsapp', NEW.whatsapp,
+      'email', NEW.email,
+      'estado', NEW.estado,
+      'escola', NEW.escola,
+      'nivel', NEW.nivel,
+      'criado_em', NEW.criado_em,
+      'webhook_status', NEW.webhook_status,
+      'atendimento_status', NEW.atendimento_status,
+      'atendente_id', NEW.atendente_id,
+      'atendente_nome', NEW.atendente_nome
+    )
+  )::text;
+  -- Carga acima do limite do NOTIFY derrubaria a transação que gravou o
+  -- lead. Perder o aviso é aceitável; perder o lead não é.
+  IF length(carga) < 7900 THEN
+    PERFORM pg_notify('leads_mudou', carga);
+  ELSE
+    PERFORM pg_notify('leads_mudou',
+      json_build_object('acao', 'recarregar', 'lead',
+        json_build_object('id', NEW.id, 'estado', NEW.estado))::text);
+  END IF;
+  RETURN NULL; -- AFTER trigger: o retorno é ignorado
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS leads_avisar_trg ON leads;
+CREATE TRIGGER leads_avisar_trg
+  AFTER INSERT OR UPDATE ON leads
+  FOR EACH ROW EXECUTE FUNCTION leads_avisar();
+
 CREATE INDEX IF NOT EXISTS leads_estado_idx ON leads (estado);
 CREATE INDEX IF NOT EXISTS leads_criado_em_idx ON leads (criado_em DESC);
 CREATE INDEX IF NOT EXISTS leads_webhook_pendente_idx

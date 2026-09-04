@@ -73,6 +73,8 @@ const EXIGE_COLUNA = [
   "leads.cidade",
   "leads.utm",
   "leads.atendimento_status",
+  "leads.atendente_id",
+  "leads.atendente_nome",
   "acessos.ip",
   "acessos.agente",
   "consentimentos.metodo",
