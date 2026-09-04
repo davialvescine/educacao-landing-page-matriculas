@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
-import { getRegiaoLead } from "@/lib/rede";
+import { getEscola, getRegiaoLead } from "@/lib/rede";
+import { slugificar } from "@/lib/site";
 import { salvarLead, type LeadNovo } from "@/lib/leads";
 import { enviarLeadWebhook } from "@/lib/webhook";
+import { enviarConfirmacaoLead, type EscolaEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -28,6 +30,29 @@ function limparUtm(v: unknown): Record<string, string> | null {
     if (valor) utm[chave] = valor;
   }
   return Object.keys(utm).length ? utm : null;
+}
+
+/**
+ * Dados da escola escolhida para o e-mail de confirmação.
+ * A foto só entra quando a unidade tem imagem própria: 6 das 39 ainda
+ * reaproveitam a foto de outra escola, e mostrar o prédio errado é pior
+ * do que não mostrar prédio nenhum.
+ */
+function escolaDoEmail(
+  estadoSlug: string,
+  nomeEscola: string,
+): EscolaEmail | undefined {
+  if (!nomeEscola) return undefined;
+  const achado = getEscola(estadoSlug, slugificar(nomeEscola));
+  if (!achado) return { nome: nomeEscola, foto: null };
+
+  const { escola } = achado;
+  const propria = escola.foto && escola.foto_propria;
+  const arquivo = propria
+    ? `imagens/email/unidades/${escola.foto!.split("/").pop()!.replace(/\.png$/i, ".jpg")}`
+    : null;
+
+  return { nome: nomeEscola, foto: arquivo };
 }
 
 export async function POST(req: Request) {
@@ -79,6 +104,23 @@ export async function POST(req: Request) {
 
   // Dispara para o sistema externo depois de salvar: lead nunca se perde.
   await enviarLeadWebhook(id, lead);
+
+  // Confirmação para a família. Só sai se ela informou e-mail (campo opcional)
+  // e nunca derruba a resposta: falha de SMTP não pode custar uma matrícula.
+  if (lead.email) {
+    // A sigla da associação (ABC, APLAC...) não diz nada para a família:
+    // o e-mail fala pela região, do jeito que ela escolheu no formulário.
+    await enviarConfirmacaoLead({
+      para: lead.email,
+      nome: lead.nome,
+      equipe: estado.slug === "iabc" ? "do IABC" : `em ${estado.nome}`,
+      regiao: estado.nome,
+      whatsapp: estado.whatsapp.link,
+      telefone: lead.whatsapp,
+      nivel: lead.nivel,
+      escola: escolaDoEmail(estado.slug, lead.escola),
+    }).catch((e) => console.error("[leads] confirmação não enviada:", e));
+  }
 
   return NextResponse.json({ ok: true, id });
 }

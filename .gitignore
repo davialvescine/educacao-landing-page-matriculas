@@ -40,3 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 var/
+
+# skills de terceiros instaladas por `npx skills add` (código vendorizado).
+# O skills-lock.json fica versionado: é o que permite reinstalar.
+.agents/
+.claude/skills/*
+!.claude/skills/ui-ux-pro-max

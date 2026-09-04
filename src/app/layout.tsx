@@ -44,14 +44,7 @@ export const metadata: Metadata = {
     title: `${SITE_NOME} | Matrículas Abertas 2027`,
     description:
       "39 escolas particulares cristãs no Centro-Oeste, da Educação Infantil ao Ensino Médio. 130 anos educando gerações com valores pra vida.",
-    images: [
-      {
-        url: "/imagens/campanha/hero-bg.jpg",
-        width: 2560,
-        height: 1440,
-        alt: "Educação Adventista Centro-Oeste: Matrículas Abertas",
-      },
-    ],
+    // A imagem vem de src/app/opengraph-image.tsx, herdada por todas as rotas.
   },
   twitter: {
     card: "summary_large_image",
